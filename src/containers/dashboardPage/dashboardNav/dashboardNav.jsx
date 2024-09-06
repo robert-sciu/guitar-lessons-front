@@ -1,8 +1,17 @@
 import { useTranslation, I18nextProvider } from "react-i18next";
 import i18n from "../../../../config/i18n";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logoutUser } from "../../../store/authSlice";
 
 export default function DashboardNav() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  function handleLogout(e) {
+    e.preventDefault();
+    dispatch(logoutUser());
+    navigate("/");
+  }
   const { t } = useTranslation();
   return (
     <div>
@@ -29,6 +38,7 @@ export default function DashboardNav() {
             <li>
               <NavLink>{t("dashboardNav.payments")}</NavLink>
             </li>
+            <button onClick={handleLogout}>{t("dashboardNav.logout")}</button>
           </ul>
         </I18nextProvider>
       </div>

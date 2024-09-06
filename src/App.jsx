@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Suspense } from "react";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.scss";
+import { useDispatch } from "react-redux";
+import { verifyStoredToken } from "./store/authSlice";
 
 const LazyMainNav = React.lazy(() =>
   import("./containers/mainPage/mainNav/mainNav")
@@ -27,6 +29,13 @@ const LazyAvailableTasksPage = React.lazy(() =>
   )
 );
 function App() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      dispatch(verifyStoredToken({ token }));
+    }
+  });
   return (
     <BrowserRouter>
       <Routes>

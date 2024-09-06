@@ -26,11 +26,11 @@ apiClient.interceptors.request.use(
 const refreshAccessToken = async () => {
   try {
     const response = await axios.post(
-      `${api_url}login/refreshToken`,
+      `${api_url}/auth/refreshToken`,
       {},
       { withCredentials: true }
     );
-    const { token } = response.data;
+    const { token } = response.data.data;
     localStorage.setItem("access_token", token);
     return token;
   } catch (error) {

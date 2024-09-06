@@ -10,8 +10,7 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post("/login", { email, password });
-      console.log(response);
+      const response = await apiClient.post("/auth/login", { email, password });
       const { token } = response.data.data;
       localStorage.setItem("access_token", token);
       return token;
@@ -21,9 +20,27 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+export const verifyStoredToken = createAsyncThunk(
+  "auth/verifyStoredToken",
+  async ({ token }, { rejectWithValue }) => {
+    try {
+      if (token) {
+        const response = await apiClient.post("/auth/verifyToken", { token });
+        if (response.status === 200) {
+          return token;
+        }
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 // Async thunk for user logout
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
   localStorage.removeItem("access_token");
+  await apiClient.post("/auth/logout");
+  return null;
 });
 
 const authSlice = createSlice({
@@ -50,6 +67,19 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.token = null;
       })
+      .addCase(verifyStoredToken.pending, (state) => {
+        managePendingState(state);
+      })
+      .addCase(verifyStoredToken.fulfilled, (state, action) => {
+        manageFulfilledState(state);
+        state.isAuthenticated = true;
+        state.token = action.payload;
+      })
+      .addCase(verifyStoredToken.rejected, (state) => {
+        manageRejectedState(state);
+        state.isAuthenticated = false;
+        state.token = null;
+      })
       .addCase(logoutUser.pending, (state) => {
         managePendingState(state);
       })
@@ -61,6 +91,7 @@ const authSlice = createSlice({
   },
 });
 
-export const selectToken = (state) => state.auth.token;
+export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
+export const selectIsLoading = (state) => state.auth.isLoading;
 
 export default authSlice.reducer;
