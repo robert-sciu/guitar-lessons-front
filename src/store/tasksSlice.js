@@ -22,6 +22,7 @@ const tasksSlice = createSlice({
   name: "tasks",
   initialState: {
     isLoading: false,
+    fetchComplete: false,
     hasError: false,
     tasks: [],
   },
@@ -33,6 +34,7 @@ const tasksSlice = createSlice({
     builder.addCase(fetchAvailableTasks.fulfilled, (state, action) => {
       manageFulfilledState(state);
       state.tasks = action.payload;
+      state.fetchComplete = true;
     });
     builder.addCase(fetchAvailableTasks.rejected, (state) => {
       manageRejectedState(state);
@@ -43,5 +45,6 @@ const tasksSlice = createSlice({
 
 export const selectAvailableTasks = (state) => state.tasks.tasks;
 export const selectIsLoadingTasks = (state) => state.tasks.isLoading;
+export const selectFetchComplete = (state) => state.tasks.fetchComplete;
 
 export default tasksSlice.reducer;

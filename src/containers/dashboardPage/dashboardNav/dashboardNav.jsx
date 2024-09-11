@@ -1,17 +1,24 @@
 import { useTranslation, I18nextProvider } from "react-i18next";
 import i18n from "../../../../config/i18n";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { logoutUser } from "../../../store/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser, selectIsAuthenticated } from "../../../store/authSlice";
+import { useEffect } from "react";
 
 export default function DashboardNav() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   function handleLogout(e) {
     e.preventDefault();
     dispatch(logoutUser());
     navigate("/");
   }
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  });
   const { t } = useTranslation();
   return (
     <div>
@@ -33,7 +40,9 @@ export default function DashboardNav() {
               <NavLink>{t("dashboardNav.completedTasks")}</NavLink>
             </li>
             <li>
-              <NavLink>{t("dashboardNav.calendar")}</NavLink>
+              <NavLink to="/dashboard/calendar">
+                {t("dashboardNav.calendar")}
+              </NavLink>
             </li>
             <li>
               <NavLink>{t("dashboardNav.payments")}</NavLink>

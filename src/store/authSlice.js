@@ -5,6 +5,7 @@ import {
   managePendingState,
   manageRejectedState,
 } from "../utilities/reduxUtilities";
+import store from ".";
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
@@ -40,6 +41,7 @@ export const verifyStoredToken = createAsyncThunk(
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
   localStorage.removeItem("access_token");
   await apiClient.post("/auth/logout");
+  store.dispatch(clearToken());
   return null;
 });
 
@@ -49,9 +51,16 @@ const authSlice = createSlice({
     isLoading: false,
     hasError: false,
     isAuthenticated: false,
-    token: null,
+    token: localStorage.getItem("access_token"),
   },
-  reducers: {},
+  reducers: {
+    setToken: (state, action) => {
+      state.token = action.payload;
+    },
+    clearToken: (state) => {
+      state.token = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
@@ -65,15 +74,13 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state) => {
         manageRejectedState(state);
         state.isAuthenticated = false;
-        state.token = null;
       })
       .addCase(verifyStoredToken.pending, (state) => {
         managePendingState(state);
       })
-      .addCase(verifyStoredToken.fulfilled, (state, action) => {
+      .addCase(verifyStoredToken.fulfilled, (state) => {
         manageFulfilledState(state);
         state.isAuthenticated = true;
-        state.token = action.payload;
       })
       .addCase(verifyStoredToken.rejected, (state) => {
         manageRejectedState(state);
@@ -93,5 +100,8 @@ const authSlice = createSlice({
 
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectIsLoading = (state) => state.auth.isLoading;
+export const selectToken = (state) => state.auth.token;
+
+export const { setToken, clearToken } = authSlice.actions;
 
 export default authSlice.reducer;

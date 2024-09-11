@@ -17,7 +17,7 @@ const LazyLoginForm = React.lazy(() =>
 const LazyDashboardNav = React.lazy(() =>
   import("./containers/dashboardPage/dashboardNav/dashboardNav")
 );
-const LazyDashboardWelcomePaqge = React.lazy(() =>
+const LazyDashboardWelcomePage = React.lazy(() =>
   import("./containers/dashboardPage/dashboardMainPage/dashboardWelcomePage")
 );
 const LazyDashboardTasksPage = React.lazy(() =>
@@ -28,6 +28,10 @@ const LazyAvailableTasksPage = React.lazy(() =>
     "./containers/dashboardPage/dashboardAvailableTasks/dashboardAvailableTasksPage"
   )
 );
+const LazyCalendarPage = React.lazy(() =>
+  import("./containers/dashboardPage/calendar/calendar")
+);
+
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -68,7 +72,7 @@ function App() {
             index
             element={
               <Suspense fallback={<div>Loading...</div>}>
-                <LazyDashboardWelcomePaqge />
+                <LazyDashboardWelcomePage />
               </Suspense>
             }
           />
@@ -86,6 +90,15 @@ function App() {
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <LazyAvailableTasksPage />
+              </Suspense>
+            }
+          />
+
+          <Route
+            path="/dashboard/calendar"
+            element={
+              <Suspense fallback={<div>Loading...</div>}>
+                <LazyCalendarPage />
               </Suspense>
             }
           />
