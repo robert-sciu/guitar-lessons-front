@@ -1,21 +1,26 @@
+import { useSelector } from "react-redux";
 import CalendarDay from "../calendarDay/calendarDay";
+import { selectDates } from "../../../../store/calendarSlice";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 export default function CalendarWeek() {
-  const daysArray = Array.from({ length: 7 }, (_, i) => i);
+  const days = Object.values(useSelector(selectDates));
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        width: "100%",
-        justifyContent: "center",
-      }}
-    >
-      {daysArray.map((day) => (
-        <div key={day}>
-          <CalendarDay />
-        </div>
-      ))}
-    </div>
+    <DndProvider backend={HTML5Backend}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "center",
+        }}
+      >
+        {/* <CalendarDay isLabel={true} /> */}
+        {days.map((day) => (
+          <CalendarDay key={day.date} dayData={day} />
+        ))}
+      </div>
+    </DndProvider>
   );
 }
