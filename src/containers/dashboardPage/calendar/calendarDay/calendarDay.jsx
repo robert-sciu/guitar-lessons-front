@@ -26,11 +26,24 @@ export default function CalendarDay({ dayData }) {
 
   return (
     <div>
-      <p>{date}</p>
-      <p>{t(`daysOfTheWeek.${weekday}`)}</p>
+      <p
+        style={{
+          color: isCurrentDay ? "green" : "black",
+          fontWeight: isCurrentDay ? "bold" : "normal",
+        }}
+      >
+        {date}
+      </p>
+      <p
+        style={{
+          color: isCurrentDay ? "green" : "black",
+          fontWeight: isCurrentDay ? "bold" : "normal",
+        }}
+      >
+        {t(`daysOfTheWeek.${weekday}`)}
+      </p>
       <div
         style={{
-          border: isCurrentDay ? "1px solid green" : "none",
           width: "100px",
         }}
       >
@@ -46,15 +59,17 @@ export default function CalendarDay({ dayData }) {
                 key={hourData[0]}
               >
                 <CalendarHalfHourBlock
+                  id={`${weekday}${hourData[0]}00`}
                   date={date}
-                  hour={hourData[0]}
+                  hour={Number(hourData[0])}
                   minute={0}
                   hourData={hourData[1][0]}
                   isBooked={checkIsBooked(hourData[1][0])}
                 />
                 <CalendarHalfHourBlock
+                  id={`${weekday}${hourData[0]}30`}
                   date={date}
-                  hour={hourData[0]}
+                  hour={Number(hourData[0])}
                   minute={30}
                   hourData={hourData[1][30]}
                   isBooked={checkIsBooked(hourData[1][30])}

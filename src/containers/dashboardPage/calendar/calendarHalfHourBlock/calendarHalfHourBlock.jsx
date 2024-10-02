@@ -1,35 +1,91 @@
 import { useDrop } from "react-dnd";
 import BookingTile from "../bookingTile/bookingTile";
 import PropTypes from "prop-types";
-import { useDispatch } from "react-redux";
-import { moveEvent } from "../../../../store/calendarSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectRescheduleConfirmation,
+  setRescheduleConfirmation,
+  setRescheduleConfirmationNeeded,
+  updateLessonReservation,
+} from "../../../../store/calendarSlice";
+import { useEffect, useState } from "react";
 
 export default function CalendarHalfHourBlock({
+  id,
   date,
   hour,
   minute,
   hourData,
   isBooked,
 }) {
-  console.log(date);
+  const [hover, setHover] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState("lightGray");
+  const [updateData, setUpdateData] = useState({});
+  const [dropped, setDropped] = useState(false);
+
+  const rescheduleConfirmed = useSelector(selectRescheduleConfirmation);
+
   const dispatch = useDispatch();
+
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "reservation",
     drop: (item, monitor) => {
-      dispatch(
-        moveEvent({
-          reservation: item.reservation,
-          date: date,
-          hour: hour,
-          minute: minute,
-        })
-      );
-      console.log("Dropped item:", item, `${hour}:${minute}`); // Here you can handle the dropped item
+      // if (!rescheduleConfirmed) return;
+
+      setUpdateData({
+        oldReservation: item.reservation,
+        newDate: date,
+        newHour: hour,
+        newMinute: minute,
+      });
+
+      setDropped(true);
+      dispatch(setRescheduleConfirmationNeeded(true));
+
+      // dispatch(
+      //   updateLessonReservation({
+      //     oldReservation: item.reservation,
+      //     newDate: date,
+      //     newHour: hour,
+      //     newMinute: minute,
+      //   })
+      // );
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
   }));
+
+  useEffect(() => {
+    if (isOver) {
+      setBackgroundColor("green");
+    } else {
+      setBackgroundColor("lightGray");
+    }
+  }, [isOver]);
+
+  useEffect(() => {
+    if (hover) {
+      setBackgroundColor("green");
+    } else {
+      setBackgroundColor("lightGray");
+    }
+  }, [hover]);
+
+  useEffect(() => {
+    if (!isBooked) {
+      setBackgroundColor("lightGray");
+    }
+  }, [isBooked]);
+
+  useEffect(() => {
+    if (dropped && rescheduleConfirmed) {
+      dispatch(updateLessonReservation(updateData));
+      dispatch(setRescheduleConfirmation(false));
+      setDropped(false);
+      setUpdateData({});
+    }
+  }, [updateData, rescheduleConfirmed, dropped, dispatch]);
 
   const durationBlocks = isBooked && hourData.duration / 30;
 
@@ -41,8 +97,11 @@ export default function CalendarHalfHourBlock({
         position: "relative",
         width: "100%",
         height: "20px",
-        backgroundColor: isOver ? "gray" : "lightGray",
+        backgroundColor,
+        cursor: "pointer",
       }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
       {isBooked ? (
         <BookingTile reservation={hourData} durationBlocks={durationBlocks} />
@@ -54,8 +113,9 @@ export default function CalendarHalfHourBlock({
 }
 
 CalendarHalfHourBlock.propTypes = {
-  hour: PropTypes.string,
+  hour: PropTypes.number,
   minute: PropTypes.number,
   hourData: PropTypes.object,
   isBooked: PropTypes.bool,
+  date: PropTypes.string,
 };

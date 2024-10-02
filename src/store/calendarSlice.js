@@ -5,6 +5,7 @@ import {
   manageRejectedState,
 } from "../utilities/reduxUtilities";
 import apiClient from "../api/api";
+import { useDispatch } from "react-redux";
 
 export const fetchLessonReservations = createAsyncThunk(
   "calendar/fetchLessonReservations",
@@ -22,10 +23,7 @@ export const updateLessonReservation = createAsyncThunk(
   "calendar/updateLessonReservation",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await apiClient.patch(
-        `/lessonReservations/${data.id}`,
-        data
-      );
+      const response = await apiClient.patch(`/lessonReservations`, data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -40,8 +38,10 @@ const calendarSlice = createSlice({
     fetchComplete: false,
     datesSet: false,
     hasError: false,
-    // lessonReservations: [],
+    error: null,
     dates: {},
+    rescheduleConfirmationNeeded: false,
+    rescheduleConfirmation: false,
   },
   reducers: {
     setDates: (state) => {
@@ -71,39 +71,27 @@ const calendarSlice = createSlice({
       });
       state.datesSet = true;
     },
+    setRescheduleConfirmationNeeded: (state, action) => {
+      state.rescheduleConfirmationNeeded = action.payload;
+    },
+    setRescheduleConfirmation: (state, action) => {
+      state.rescheduleConfirmationNeeded = false;
+      state.rescheduleConfirmation = action.payload;
+    },
     moveEvent: (state, action) => {
-      const {
-        reservation: {
-          id,
-          date: reservationDate,
-          hour: reservationHour,
-          minute: reservationMinute,
-        },
-        date,
-        hour,
-        minute,
-      } = action.payload;
-      console.log(hour, minute);
-      // console.log(date);
+      const { id, previousDate, date, hour, minute } = action.payload;
       const reservationFromState = state.dates[
-        reservationDate
+        previousDate
       ].lessonReservations.find((reservation) => reservation.id === id);
-      // console.log(
-      //   state.dates[date].lessonReservations.forEach((res) => console.log(res))
-      // );
-      // console.log(reservationFromState);
-      if (date !== reservationDate) {
+      if (date !== previousDate) {
         reservationFromState["date"] = date;
         state.dates[date].lessonReservations.push(reservationFromState);
-        state.dates[reservationDate].lessonReservations = state.dates[
-          reservationDate
+        state.dates[previousDate].lessonReservations = state.dates[
+          previousDate
         ].lessonReservations.filter((reservation) => reservation.id !== id);
       }
-
       reservationFromState["hour"] = Number(hour);
       reservationFromState["minute"] = minute;
-
-      // state.dates[id].top = newTop;
     },
   },
   extraReducers: (builder) => {
@@ -112,7 +100,6 @@ const calendarSlice = createSlice({
       .addCase(fetchLessonReservations.fulfilled, (state, action) => {
         manageFulfilledState(state);
         const lessonReservations = action.payload;
-
         state.fetchComplete = true;
         lessonReservations.forEach((reservation) => {
           if (!state.dates[reservation.date]) return;
@@ -120,7 +107,17 @@ const calendarSlice = createSlice({
           state.dates[reservation.date].lessonReservations.push(reservation);
         });
       })
-      .addCase(fetchLessonReservations.rejected, manageRejectedState);
+      .addCase(fetchLessonReservations.rejected, manageRejectedState)
+
+      .addCase(updateLessonReservation.pending, managePendingState)
+      .addCase(updateLessonReservation.fulfilled, (state, action) => {
+        manageFulfilledState(state);
+        calendarSlice.caseReducers.moveEvent(state, action);
+      })
+      .addCase(updateLessonReservation.rejected, (state, action) => {
+        manageRejectedState(state);
+        state.error = action.payload;
+      });
   },
 });
 
@@ -134,11 +131,16 @@ export const selectLessonReservations = (state) =>
 export const selectFetchReservationsComplete = (state) =>
   state.calendar.fetchComplete;
 
-// export const selectReservationsForDate = (state, date) => {
-//   return state.calendar.lessonReservations.filter((reservation) => {
-//     return reservation.date === date;
-//   });
-// };
-export const { moveEvent } = calendarSlice.actions;
+export const selectRescheduleConfirmationNeeded = (state) =>
+  state.calendar.rescheduleConfirmationNeeded;
+
+export const selectRescheduleConfirmation = (state) =>
+  state.calendar.rescheduleConfirmation;
+
+export const {
+  moveEvent,
+  setRescheduleConfirmationNeeded,
+  setRescheduleConfirmation,
+} = calendarSlice.actions;
 
 export default calendarSlice.reducer;
