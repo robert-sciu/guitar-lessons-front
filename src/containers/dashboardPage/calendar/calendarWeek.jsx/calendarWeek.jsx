@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import CalendarDay from "../calendarDay/calendarDay";
-import { selectDates } from "../../../../store/calendarSlice";
+import { selectDates } from "../../../../store/calendar/calendarSelectors";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -16,7 +16,6 @@ export default function CalendarWeek() {
           justifyContent: "center",
         }}
       >
-        {/* <CalendarDay isLabel={true} /> */}
         {days.map((day) => (
           <CalendarDay key={day.date} dayData={day} />
         ))}

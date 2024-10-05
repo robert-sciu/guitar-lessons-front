@@ -28,7 +28,7 @@ export const verifyStoredToken = createAsyncThunk(
       if (token) {
         const response = await apiClient.post("/auth/verifyToken", { token });
         if (response.status === 200) {
-          return token;
+          return response.data.data;
         }
       }
     } catch (error) {
@@ -78,8 +78,9 @@ const authSlice = createSlice({
       .addCase(verifyStoredToken.pending, (state) => {
         managePendingState(state);
       })
-      .addCase(verifyStoredToken.fulfilled, (state) => {
+      .addCase(verifyStoredToken.fulfilled, (state, action) => {
         manageFulfilledState(state);
+        state.user = action.payload.user;
         state.isAuthenticated = true;
       })
       .addCase(verifyStoredToken.rejected, (state) => {
@@ -101,6 +102,7 @@ const authSlice = createSlice({
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectIsLoading = (state) => state.auth.isLoading;
 export const selectToken = (state) => state.auth.token;
+export const selectUser = (state) => state.auth.user;
 
 export const { setToken, clearToken } = authSlice.actions;
 

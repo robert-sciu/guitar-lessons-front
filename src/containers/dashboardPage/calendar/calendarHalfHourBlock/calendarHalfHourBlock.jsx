@@ -3,15 +3,13 @@ import BookingTile from "../bookingTile/bookingTile";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectRescheduleConfirmation,
-  setRescheduleConfirmation,
-  setRescheduleConfirmationNeeded,
-  updateLessonReservation,
-} from "../../../../store/calendarSlice";
+  setNewReservationData,
+  setUpdateData,
+} from "../../../../store/calendar/calendarSlice";
 import { useEffect, useState } from "react";
+import { selectUpdateData } from "../../../../store/calendar/calendarSelectors";
 
 export default function CalendarHalfHourBlock({
-  id,
   date,
   hour,
   minute,
@@ -20,36 +18,32 @@ export default function CalendarHalfHourBlock({
 }) {
   const [hover, setHover] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState("lightGray");
-  const [updateData, setUpdateData] = useState({});
-  const [dropped, setDropped] = useState(false);
-
-  const rescheduleConfirmed = useSelector(selectRescheduleConfirmation);
+  const [reservationToReschedule, setReservationToReschedule] = useState({});
+  const [newReservation, setNewReservation] = useState(false);
+  const updateData = useSelector(selectUpdateData);
 
   const dispatch = useDispatch();
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "reservation",
-    drop: (item, monitor) => {
-      // if (!rescheduleConfirmed) return;
-
-      setUpdateData({
-        oldReservation: item.reservation,
-        newDate: date,
-        newHour: hour,
-        newMinute: minute,
-      });
-
-      setDropped(true);
-      dispatch(setRescheduleConfirmationNeeded(true));
-
-      // dispatch(
-      //   updateLessonReservation({
-      //     oldReservation: item.reservation,
-      //     newDate: date,
-      //     newHour: hour,
-      //     newMinute: minute,
-      //   })
-      // );
+    canDrop: (item) => {
+      return (
+        (item.reservation.date === date &&
+          // prettier-ignore
+          `${item.reservation.hour}${item.reservation.minute}` !==
+            `${hour}${minute}${minute === 0 ? "0" : ""}`) ||
+        item.reservation.date !== date
+      );
+    },
+    drop: (item) => {
+      dispatch(
+        setUpdateData({
+          oldReservation: item.reservation,
+          newDate: date,
+          newHour: hour,
+          newMinute: minute,
+        })
+      );
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
@@ -58,53 +52,87 @@ export default function CalendarHalfHourBlock({
 
   useEffect(() => {
     if (isOver) {
-      setBackgroundColor("green");
+      setBackgroundColor("gray");
     } else {
       setBackgroundColor("lightGray");
     }
   }, [isOver]);
 
   useEffect(() => {
-    if (hover) {
+    if (hover && !isBooked) {
       setBackgroundColor("green");
     } else {
       setBackgroundColor("lightGray");
     }
-  }, [hover]);
+  }, [hover, isBooked]);
 
   useEffect(() => {
-    if (!isBooked) {
-      setBackgroundColor("lightGray");
+    if (Object.keys(updateData).length > 0) {
+      if (
+        updateData.newDate === date &&
+        // prettier-ignore
+        `${updateData.newHour}${updateData.newMinute}${updateData.newMinute === 0 ? "0" : ""}` ===
+          `${hour}${minute}${minute === 0 ? "0" : ""}`
+      ) {
+        setReservationToReschedule({
+          date: updateData.newDate,
+          hour: updateData.newHour,
+          minute: updateData.newMinute,
+          duration: updateData.oldReservation.duration,
+        });
+      }
+    } else {
+      setReservationToReschedule({});
     }
-  }, [isBooked]);
+  }, [updateData, date, hour, minute]);
 
   useEffect(() => {
-    if (dropped && rescheduleConfirmed) {
-      dispatch(updateLessonReservation(updateData));
-      dispatch(setRescheduleConfirmation(false));
-      setDropped(false);
-      setUpdateData({});
+    if (newReservation) {
+      dispatch(setNewReservationData({ date, hour, minute }));
+      setNewReservation(false);
     }
-  }, [updateData, rescheduleConfirmed, dropped, dispatch]);
+  }, [newReservation, date, hour, minute, dispatch]);
+
+  function handleClick(e) {
+    if (e.target.draggable || isBooked) return;
+    setNewReservation(true);
+  }
 
   const durationBlocks = isBooked && hourData.duration / 30;
+
+  const rescheduleDurationBlocks =
+    Object.keys(reservationToReschedule).length > 0 &&
+    reservationToReschedule.duration / 30;
 
   return (
     <div
       ref={drop}
       style={{
-        display: "block",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
         position: "relative",
         width: "100%",
         height: "20px",
         backgroundColor,
         cursor: "pointer",
       }}
-      onMouseEnter={() => setHover(true)}
+      onMouseEnter={() => setHover(isBooked ? false : true)}
       onMouseLeave={() => setHover(false)}
+      onClick={handleClick}
     >
+      {hover && <span style={{ color: "white" }}>+</span>}
       {isBooked ? (
         <BookingTile reservation={hourData} durationBlocks={durationBlocks} />
+      ) : (
+        ""
+      )}
+      {Object.keys(reservationToReschedule).length > 0 ? (
+        <BookingTile
+          reservation={reservationToReschedule}
+          durationBlocks={rescheduleDurationBlocks}
+        />
       ) : (
         ""
       )}

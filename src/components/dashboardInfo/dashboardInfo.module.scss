@@ -1,0 +1,18 @@
+@import "../../../styles/variables.module.scss";
+
+.DashboardInfoContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $size-xxs;
+
+  p {
+    color: $main-white;
+  }
+  .active {
+    color: $main-green;
+  }
+
+  .inactive {
+    color: $main-red;
+  }
+}

@@ -1,6 +1,6 @@
 export function managePendingState(state) {
   state.isLoading = true;
-  state.hasError = true;
+  state.hasError = false;
 }
 
 export function manageFulfilledState(state) {
@@ -8,7 +8,8 @@ export function manageFulfilledState(state) {
   state.hasError = false;
 }
 
-export function manageRejectedState(state) {
+export function manageRejectedState(state, action) {
   state.isLoading = false;
   state.hasError = true;
+  state.error = action.payload;
 }

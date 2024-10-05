@@ -69,7 +69,7 @@ function App() {
           }
         >
           <Route
-            index
+            path="/dashboard/welcome"
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <LazyDashboardWelcomePage />

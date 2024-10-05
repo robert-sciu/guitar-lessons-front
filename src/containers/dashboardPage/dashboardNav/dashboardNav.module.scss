@@ -1,0 +1,79 @@
+@import "../../../../styles/variables.module.scss";
+
+.dashboardContainer {
+  background: $background-gradient;
+  height: 100vh;
+  display: grid;
+  gap: $size-xxs;
+  padding: $size-xxs;
+  grid-template-columns: 300px 1fr;
+
+  overflow: hidden;
+
+  .dashboardNav {
+    color: $main-white;
+    background-color: $main-gray-dark-transparent;
+    border-radius: $size-xxs;
+    .navList {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-between;
+      padding: $size-s $size-xxs;
+      .dashboardInfo {
+        display: flex;
+        flex-direction: column;
+        gap: $size-xxs;
+      }
+      ul {
+        display: flex;
+        flex-direction: column;
+        gap: $size-xxs;
+        margin: $size-s 0;
+        li {
+          background-color: $main-gray-darkest;
+          border-radius: $size-xxs;
+          list-style: none;
+
+          :visited,
+          :link {
+            color: $main-white;
+            text-decoration: none;
+          }
+
+          :hover,
+          :active {
+            cursor: pointer;
+            color: $active-yellow;
+          }
+
+          .navLink {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: $size-xxs;
+          }
+          .active {
+            background-color: $active-yellow;
+            color: $main-gray-darkest;
+            font-weight: 700;
+            border-radius: $size-xxs;
+          }
+        }
+      }
+      .logoutBtn {
+        background-color: $main-gray-darkest;
+        border: none;
+        color: $main-white;
+        padding: $size-xxs;
+        border-radius: $size-xxs;
+
+        &:hover,
+        &:active {
+          cursor: pointer;
+          color: $main-red;
+        }
+      }
+    }
+  }
+}

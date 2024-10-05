@@ -3,7 +3,9 @@ import authReducer from "./authSlice";
 import tasksReducer from "./tasksSlice";
 import userTasksReducer from "./userTasksSlice";
 import tagsReducer from "./tagsSlice";
-import calendarReducer from "./calendarSlice";
+import calendarReducer from "./calendar/calendarSlice";
+import userInfoReducer from "./userInfoSlice";
+import planInfoReducer from "./planInfoSlice";
 
 export default configureStore({
   reducer: {
@@ -12,6 +14,8 @@ export default configureStore({
     userTasks: userTasksReducer,
     tags: tagsReducer,
     calendar: calendarReducer,
+    userInfo: userInfoReducer,
+    planInfo: planInfoReducer,
   },
   devTools: true,
 });

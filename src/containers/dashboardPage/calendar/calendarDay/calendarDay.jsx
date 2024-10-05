@@ -59,7 +59,6 @@ export default function CalendarDay({ dayData }) {
                 key={hourData[0]}
               >
                 <CalendarHalfHourBlock
-                  id={`${weekday}${hourData[0]}00`}
                   date={date}
                   hour={Number(hourData[0])}
                   minute={0}
@@ -67,7 +66,6 @@ export default function CalendarDay({ dayData }) {
                   isBooked={checkIsBooked(hourData[1][0])}
                 />
                 <CalendarHalfHourBlock
-                  id={`${weekday}${hourData[0]}30`}
                   date={date}
                   hour={Number(hourData[0])}
                   minute={30}
