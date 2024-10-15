@@ -48,7 +48,7 @@ const planInfoSlice = createSlice({
 
 export const { clearPlanInfoError } = planInfoSlice.actions;
 
-export const selectPlanInfo = (state) => state.planInfo.userInfo;
+export const selectPlanInfo = (state) => state.planInfo.planInfo;
 export const selectPlanInfoIsLoading = (state) => state.planInfo.isLoading;
 //prettier-ignore
 export const selectPlanInfoFetchComplete = (state) => state.planInfo.fetchComplete;

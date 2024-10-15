@@ -10,8 +10,13 @@ import {
 } from "../../store/userTasksSlice";
 import TagDisplay from "../tagDisplay/tagDisplay";
 import { debounce } from "lodash";
+import styles from "./taskDisplay.module.scss";
+import i18n from "../../../config/i18n";
+import { IoLogoYoutube } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 export default function TaskDisplay({ task, ...props }) {
+  const language = i18n.language;
   const [loading, setLoading] = useState(false);
   const [notes, setNotes] = useState(
     task?.UserTask?.user_notes ? task.UserTask.user_notes : ""
@@ -28,6 +33,8 @@ export default function TaskDisplay({ task, ...props }) {
   const tags = showTags ? task.Tags : null;
   const isLoading = useSelector(selectIsLoadingUserTasks);
   const dispatch = useDispatch();
+
+  console.log(task);
 
   useEffect(() => {
     if (!isLoading) {
@@ -67,22 +74,34 @@ export default function TaskDisplay({ task, ...props }) {
     debouncedSaveNote(e.target.value);
   }
   return (
-    <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>
-      {tags?.map((tag) => (
-        <TagDisplay key={tag.id} tag={tag} />
-      ))}
-      <h3>{task.title}</h3>
-      <p>{task.artist}</p>
-      <p>
-        {t("taskDisplay.difficultyLevel")}: {task.difficulty_level}
-      </p>
-      {showMore && (
-        <div>
-          <p>{task.notes_pl}</p>
-          <p>{task.notes_en}</p>
-          <p>{task.url}</p>
+    <div className={styles.taskDisplayContainer}>
+      <div className={styles.title}>
+        {task.youtube_url && (
+          <Link
+            to={`https://${task.youtube_url}`}
+            target="_blank"
+            className={styles.icon}
+          >
+            <IoLogoYoutube />
+          </Link>
+        )}
+        <div className={styles.titleText}>
+          <h5>{task.title}</h5>
+          <p>{task.artist}</p>
         </div>
-      )}
+      </div>
+
+      <div className={styles.tagsContainer}>
+        {tags?.map((tag) => (
+          <TagDisplay key={tag.id} tag={tag} />
+        ))}
+      </div>
+
+      <div className={styles.taskDifficulty}>
+        <p>
+          {t("taskDisplay.difficultyLevel")}: {task.difficulty_level}
+        </p>
+      </div>
       {showUserNotes && (
         <div>
           <p>
@@ -91,18 +110,34 @@ export default function TaskDisplay({ task, ...props }) {
           <textarea value={notes} onChange={handleInputChange} />
         </div>
       )}
-      <button onClick={() => setShowMore(!showMore)}>
-        {t("taskDisplay.showMore")}
-      </button>
-      {enableAdd && (
-        <button onClick={handleAddTask}>
-          {loading ? "Loading..." : t("taskDisplay.addTask")}
+
+      <div className={styles.buttonsContainer}>
+        {enableAdd && (
+          <button onClick={handleAddTask} className={styles.addTask}>
+            {loading ? "Loading..." : t("taskDisplay.addTask")}
+          </button>
+        )}
+        <button onClick={() => setShowMore(!showMore)}>
+          {t("taskDisplay.showMore")}
         </button>
-      )}
-      {enableDelete && (
-        <button onClick={handleDeleteTask}>
-          {loading ? "Deleting..." : t("taskDisplay.deleteTask")}
-        </button>
+        {enableDelete && (
+          <button onClick={handleDeleteTask}>
+            {loading ? "Deleting..." : t("taskDisplay.deleteTask")}
+          </button>
+        )}
+      </div>
+      {showMore && (
+        <div className={styles.moreInfo}>
+          <p>
+            {t("taskDisplay.description")}: {task[`notes_${language}`]}
+          </p>
+          <p>
+            {t("taskDisplay.tutorial")}:{" "}
+            <Link to={`https://${task.url}`} target="_blank">
+              {task.url}
+            </Link>
+          </p>
+        </div>
       )}
     </div>
   );

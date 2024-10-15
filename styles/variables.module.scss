@@ -1,3 +1,4 @@
+$size-giant: 6.25rem;
 $size-xxxxl: 3.815rem;
 $size-xxxl: 3.052rem;
 $size-xxl: 2.441rem;
@@ -7,17 +8,40 @@ $size-m: 1.25rem;
 $size-s: 1rem;
 $size-xs: 0.8rem;
 $size-xxs: 0.64rem;
+$size-xxxs: 0.48rem;
+$size-xxxxs: 0.32rem;
+$size-tiny: 0.16rem;
 
-$background-gradient: linear-gradient(135deg, #1f1f1f, #353535);
+$experience-gradient: linear-gradient(135deg, #a2b312, #22c967);
+$background-gradient: linear-gradient(135deg, #c4c4c4, #bdbdbd);
+$card-background-gradient: linear-gradient(135deg, #e7e7e7, #dddddd);
 $main-black: #272829;
 $main-white: #fff6e0;
-$main-gray-darkest: #272931;
-$main-gray-dark: #444855;
+$main-white-light: #fff6e0;
+$main-white-lightest: #fffdf9;
+$main-gray-darkest: #3f3f3f;
+$main-gray-dark: #656565;
 $main-gray-dark-transparent: #44485591;
-$main-gray: #61677a;
-$main-gray-light: #9095a2;
-$main-gray-lightest: #c0c2ca;
+$main-gray: #7e7e7e;
+$main-gray-light: #a5a5a5;
+$main-gray-lightest: #d8d8d8;
 $active-yellow: #f2c94c;
 $light-gray: #d8d9da;
 $main-green: #10a710;
 $main-red: #9b0a0a;
+$icon-color: #375188;
+$youtube-red: #ff0000;
+
+$tag-yellow: #f2c94c;
+$tag-green: #10a710;
+
+$add-green: #10a710;
+$add-green-hover: #14c214;
+
+$soft-shadow-gray: 0 0.04rem 0.3rem 0 $main-gray-dark;
+$soft-shadow-gray-light: 0 0.04rem 0.3rem 0 $main-gray-light;
+$soft-shadow-yellow: 0 0.04rem 0.3rem 0 $active-yellow;
+$soft-shadow-green: 0 0.04rem 0.3rem 0 $main-green;
+$inset-soft-shadow: inset 0 0.04rem 0.3rem 0 $main-gray-light;
+
+$basic-transition: all 0.2s ease-in-out;

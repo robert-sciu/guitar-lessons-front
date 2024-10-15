@@ -4,18 +4,20 @@ import {
   fetchAvailableTasks,
   selectAvailableTasks,
   selectIsLoadingTasks,
-} from "../../../store/tasksSlice";
-import { selectIsAuthenticated } from "../../../store/authSlice";
-import TaskDisplay from "../../../components/taskDisplay/taskDisplay";
-import { selectFetchComplete } from "../../../store/tasksSlice";
+} from "../../../../store/tasksSlice";
+import { selectIsAuthenticated } from "../../../../store/authSlice";
+import TaskDisplay from "../../../../components/taskDisplay/taskDisplay";
+import { selectFetchComplete } from "../../../../store/tasksSlice";
 import {
   fetchTags,
   selectFetchTagsComplete,
   selectTags,
-} from "../../../store/tagsSlice";
-import TagDisplay from "../../../components/tagDisplay/tagDisplay";
+} from "../../../../store/tagsSlice";
+import TagDisplay from "../../../../components/tagDisplay/tagDisplay";
 
-export default function DashboardAvailableTasksPage() {
+import styles from "./availableTasksMain.module.scss";
+
+export default function AvailableTasksMain() {
   const [selectedTags, setSelectedTags] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const allAvailableTasks = useSelector(selectAvailableTasks);
@@ -59,20 +61,24 @@ export default function DashboardAvailableTasksPage() {
     }
   }
   return (
-    <div>
-      <p>selected tags: {selectedTags.map((tag) => tag.value).join(", ")}</p>
-      <div>
+    <div className={styles.tasksContainer}>
+      <div className={styles.selectedTags}>
+        <p>selected tags:</p>
+        <div className={styles.tags}>
+          {selectedTags.map((tag) => tag.value).join(", ")}
+        </div>
+      </div>
+      <div className={styles.tagsContainer}>
         {fetchTagsComplete &&
           allTags?.length > 0 &&
           allTags.map((tag) => (
             <TagDisplay key={tag.id} tag={tag} onTagClick={handleTagClick} />
           ))}
       </div>
-      <h1>
-        {isLoading && <p>Loading...</p>}
-        {fetchComplete && allAvailableTasks?.length === 0 && (
-          <p>No tasks yet</p>
-        )}
+      <h1></h1>
+      {isLoading && <p>Loading...</p>}
+      {fetchComplete && allAvailableTasks?.length === 0 && <p>No tasks yet</p>}
+      <div className={styles.tasksList}>
         {filteredTasks?.length > 0 &&
           filteredTasks.map((task) => (
             <TaskDisplay
@@ -82,7 +88,7 @@ export default function DashboardAvailableTasksPage() {
               showTags={true}
             />
           ))}
-      </h1>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,24 @@
+@import "../../../styles/variables.module.scss";
+
+.tagDisplay {
+  display: flex;
+  justify-content: center;
+  background-color: $tag-yellow;
+  border-radius: $size-xxxxs;
+  box-shadow: $soft-shadow-yellow;
+  font-weight: 400;
+  cursor: pointer;
+  font-size: $size-xxxs;
+  display: flex;
+  align-items: center;
+  gap: $size-tiny;
+  padding: $size-tiny $size-xxxxs;
+  p {
+    font-size: $size-xs;
+  }
+}
+
+.selected {
+  background-color: $tag-green;
+  box-shadow: $soft-shadow-green;
+}

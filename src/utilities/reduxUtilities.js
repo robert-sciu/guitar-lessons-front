@@ -13,3 +13,11 @@ export function manageRejectedState(state, action) {
   state.hasError = true;
   state.error = action.payload;
 }
+
+export function extractResponseData(response) {
+  return response?.data?.data || response?.data?.message || "empty response";
+}
+
+export function extractErrorResponse(error) {
+  return error?.response?.data?.message || error.message || "unknown error";
+}

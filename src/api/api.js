@@ -2,6 +2,8 @@ import axios from "axios";
 const api_url = import.meta.env.VITE_API_BASE_URL;
 import store from "../store";
 import { logoutUser, selectToken, setToken } from "../store/authSlice";
+import i18n from "../../config/i18n";
+const currentLanguage = i18n.language;
 
 // Create an Axios instance
 const apiClient = axios.create({
@@ -19,6 +21,7 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers["x-auth-token"] = token;
     }
+    config.headers["Accept-Language"] = currentLanguage;
     return config;
   },
   (error) => Promise.reject(error)

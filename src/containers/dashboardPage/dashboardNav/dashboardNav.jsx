@@ -1,6 +1,6 @@
-import { useTranslation, I18nextProvider } from "react-i18next";
-import i18n from "../../../../config/i18n";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+// import { I18nextProvider } from "react-i18next";
+// import i18n from "../../../../config/i18n";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser, selectIsAuthenticated } from "../../../store/authSlice";
 import { useEffect, useState } from "react";
@@ -14,8 +14,6 @@ import {
   selectUserInfoHasError,
   selectUserInfoIsLoading,
 } from "../../../store/userInfoSlice";
-import ErrorWindow from "../calendar/modalWindows/errorWindow/errorWindow";
-import DashboardInfo from "../../../components/dashboardInfo/dashboardInfo";
 import {
   fetchPlanInfo,
   selectPlanInfoError,
@@ -23,6 +21,9 @@ import {
   selectPlanInfoHasError,
   selectPlanInfoIsLoading,
 } from "../../../store/planInfoSlice";
+import DashboardWelcome from "../../../components/dashboard/dashboardWelcome/dashboardWelcome";
+import DashboardNavLinks from "../../../components/dashboard/dashboardNavLinks/dashboardNavLinks";
+import ErrorWindow from "../../../components/modalWindows/errorWindow/errorWindow";
 
 export default function DashboardNav() {
   const [error, setError] = useState(null);
@@ -42,11 +43,6 @@ export default function DashboardNav() {
   const planInfoError = useSelector(selectPlanInfoError);
   const planInfoFetchComplete = useSelector(selectPlanInfoFetchComplete);
 
-  function handleLogout(e) {
-    e.preventDefault();
-    dispatch(logoutUser());
-    navigate("/");
-  }
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login");
@@ -77,85 +73,36 @@ export default function DashboardNav() {
   useEffect(() => {
     if (userInfoHasError) {
       setError(userInfoError);
+    } else {
+      setError(null);
     }
   }, [userInfoHasError, userInfoError]);
 
   useEffect(() => {
     if (planInfoHasError) {
       setError(planInfoError);
+    } else {
+      setError(null);
     }
   }, [planInfoHasError, planInfoError]);
 
-  function activeStateStyle({ isActive }) {
-    const className = isActive
-      ? `${styles.navLink} ${styles.active}`
-      : styles.navLink;
-
-    return className;
+  function handleLogout(e) {
+    e.preventDefault();
+    dispatch(logoutUser());
+    navigate("/");
   }
 
-  const { t } = useTranslation();
   return (
     <div className={styles.dashboardContainer}>
+      {/* <I18nextProvider i18n={i18n}> */}
       <div className={styles.dashboardNav}>
-        <I18nextProvider i18n={i18n}>
-          <div className={styles.navList}>
-            <div>
-              <div className={styles.dashboardInfo}>
-                {userInfoFetchComplete && <DashboardInfo userInfo={userInfo} />}
-              </div>
-              <ul>
-                <li>
-                  <NavLink className={activeStateStyle} to="/dashboard/welcome">
-                    {t("dashboardNav.home")}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink className={activeStateStyle} to="/dashboard/tasks">
-                    {t("dashboardNav.tasks")}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    className={activeStateStyle}
-                    to="/dashboard/availableTasks"
-                  >
-                    {t("dashboardNav.availableTasks")}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    className={activeStateStyle}
-                    to="/dashboard/completedTasks"
-                  >
-                    {t("dashboardNav.completedTasks")}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    className={activeStateStyle}
-                    to="/dashboard/calendar"
-                  >
-                    {t("dashboardNav.calendar")}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    className={activeStateStyle}
-                    to="/dashboard/payments"
-                  >
-                    {t("dashboardNav.payments")}
-                  </NavLink>
-                </li>
-              </ul>
-            </div>
-            <button className={styles.logoutBtn} onClick={handleLogout}>
-              {t("dashboardNav.logout")}
-            </button>
-          </div>
-        </I18nextProvider>
+        {userInfoFetchComplete && (
+          <DashboardWelcome username={userInfo.username} />
+        )}
+        <DashboardNavLinks onLogout={handleLogout} />
       </div>
-      <div>
+      {/* </I18nextProvider> */}
+      <div className={styles.dashboardContent}>
         <Outlet />
         {error && (
           <ErrorWindow error={error} dismissHandler={clearUserInfoError} />

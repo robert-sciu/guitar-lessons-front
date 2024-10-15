@@ -1,0 +1,26 @@
+@import "../../../../../styles/variables.module.scss";
+
+.tasksContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $size-s;
+  .selectedTags {
+    display: flex;
+    gap: $size-xxxs;
+    flex-wrap: wrap;
+    .tags {
+      color: $tag-green;
+      font-weight: 500;
+    }
+  }
+  .tagsContainer {
+    display: flex;
+    gap: $size-xxxs;
+    flex-wrap: wrap;
+  }
+  .tasksList {
+    display: flex;
+    flex-direction: column;
+    gap: $size-xxxxs;
+  }
+}

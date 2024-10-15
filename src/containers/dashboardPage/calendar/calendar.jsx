@@ -10,7 +10,7 @@ import {
 import { useEffect } from "react";
 import { selectIsAuthenticated, selectUser } from "../../../store/authSlice";
 import ConfirmationWindow from "./modalWindows/confirmationWindow/confirmationWindow";
-import { fetchPlanInfo, selectUserInfo } from "../../../store/planInfoSlice";
+import { fetchPlanInfo } from "../../../store/planInfoSlice";
 import ErrorWindow from "./modalWindows/errorWindow/errorWindow";
 import NewReservationWindow from "./modalWindows/newReservationWIndow/newReservationWindow";
 
@@ -36,7 +36,7 @@ export default function Calendar() {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const datesSet = useSelector(selectDatesAreSet);
   const fetchComplete = useSelector(selectFetchReservationsComplete);
-  const planInfo = useSelector(selectUserInfo).planInfo;
+  // const planInfo = useSelector(selectUserInfo).planInfo;
   const rescheduleConfirmationNeeded = useSelector(
     selectRescheduleConfirmationNeeded
   );
@@ -89,7 +89,7 @@ export default function Calendar() {
                 New time: {updateData.newHour}:{updateData.newMinute}
                 {updateData.newMinute === 0 ? "0" : ""}
               </p>
-              <p>Reschedules left {planInfo.reschedules_left_count} </p>
+              {/* <p>Reschedules left {planInfo.reschedules_left_count} </p> */}
             </div>
           }
           confirmHandler={updateLessonReservation}

@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
+import styles from "./tagDisplay.module.scss";
 
 export default function TagDisplay({ tag, onTagClick }) {
   const [selected, setSelected] = useState(false);
@@ -10,22 +11,10 @@ export default function TagDisplay({ tag, onTagClick }) {
   }
   return (
     <div
-      style={{
-        backgroundColor: selected ? "green" : "coral",
-        display: "inline-block",
-        fontSize: "20px",
-        margin: "0 10px 10px 0",
-        padding: "5px 10px",
-        textAlign: "center",
-        width: "fit-content",
-      }}
+      className={`${styles.tagDisplay} ${selected ? styles.selected : ""}`}
+      onClick={handleOnTagClick}
     >
-      <div>
-        <p>{tag.value}</p>
-        {onTagClick && (
-          <button onClick={handleOnTagClick}>{selected ? "-" : "+"}</button>
-        )}
-      </div>
+      <p>{tag.value}</p>
     </div>
   );
 }

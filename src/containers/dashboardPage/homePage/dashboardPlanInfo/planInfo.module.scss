@@ -1,0 +1,42 @@
+@import "../../../../../styles/variables.module.scss";
+
+.planInfoContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  h4 {
+    text-align: center;
+    margin-bottom: $size-xl;
+  }
+
+  .detailsContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: $size-s;
+    height: 100%;
+    .planInfoData {
+      box-shadow: $soft-shadow-gray-light;
+      border-radius: $size-xxxxs;
+      // padding: $size-m;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: $size-xs;
+
+      font-weight: 500;
+      p {
+        font-size: $size-s;
+      }
+      .active {
+        color: $main-green;
+      }
+      .inactive {
+        color: $main-red;
+      }
+    }
+  }
+}

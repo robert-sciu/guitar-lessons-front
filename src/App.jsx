@@ -17,15 +17,15 @@ const LazyLoginForm = React.lazy(() =>
 const LazyDashboardNav = React.lazy(() =>
   import("./containers/dashboardPage/dashboardNav/dashboardNav")
 );
-const LazyDashboardWelcomePage = React.lazy(() =>
-  import("./containers/dashboardPage/dashboardMainPage/dashboardWelcomePage")
+const LazyDashboardHomePage = React.lazy(() =>
+  import("./containers/dashboardPage/homePage/homePageMain/homePageMain")
 );
 const LazyDashboardTasksPage = React.lazy(() =>
   import("./containers/dashboardPage/dashboardTasksPage/dashboardTasksPage")
 );
 const LazyAvailableTasksPage = React.lazy(() =>
   import(
-    "./containers/dashboardPage/dashboardAvailableTasks/dashboardAvailableTasksPage"
+    "./containers/dashboardPage/availableTasksPage/availableTasksMain/availableTasksMain"
   )
 );
 const LazyCalendarPage = React.lazy(() =>
@@ -72,7 +72,7 @@ function App() {
             path="/dashboard/welcome"
             element={
               <Suspense fallback={<div>Loading...</div>}>
-                <LazyDashboardWelcomePage />
+                <LazyDashboardHomePage />
               </Suspense>
             }
           />

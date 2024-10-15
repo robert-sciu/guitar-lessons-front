@@ -1,0 +1,82 @@
+@import "../../../../../styles/variables.module.scss";
+
+@import "../../../../../styles/classes.module.scss";
+
+.userInfoContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  h4 {
+    text-align: center;
+    margin-bottom: $size-xl;
+  }
+
+  .detailsContainer {
+    display: flex;
+    flex-direction: column;
+    // justify-content: space-between;
+    gap: $size-s;
+    height: 100%;
+    .userData {
+      box-shadow: $soft-shadow-gray-light;
+      border-radius: $size-xxxxs;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: $size-xs;
+      font-weight: 500;
+      p {
+        font-size: $size-s;
+      }
+
+      .userDataStatus {
+        min-width: 7rem;
+        display: flex;
+        // flex: 1;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        gap: $size-xs;
+        justify-content: center;
+
+        .inputToggler {
+          width: 90%;
+          text-align: center;
+          input {
+            @extend .input;
+            width: 100%;
+            &:focus {
+              outline: none;
+            }
+          }
+        }
+
+        .active {
+          color: $main-green;
+        }
+        .inactive {
+          color: $main-red;
+        }
+        .level {
+          color: $main-white;
+          font-size: $size-l;
+          width: 4rem;
+          height: 4rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background: $experience-gradient;
+          box-shadow: $soft-shadow-gray;
+          font-weight: 700;
+        }
+        .editBtn {
+          @extend .button;
+        }
+      }
+    }
+  }
+}

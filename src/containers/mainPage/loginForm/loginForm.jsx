@@ -28,7 +28,7 @@ export default function LoginForm() {
 
   useEffect(() => {
     if (loggedIn) {
-      navigate("/dashboard");
+      navigate("/dashboard/welcome");
     } else {
       setShowLogin(true);
     }

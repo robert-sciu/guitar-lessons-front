@@ -71,8 +71,8 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.token = action.payload;
       })
-      .addCase(loginUser.rejected, (state) => {
-        manageRejectedState(state);
+      .addCase(loginUser.rejected, (state, action) => {
+        manageRejectedState(state, action);
         state.isAuthenticated = false;
       })
       .addCase(verifyStoredToken.pending, (state) => {
@@ -83,8 +83,8 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.isAuthenticated = true;
       })
-      .addCase(verifyStoredToken.rejected, (state) => {
-        manageRejectedState(state);
+      .addCase(verifyStoredToken.rejected, (state, action) => {
+        manageRejectedState(state, action);
         state.isAuthenticated = false;
         state.token = null;
       })

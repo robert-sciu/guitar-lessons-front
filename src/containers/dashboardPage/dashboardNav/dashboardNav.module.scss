@@ -1,79 +1,31 @@
 @import "../../../../styles/variables.module.scss";
 
 .dashboardContainer {
-  background: $background-gradient;
+  display: flex;
+  gap: $size-s;
   height: 100vh;
-  display: grid;
-  gap: $size-xxs;
-  padding: $size-xxs;
-  grid-template-columns: 300px 1fr;
-
-  overflow: hidden;
+  width: 100vw;
+  padding: $size-xxxxs $size-xxxxs;
+  background: $background-gradient;
 
   .dashboardNav {
-    color: $main-white;
-    background-color: $main-gray-dark-transparent;
-    border-radius: $size-xxs;
-    .navList {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      justify-content: space-between;
-      padding: $size-s $size-xxs;
-      .dashboardInfo {
-        display: flex;
-        flex-direction: column;
-        gap: $size-xxs;
-      }
-      ul {
-        display: flex;
-        flex-direction: column;
-        gap: $size-xxs;
-        margin: $size-s 0;
-        li {
-          background-color: $main-gray-darkest;
-          border-radius: $size-xxs;
-          list-style: none;
+    width: 18rem;
+    height: 100%;
+    flex-direction: column;
+    display: flex;
+    gap: $size-xxxl;
+    padding: $size-xl $size-xs;
+  }
 
-          :visited,
-          :link {
-            color: $main-white;
-            text-decoration: none;
-          }
+  .dashboardContent {
+    flex: 1;
+    padding: $size-s;
+  }
 
-          :hover,
-          :active {
-            cursor: pointer;
-            color: $active-yellow;
-          }
-
-          .navLink {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: $size-xxs;
-          }
-          .active {
-            background-color: $active-yellow;
-            color: $main-gray-darkest;
-            font-weight: 700;
-            border-radius: $size-xxs;
-          }
-        }
-      }
-      .logoutBtn {
-        background-color: $main-gray-darkest;
-        border: none;
-        color: $main-white;
-        padding: $size-xxs;
-        border-radius: $size-xxs;
-
-        &:hover,
-        &:active {
-          cursor: pointer;
-          color: $main-red;
-        }
-      }
-    }
+  .dashboardNav,
+  .dashboardContent {
+    border-radius: $size-xxxxs;
+    background-color: $main-gray-lightest;
+    box-shadow: $soft-shadow-gray;
   }
 }

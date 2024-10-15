@@ -1,0 +1,68 @@
+@import "./variables.module.scss";
+
+.backdropBlur {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  z-index: 1;
+}
+
+.modalBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.smallModalWindow {
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: $size-xxl;
+  background-color: $main-white-lightest;
+  padding: $size-xxxl;
+  border-radius: $size-xxxxs;
+  align-items: center;
+}
+
+.input {
+  border-radius: $size-xxxxs;
+  border: none;
+  padding: $size-xxxxs;
+  box-shadow: $inset-soft-shadow;
+  text-align: center;
+  &:focus {
+    outline: none;
+  }
+}
+
+.button {
+  border-radius: $size-xxxxs;
+  border: none;
+  padding: $size-xxxxs $size-xs;
+  background-color: $main-gray;
+  color: $main-white;
+  transition: $basic-transition;
+  box-shadow: $inset-soft-shadow;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: $size-xxxs;
+  cursor: pointer;
+  &:hover,
+  &:active {
+    background-color: $main-gray-light;
+  }
+  &:focus {
+    outline: none;
+  }
+}

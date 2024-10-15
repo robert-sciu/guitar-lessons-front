@@ -1,0 +1,59 @@
+@import "../../../styles/variables.module.scss";
+@import "../../../styles/classes.module.scss";
+
+.taskDisplayContainer {
+  display: grid;
+  grid-template-columns: 5fr 2fr 1fr 1fr;
+  gap: $size-xxl;
+  width: 100%;
+  height: 100%;
+  border-radius: $size-xxxxs;
+  box-shadow: $soft-shadow-gray;
+  background-color: $main-white-lightest;
+  padding: $size-s;
+  .title {
+    display: flex;
+    align-items: center;
+    gap: $size-xs;
+    .titleText {
+      margin: 0;
+    }
+    .icon {
+      color: $youtube-red;
+      font-size: $size-xxxxl;
+    }
+  }
+
+  .tagsContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: $size-xxxs;
+    align-content: center;
+  }
+  .taskDifficulty {
+    display: flex;
+    align-items: center;
+  }
+  .buttonsContainer {
+    font-size: $size-s;
+    display: flex;
+    flex-direction: column;
+    gap: $size-xxxxs;
+
+    button {
+      @extend .button;
+      justify-content: center;
+    }
+    .addTask {
+      background-color: $add-green;
+      &:hover {
+        background-color: $add-green-hover;
+      }
+    }
+  }
+  .moreInfo {
+    grid-column: span 4;
+    display: flex;
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,55 @@
+@import "../../../../styles/variables.module.scss";
+
+.dashboardNavLinksContainer {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: $size-xxxl;
+  ul {
+    display: flex;
+    gap: $size-xxxxs;
+    flex-direction: column;
+    list-style: none;
+  }
+
+  li,
+  button {
+    background-color: $main-gray;
+    border-radius: $size-xxxxs;
+    cursor: pointer;
+    transition: $basic-transition;
+    font-size: $size-s;
+    font-weight: 600;
+
+    &:hover,
+    &:active {
+      background-color: $main-gray-light;
+      .icon {
+        color: $main-gray-darkest;
+      }
+    }
+    .icon {
+      font-size: $size-l;
+      transition: $basic-transition;
+    }
+  }
+
+  .navLink,
+  button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $size-xxxs $size-xs;
+    border-radius: $size-xxxxs;
+    text-decoration: none;
+    color: $main-white;
+    border: none;
+    box-shadow: $soft-shadow-gray;
+  }
+  .active {
+    background-color: $active-yellow;
+    color: $main-black;
+    box-shadow: $soft-shadow-yellow;
+  }
+}
