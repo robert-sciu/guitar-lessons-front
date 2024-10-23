@@ -6,6 +6,8 @@ import "./App.scss";
 import { useDispatch } from "react-redux";
 import { verifyStoredToken } from "./store/authSlice";
 
+import LoadingState from "./components/loadingState/loadingState";
+
 const LazyMainNav = React.lazy(() =>
   import("./containers/mainPage/mainNav/mainNav")
 );
@@ -20,12 +22,19 @@ const LazyDashboardNav = React.lazy(() =>
 const LazyDashboardHomePage = React.lazy(() =>
   import("./containers/dashboardPage/homePage/homePageMain/homePageMain")
 );
-const LazyDashboardTasksPage = React.lazy(() =>
-  import("./containers/dashboardPage/dashboardTasksPage/dashboardTasksPage")
+const LazyUserTasksPage = React.lazy(() =>
+  import(
+    "./containers/dashboardPage/userTasksPage/userTasksPageMain/userTasksPageMain"
+  )
 );
 const LazyAvailableTasksPage = React.lazy(() =>
   import(
     "./containers/dashboardPage/availableTasksPage/availableTasksMain/availableTasksMain"
+  )
+);
+const LazyCompletedUserTasksPage = React.lazy(() =>
+  import(
+    "./containers/dashboardPage/completedUserTasksPage/completedUserTasksMain/completedUserTasksMain"
   )
 );
 const LazyCalendarPage = React.lazy(() =>
@@ -46,7 +55,7 @@ function App() {
         <Route
           path="/"
           element={
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<LoadingState />}>
               <LazyMainNav />
             </Suspense>
           }
@@ -54,7 +63,7 @@ function App() {
           <Route
             path="/login"
             element={
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<LoadingState />}>
                 <LazyLoginForm />
               </Suspense>
             }
@@ -63,7 +72,7 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<LoadingState fullscreen={true} />}>
               <LazyDashboardNav />
             </Suspense>
           }
@@ -71,7 +80,7 @@ function App() {
           <Route
             path="/dashboard/welcome"
             element={
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<LoadingState />}>
                 <LazyDashboardHomePage />
               </Suspense>
             }
@@ -80,20 +89,27 @@ function App() {
           <Route
             path="/dashboard/tasks"
             element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <LazyDashboardTasksPage />
+              <Suspense fallback={<LoadingState />}>
+                <LazyUserTasksPage />
               </Suspense>
             }
           />
           <Route
             path="/dashboard/availableTasks"
             element={
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<LoadingState />}>
                 <LazyAvailableTasksPage />
               </Suspense>
             }
           />
-
+          <Route
+            path="/dashboard/completedTasks"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <LazyCompletedUserTasksPage />
+              </Suspense>
+            }
+          />
           <Route
             path="/dashboard/calendar"
             element={

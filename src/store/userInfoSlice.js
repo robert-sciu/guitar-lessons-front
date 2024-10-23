@@ -110,9 +110,10 @@ export const userInfoSlice = createSlice({
       .addCase(updateUserMailCodeRequest.rejected, manageRejectedState)
 
       .addCase(updateEmail.pending, managePendingState)
-      .addCase(updateEmail.fulfilled, (state) => {
+      .addCase(updateEmail.fulfilled, (state, action) => {
         manageFulfilledState(state);
         state.emailChangeConfirmationCodeRequired = false;
+        state.userInfo = action.payload;
       })
       .addCase(updateEmail.rejected, (state, action) => {
         manageRejectedState(state, action);

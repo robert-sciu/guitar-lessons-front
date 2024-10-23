@@ -21,3 +21,18 @@ export function extractResponseData(response) {
 export function extractErrorResponse(error) {
   return error?.response?.data?.message || error.message || "unknown error";
 }
+
+export function downloadFile(fileBlob, filename) {
+  const downloadUrl = window.URL.createObjectURL(fileBlob);
+  const link = document.createElement("a");
+  link.href = downloadUrl;
+  link.download = filename;
+
+  // Append, click, and remove the link element
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  // Revoke the object URL to free memory
+  window.URL.revokeObjectURL(downloadUrl);
+}

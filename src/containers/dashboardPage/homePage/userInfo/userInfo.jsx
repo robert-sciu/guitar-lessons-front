@@ -113,7 +113,6 @@ export default function UserInfo({ userInfo }) {
               inputIsActive={usernameEditMode}
             />
             <EditButton
-              style={styles.editBtn}
               onClick={() => setUsernameEditMode(!usernameEditMode)}
               isLoading={username !== userInfo.username && userInfoIsLoading}
               isEditing={usernameEditMode}

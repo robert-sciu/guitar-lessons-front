@@ -1,0 +1,20 @@
+@import "../../../../styles/variables.module.scss";
+@import "../../../../styles/classes.module.scss";
+
+.buttonsContainer {
+  font-size: $size-s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: $size-xxxxs;
+}
+button {
+  @extend .button;
+  justify-content: center;
+}
+.addTask {
+  background-color: $add-green;
+  &:hover {
+    background-color: $add-green-hover;
+  }
+}

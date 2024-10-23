@@ -5,6 +5,7 @@
   @extend .modalBackground;
   .errorWindow {
     @extend .smallModalWindow;
+    cursor: default;
     button {
       @extend .button;
     }

@@ -12,16 +12,22 @@
     flex-direction: column;
     list-style: none;
   }
-
-  li,
+  .navLink,
   button {
     background-color: $main-gray;
     border-radius: $size-xxxxs;
     cursor: pointer;
+    font-weight: 500;
     transition: $basic-transition;
-    font-size: $size-s;
-    font-weight: 600;
-
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $size-xxxs $size-xs;
+    border-radius: $size-xxxxs;
+    text-decoration: none;
+    color: $main-white;
+    border: none;
+    box-shadow: $soft-shadow-gray;
     &:hover,
     &:active {
       background-color: $main-gray-light;
@@ -35,19 +41,7 @@
     }
   }
 
-  .navLink,
-  button {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: $size-xxxs $size-xs;
-    border-radius: $size-xxxxs;
-    text-decoration: none;
-    color: $main-white;
-    border: none;
-    box-shadow: $soft-shadow-gray;
-  }
-  .active {
+  .navLink.active {
     background-color: $active-yellow;
     color: $main-black;
     box-shadow: $soft-shadow-yellow;

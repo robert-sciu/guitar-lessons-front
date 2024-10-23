@@ -22,3 +22,7 @@
   background-color: $tag-green;
   box-shadow: $soft-shadow-green;
 }
+
+.disabled {
+  cursor: default;
+}

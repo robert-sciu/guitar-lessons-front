@@ -1,0 +1,38 @@
+@import "../../../../styles/variables.module.scss";
+
+.moreInfo {
+  grid-column: span 4;
+  display: flex;
+  .userNotesContainer {
+    flex: 3;
+    padding: $size-xxxxs;
+    textarea {
+      width: 90%;
+      height: 30rem;
+      border-radius: $size-xxxxs;
+      padding: $size-xxxxs;
+      resize: none;
+      outline: none;
+      border: 1px solid $main-gray-light;
+
+      &:focus {
+        outline: none;
+        border: 2px solid $main-gray;
+      }
+    }
+  }
+  .additionalNotesContainer {
+    flex: 1;
+    padding: $size-xxxxs;
+    gap: $size-m;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    .fileContainer {
+      display: flex;
+      align-items: center;
+      gap: $size-s;
+    }
+  }
+}

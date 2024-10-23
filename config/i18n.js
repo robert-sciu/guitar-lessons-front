@@ -6,6 +6,9 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
+    interpolation: {
+      escapeValue: false, // Disables escaping of characters
+    },
     resources: {
       pl: {
         translation: {
@@ -26,11 +29,10 @@ i18n
             welcome: "Witaj",
             home: "start",
             tasks: "moje zadania",
-            availableTasks: "dostępne zadania",
-            completedTasks: "zakończone zadania",
+            availableTasks: "dostępne zadania",
+            completedTasks: "wykonane zadania",
             calendar: "kalendarz",
             payments: "płatności",
-
             dashboard: "Centrum Dowodzenia",
           },
           userInfo: {
@@ -53,18 +55,33 @@ i18n
             active: "aktywny",
             inactive: "nieaktywny",
           },
+          myTasks: {
+            title: "Moje Zadania",
+          },
+          availableTasks: {
+            title: "Wszystkie Zadania",
+            selectedTags: "Zaznaczone Tagi",
+          },
+          completedTasks: {
+            title: "Wykonane Zadania",
+          },
           taskDisplay: {
             title: "Tytuł",
             artist: "Wykonawca",
             description: "Opis",
-            difficultyLevel: "Poziom trudnosci",
-            showMore: "Zobacz więcej",
+            difficultyLevel: "Poziom trudności",
+            showMore: "Zobacz więcej",
+            showLess: "Zobacz mniej",
             addTask: "Dodaj zadanie",
-            deleteTask: "Usuń zadanie",
+            addingTask: "Dodaję...",
+            deleteTask: "Usuń zadanie",
+            deletingTask: "Usuwam...",
+            confirmDelete: "Czy na pewno chcesz usunąć to zadanie?",
             userNotes: "Notatki",
             tutorial: "Tutorial",
             note: "Notka",
             file: "Plik",
+            isTyping: "zapisuję...",
           },
           daysOfTheWeek: {
             0: "Niedziela",
@@ -84,6 +101,7 @@ i18n
             confirm: "Potwierdź",
             cancel: "Anuluj",
             close: "Zamknij",
+            download: "Pobierz",
           },
           modals: {
             codeRequired: "Kod wymagany",
@@ -143,18 +161,33 @@ i18n
             active: "active",
             inactive: "inactive",
           },
+          myTasks: {
+            title: "My tasks",
+          },
+          availableTasks: {
+            title: "Available tasks",
+            selectedTags: "Selected tags",
+          },
+          completedTasks: {
+            title: "Completed tasks",
+          },
           taskDisplay: {
             title: "Title",
             artist: "Artist",
             description: "Description",
             difficultyLevel: "Difficulty level",
             showMore: "Show more",
+            showLess: "Show less",
             addTask: "Add task",
+            addingTask: "Adding...",
             deleteTask: "Delete task",
+            deletingTask: "Deleting...",
+            confirmDelete: "Are you sure you want to delete this task?",
             userNotes: "User notes",
             tutorial: "Tutorial",
             note: "Note",
             file: "File",
+            isTyping: "is typing...",
           },
           daysOfTheWeek: {
             0: "Sunday",
@@ -173,6 +206,7 @@ i18n
             cancel: "Cancel",
             confirm: "Confirm",
             close: "Close",
+            download: "Download",
           },
           modals: {
             codeRequired: "Code required",

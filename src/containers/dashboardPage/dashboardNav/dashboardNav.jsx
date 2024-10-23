@@ -15,6 +15,7 @@ import {
   selectUserInfoIsLoading,
 } from "../../../store/userInfoSlice";
 import {
+  clearPlanInfoError,
   fetchPlanInfo,
   selectPlanInfoError,
   selectPlanInfoFetchComplete,
@@ -24,9 +25,18 @@ import {
 import DashboardWelcome from "../../../components/dashboard/dashboardWelcome/dashboardWelcome";
 import DashboardNavLinks from "../../../components/dashboard/dashboardNavLinks/dashboardNavLinks";
 import ErrorWindow from "../../../components/modalWindows/errorWindow/errorWindow";
+import {
+  clearUserTasksError,
+  fetchUserTasks,
+  selectUserTasksError,
+  selectUserTasksFetchComplete,
+  selectUserTasksHasError,
+  selectUserTasksIsLoading,
+} from "../../../store/userTasksSlice";
+import { classNameFormatter } from "../../../utilities/utilities";
 
 export default function DashboardNav() {
-  const [error, setError] = useState(null);
+  const [loaded, setLoaded] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -43,6 +53,11 @@ export default function DashboardNav() {
   const planInfoError = useSelector(selectPlanInfoError);
   const planInfoFetchComplete = useSelector(selectPlanInfoFetchComplete);
 
+  const userTaskIsLoading = useSelector(selectUserTasksIsLoading);
+  const userTaskHasError = useSelector(selectUserTasksHasError);
+  const userTaskError = useSelector(selectUserTasksError);
+  const userTaskFetchComplete = useSelector(selectUserTasksFetchComplete);
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login");
@@ -57,7 +72,13 @@ export default function DashboardNav() {
     ) {
       dispatch(fetchUserInfo());
     }
-  });
+  }, [
+    isAuthenticated,
+    userInfoFetchComplete,
+    userInfoIsLoading,
+    userInfoHasError,
+    dispatch,
+  ]);
 
   useEffect(() => {
     if (
@@ -68,23 +89,37 @@ export default function DashboardNav() {
     ) {
       dispatch(fetchPlanInfo());
     }
-  });
+  }, [
+    isAuthenticated,
+    planInfoFetchComplete,
+    planInfoIsLoading,
+    planInfoHasError,
+    dispatch,
+  ]);
 
   useEffect(() => {
-    if (userInfoHasError) {
-      setError(userInfoError);
-    } else {
-      setError(null);
+    if (
+      isAuthenticated &&
+      !userTaskFetchComplete &&
+      !userTaskIsLoading &&
+      !userTaskHasError
+    ) {
+      dispatch(fetchUserTasks());
     }
-  }, [userInfoHasError, userInfoError]);
+  }, [
+    isAuthenticated,
+    userTaskFetchComplete,
+    userTaskIsLoading,
+    userTaskHasError,
+    dispatch,
+  ]);
 
   useEffect(() => {
-    if (planInfoHasError) {
-      setError(planInfoError);
-    } else {
-      setError(null);
-    }
-  }, [planInfoHasError, planInfoError]);
+    if (!userInfoFetchComplete) return;
+    setTimeout(() => {
+      setLoaded(true);
+    }, 40);
+  }, [userInfoFetchComplete]);
 
   function handleLogout(e) {
     e.preventDefault();
@@ -94,19 +129,34 @@ export default function DashboardNav() {
 
   return (
     <div className={styles.dashboardContainer}>
-      {/* <I18nextProvider i18n={i18n}> */}
-      <div className={styles.dashboardNav}>
+      <div
+        className={classNameFormatter({
+          styles,
+          classNames: ["dashboardNav", loaded ? "show" : "hide"],
+        })}
+      >
         {userInfoFetchComplete && (
           <DashboardWelcome username={userInfo.username} />
         )}
         <DashboardNavLinks onLogout={handleLogout} />
       </div>
-      {/* </I18nextProvider> */}
       <div className={styles.dashboardContent}>
         <Outlet />
-        {error && (
-          <ErrorWindow error={error} dismissHandler={clearUserInfoError} />
-        )}
+        <ErrorWindow
+          error={userInfoError}
+          showError={userInfoHasError}
+          dismissHandler={clearUserInfoError}
+        />
+        <ErrorWindow
+          error={planInfoError}
+          showError={planInfoHasError}
+          dismissHandler={clearPlanInfoError}
+        />
+        <ErrorWindow
+          error={userTaskError}
+          showError={userTaskHasError}
+          dismissHandler={clearUserTasksError}
+        />
       </div>
     </div>
   );

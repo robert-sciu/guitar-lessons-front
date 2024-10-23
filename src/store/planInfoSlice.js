@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  extractResponseData,
   manageFulfilledState,
   managePendingState,
   manageRejectedState,
@@ -12,7 +13,7 @@ export const fetchPlanInfo = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await apiClient.get("/planInfo");
-      return response.data.data;
+      return extractResponseData(response);
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }

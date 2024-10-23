@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  extractErrorResponse,
+  extractResponseData,
   manageFulfilledState,
   managePendingState,
   manageRejectedState,
@@ -11,7 +13,19 @@ export const fetchUserTasks = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await apiClient.get("/userTasks");
-      return response.data.data.Tasks;
+      return extractResponseData(response);
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const fetchCompletedTasks = createAsyncThunk(
+  "userTasks/fetchCompletedTasks",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get("/userTasks/completed");
+      return extractResponseData(response);
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -23,9 +37,9 @@ export const addUserTask = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await apiClient.post("/userTasks", data);
-      return response.data.data;
+      return extractResponseData(response);
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return rejectWithValue(extractErrorResponse(error));
     }
   }
 );
@@ -35,9 +49,9 @@ export const updateUserTaskNotes = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await apiClient.patch(`/userTasks/userNotes`, data);
-      return response.data.data;
+      return extractResponseData(response);
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return rejectWithValue(extractErrorResponse(error));
     }
   }
 );
@@ -46,10 +60,11 @@ export const deleteUserTask = createAsyncThunk(
   "userTasks/deleteUserTask",
   async (id, { rejectWithValue }) => {
     try {
-      await apiClient.delete(`/userTasks/${id}`);
-      return id;
+      const response = await apiClient.delete(`/userTasks/${id}`);
+
+      return extractResponseData(response);
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return rejectWithValue(extractErrorResponse(error));
     }
   }
 );
@@ -59,10 +74,22 @@ const userTasksSlice = createSlice({
   initialState: {
     isLoading: false,
     fetchComplete: false,
+    completedTasksFetchComplete: false,
     hasError: false,
+    error: null,
     userTasks: [],
+    completedTasks: [],
+    userTaskUpdated: false,
   },
-  reducers: {},
+  reducers: {
+    clearUserTasksError: (state) => {
+      state.hasError = false;
+      state.error = null;
+    },
+    clearUserTaskUpdated: (state) => {
+      state.userTaskUpdated = false;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(addUserTask.pending, (state) => {
@@ -70,10 +97,11 @@ const userTasksSlice = createSlice({
       })
       .addCase(addUserTask.fulfilled, (state, action) => {
         manageFulfilledState(state);
-        state.userTasks.push(action.payload);
+        state.userTasks = action.payload;
+        state.userTaskUpdated = true;
       })
-      .addCase(addUserTask.rejected, (state) => {
-        manageRejectedState(state);
+      .addCase(addUserTask.rejected, (state, action) => {
+        manageRejectedState(state, action);
       })
       .addCase(fetchUserTasks.pending, (state) => {
         managePendingState(state);
@@ -83,42 +111,59 @@ const userTasksSlice = createSlice({
         state.userTasks = action.payload;
         state.fetchComplete = true;
       })
-      .addCase(fetchUserTasks.rejected, (state) => {
-        manageRejectedState(state);
+      .addCase(fetchUserTasks.rejected, (state, action) => {
+        manageRejectedState(state, action);
         state.userTasks = [];
       })
+      .addCase(fetchCompletedTasks.pending, (state) => {
+        managePendingState(state);
+      })
+      .addCase(fetchCompletedTasks.fulfilled, (state, action) => {
+        manageFulfilledState(state);
+        state.completedTasks = action.payload;
+        state.completedTasksFetchComplete = true;
+      })
+      .addCase(fetchCompletedTasks.rejected, manageRejectedState)
       .addCase(deleteUserTask.pending, (state) => {
         managePendingState(state);
       })
       .addCase(deleteUserTask.fulfilled, (state, action) => {
         manageFulfilledState(state);
-        state.userTasks = Object.values(state.userTasks).filter(
-          (task) => task.UserTask.id !== action.payload
-        );
+        state.userTasks = action.payload;
+        state.userTaskUpdated = true;
       })
-      .addCase(deleteUserTask.rejected, (state) => {
-        manageRejectedState(state);
+      .addCase(deleteUserTask.rejected, (state, action) => {
+        manageRejectedState(state, action);
       })
       .addCase(updateUserTaskNotes.pending, (state) => {
         managePendingState(state);
       })
       .addCase(updateUserTaskNotes.fulfilled, (state, action) => {
-        manageFulfilledState(state);
-        state.userTasks = Object.values(state.userTasks).map((task) => {
-          if (task.UserTask.id === action.payload.id) {
-            return { ...task, UserTask: action.payload };
-          }
-          return task;
+        const userTask = Object.values(state.userTasks).find((userTask) => {
+          return userTask.user_task.id === action.payload.user_task_id;
         });
+        if (userTask) {
+          userTask.user_task.user_notes = action.payload.user_notes;
+        }
+        manageFulfilledState(state);
       })
-      .addCase(updateUserTaskNotes.rejected, (state) => {
-        manageRejectedState(state);
+      .addCase(updateUserTaskNotes.rejected, (state, action) => {
+        manageRejectedState(state, action);
       });
   },
 });
 
+export const { clearUserTasksError, clearUserTaskUpdated } =
+  userTasksSlice.actions;
+
 export const selectUserTasks = (state) => state.userTasks.userTasks;
-export const selectIsLoadingUserTasks = (state) => state.userTasks.isLoading;
-export const selectHasErrorUserTasks = (state) => state.userTasks.hasError;
-export const selectFetchComplete = (state) => state.userTasks.fetchComplete;
+export const selectCompletedTasks = (state) => state.userTasks.completedTasks;
+export const selectUserTasksIsLoading = (state) => state.userTasks.isLoading;
+export const selectUserTasksHasError = (state) => state.userTasks.hasError;
+export const selectUserTasksError = (state) => state.userTasks.error;
+export const selectUserTasksFetchComplete = (state) =>
+  state.userTasks.fetchComplete;
+export const selectCompletedTasksFetchComplete = (state) =>
+  state.userTasks.completedTasksFetchComplete;
+export const selectUserTaskUpdated = (state) => state.userTasks.userTaskUpdated;
 export default userTasksSlice.reducer;

@@ -4,10 +4,11 @@ import {
   fetchAvailableTasks,
   selectAvailableTasks,
   selectIsLoadingTasks,
+  selectTasksFetchComplete,
+  selectTasksHasError,
 } from "../../../../store/tasksSlice";
 import { selectIsAuthenticated } from "../../../../store/authSlice";
-import TaskDisplay from "../../../../components/taskDisplay/taskDisplay";
-import { selectFetchComplete } from "../../../../store/tasksSlice";
+import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/taskDisplayMain";
 import {
   fetchTags,
   selectFetchTagsComplete,
@@ -16,18 +17,30 @@ import {
 import TagDisplay from "../../../../components/tagDisplay/tagDisplay";
 
 import styles from "./availableTasksMain.module.scss";
+import { useTranslation } from "react-i18next";
+import {
+  clearUserTaskUpdated,
+  selectUserTaskUpdated,
+} from "../../../../store/userTasksSlice";
 
 export default function AvailableTasksMain() {
   const [selectedTags, setSelectedTags] = useState([]);
+  // const [availableTasks, setAvailableTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
+  // const userTasksIds = useSelector(selectUserTasksIds);
   const allAvailableTasks = useSelector(selectAvailableTasks);
   const allTags = useSelector(selectTags);
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const isLoading = useSelector(selectIsLoadingTasks);
-  const fetchComplete = useSelector(selectFetchComplete);
+  const isLoadingTasks = useSelector(selectIsLoadingTasks);
+  const tasksHasError = useSelector(selectTasksHasError);
+  const fetchTasksComplete = useSelector(selectTasksFetchComplete);
   const fetchTagsComplete = useSelector(selectFetchTagsComplete);
+  const userTaskUpdated = useSelector(selectUserTaskUpdated);
+  // const userTasksFetchComplete = useSelector(selectUserTasksFetchComplete);
 
   const dispatch = useDispatch();
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (selectedTags.length > 0) {
@@ -42,16 +55,34 @@ export default function AvailableTasksMain() {
   }, [selectedTags, allAvailableTasks]);
 
   useEffect(() => {
-    if (isAuthenticated && !fetchComplete) {
+    if (
+      isAuthenticated &&
+      !fetchTasksComplete &&
+      !isLoadingTasks &&
+      !tasksHasError
+    ) {
       dispatch(fetchAvailableTasks());
     }
-  }, [dispatch, isAuthenticated, fetchComplete]);
+  }, [
+    dispatch,
+    isAuthenticated,
+    fetchTasksComplete,
+    isLoadingTasks,
+    tasksHasError,
+  ]);
 
   useEffect(() => {
     if (isAuthenticated && !fetchTagsComplete) {
       dispatch(fetchTags());
     }
   }, [dispatch, isAuthenticated, fetchTagsComplete]);
+
+  useEffect(() => {
+    if (userTaskUpdated) {
+      dispatch(clearUserTaskUpdated());
+      dispatch(fetchAvailableTasks());
+    }
+  }, [dispatch, userTaskUpdated]);
 
   function handleTagClick(tag, selected) {
     if (selected) {
@@ -62,8 +93,9 @@ export default function AvailableTasksMain() {
   }
   return (
     <div className={styles.tasksContainer}>
+      <h3>{t("availableTasks.title")}</h3>
       <div className={styles.selectedTags}>
-        <p>selected tags:</p>
+        <p>{t("availableTasks.selectedTags")}:</p>
         <div className={styles.tags}>
           {selectedTags.map((tag) => tag.value).join(", ")}
         </div>
@@ -75,9 +107,9 @@ export default function AvailableTasksMain() {
             <TagDisplay key={tag.id} tag={tag} onTagClick={handleTagClick} />
           ))}
       </div>
-      <h1></h1>
-      {isLoading && <p>Loading...</p>}
-      {fetchComplete && allAvailableTasks?.length === 0 && <p>No tasks yet</p>}
+      {fetchTasksComplete && filteredTasks?.length === 0 && (
+        <p>No available tasks</p>
+      )}
       <div className={styles.tasksList}>
         {filteredTasks?.length > 0 &&
           filteredTasks.map((task) => (

@@ -1,26 +1,18 @@
-@import "../../../../styles/classes.module.scss";
+@import "../../../../styles/variables.module.scss";
 @import "../../../../styles/classes.module.scss";
 
-.codeRequiredModalBg {
+.confirmationWindowBackground {
   @extend .modalBackground;
-
-  .codeRequiredModalContainer {
+  .confirmationWindow {
     @extend .smallModalWindow;
     cursor: default;
-    input {
-      @extend .input;
-      width: 80%;
-    }
     .buttonsContainer {
       display: flex;
       gap: $size-xxs;
       button {
         @extend .button;
+        min-width: $size-giant;
       }
     }
   }
-}
-
-.codeRequiredModalBg::before {
-  @extend .backdropBlur;
 }

@@ -1,17 +1,28 @@
 import { useTranslation } from "react-i18next";
 import { HiOutlinePencilSquare } from "react-icons/hi2";
 import PropTypes from "prop-types";
+import LoadingState from "../../loadingState/loadingState";
+import styles from "./editButton.module.scss";
 
-export default function EditButton({ style, onClick, isLoading, isEditing }) {
+export default function EditButton({
+  style = false,
+  onClick,
+  isLoading,
+  isEditing,
+}) {
   const { t } = useTranslation();
   return (
-    <button className={style} onClick={onClick} disabled={isLoading}>
-      <HiOutlinePencilSquare />{" "}
+    <button
+      className={style ? style : styles.editButton}
+      onClick={onClick}
+      disabled={isLoading}
+    >
       {isLoading ? (
-        <p>loading ..</p>
+        <LoadingState spinnerOnly={true} />
       ) : (
-        <p>{t(`buttons.${isEditing ? "save" : "edit"}`)}</p>
+        <HiOutlinePencilSquare />
       )}
+      <p>{t(`buttons.${isEditing ? "save" : "edit"}`)}</p>
     </button>
   );
 }
