@@ -12,6 +12,19 @@ function createDayHoursObject() {
   return dayHours;
 }
 
+function calculateReservationStartAndEnd(reservation) {
+  const reservationStart = `${reservation.hour}:${reservation.minute}${
+    reservation.minute === 0 ? "0" : ""
+  }`;
+  const hoursToAdd = Math.floor(reservation.duration / 60);
+  const minutesToAdd = reservation.duration % 60;
+
+  const reservationEnd = `${reservation.hour + hoursToAdd}:${
+    reservation.minute + minutesToAdd
+  }${minutesToAdd === 0 ? "0" : ""}`;
+  return { reservationStart, reservationEnd };
+}
+
 function attachLessonReservationsToDayHoursObject(
   dayHours,
   lessonReservations
@@ -36,4 +49,5 @@ export {
   createDayHoursObject,
   attachLessonReservationsToDayHoursObject,
   checkIsBooked,
+  calculateReservationStartAndEnd,
 };

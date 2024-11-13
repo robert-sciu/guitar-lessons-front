@@ -4,13 +4,18 @@ import { useDrag } from "react-dnd";
 import { useDispatch, useSelector } from "react-redux";
 import { selectRescheduleConfirmationNeeded } from "../../../../store/calendar/calendarSelectors";
 import { selectUser } from "../../../../store/authSlice";
-import { setEventToDelete } from "../../../../store/calendar/calendarSlice";
+import { setDetailsModalWindowData } from "../../../../store/calendar/calendarSlice";
+import styles from "./bookingTile.module.scss";
+import { classNameFormatter } from "../../../../utilities/utilities";
+import { useTranslation } from "react-i18next";
+// import ReservationDetailsModal from "../reservationDetailsModal/reservationDetailsModal";
 
-export default function BookingTile({ reservation, durationBlocks }) {
+export default function BookingTile({ reservation, durationBlocks, weekday }) {
   const rescheduleConfirmationNeeded = useSelector(
     selectRescheduleConfirmationNeeded
   );
   const user = useSelector(selectUser);
+  const { t } = useTranslation();
 
   const dispatch = useDispatch();
 
@@ -33,18 +38,20 @@ export default function BookingTile({ reservation, durationBlocks }) {
 
   useEffect(() => {
     if (rescheduleConfirmationNeeded && rescheduling) {
-      setOpacity(0.3);
+      setOpacity(30);
     } else if (isDragging) {
-      setOpacity(0.5);
+      setOpacity(50);
     } else {
-      setOpacity(1);
+      setOpacity(100);
       setRescheduling(false);
     }
   }, [rescheduleConfirmationNeeded, rescheduling, isDragging]);
 
-  function handleDeleteReservation() {
-    dispatch(setEventToDelete({ id: reservation.id, date: reservation.date }));
-  }
+  useEffect(() => {
+    if (detailsOpen) {
+      dispatch(setDetailsModalWindowData({ ...reservation, weekday }));
+    }
+  }, [detailsOpen, dispatch, reservation, weekday]);
 
   function handleOpenDetails() {
     if (user.id !== reservation.user_id) {
@@ -53,30 +60,25 @@ export default function BookingTile({ reservation, durationBlocks }) {
     setDetailsOpen(!detailsOpen);
   }
 
-  const height = durationBlocks * 100;
-
   return (
     <div
       ref={drag}
-      style={{
-        backgroundColor: detailsOpen ? "green" : "lightGreen",
-        position: "absolute",
-        top: 0,
-        height: detailsOpen ? `${height + 100}%` : `${height}%`,
-        width: detailsOpen ? "200%" : "100%",
-        // curson: "pointer",
-        opacity,
-        zIndex: isDragging ? -100 : 100,
-        // zIndex: detailsOpen ? 200 : 100,
-      }}
+      className={classNameFormatter({
+        styles,
+        classNames: [
+          "bookingTile",
+          `duration${durationBlocks}`,
+          `opacity${opacity}`,
+        ],
+      })}
       onClick={handleOpenDetails}
     >
       {reservation.user_id === user.id ? (
-        <p>moja lekcja</p>
+        <p>{t("bookingTile.myReservation")}</p>
       ) : (
         <p>{reservation.username}</p>
       )}
-      {reservation.user_id === user.id && detailsOpen && (
+      {/* {reservation.user_id === user.id && detailsOpen && (
         <div>
           <p>{reservation.date}</p>
           <p>
@@ -84,7 +86,7 @@ export default function BookingTile({ reservation, durationBlocks }) {
           </p>
           <button onClick={handleDeleteReservation}>delete</button>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
@@ -92,4 +94,5 @@ export default function BookingTile({ reservation, durationBlocks }) {
 BookingTile.propTypes = {
   reservation: PropTypes.object,
   durationBlocks: PropTypes.number,
+  weekday: PropTypes.number,
 };

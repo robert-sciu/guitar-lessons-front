@@ -8,16 +8,19 @@ import {
 } from "../../../../store/calendar/calendarSlice";
 import { useEffect, useState } from "react";
 import { selectUpdateData } from "../../../../store/calendar/calendarSelectors";
+import styles from "./calendarHalfHourBlock.module.scss";
+import { classNameFormatter } from "../../../../utilities/utilities";
 
 export default function CalendarHalfHourBlock({
   date,
+  weekday,
   hour,
   minute,
   hourData,
   isBooked,
 }) {
   const [hover, setHover] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState("lightGray");
+  const [backgroundColor, setBackgroundColor] = useState("mainWhite");
   const [reservationToReschedule, setReservationToReschedule] = useState({});
   const [newReservation, setNewReservation] = useState(false);
   const updateData = useSelector(selectUpdateData);
@@ -54,15 +57,15 @@ export default function CalendarHalfHourBlock({
     if (isOver) {
       setBackgroundColor("gray");
     } else {
-      setBackgroundColor("lightGray");
+      setBackgroundColor("mainWhite");
     }
   }, [isOver]);
 
   useEffect(() => {
     if (hover && !isBooked) {
-      setBackgroundColor("green");
+      setBackgroundColor("hoverColor");
     } else {
-      setBackgroundColor("lightGray");
+      setBackgroundColor("mainWhite");
     }
   }, [hover, isBooked]);
 
@@ -107,34 +110,32 @@ export default function CalendarHalfHourBlock({
   return (
     <div
       ref={drop}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        position: "relative",
-        width: "100%",
-        height: "20px",
-        backgroundColor,
-        cursor: "pointer",
-      }}
+      onClick={handleClick}
+      className={classNameFormatter({
+        styles,
+        classNames: ["calendarHalfHourBlock", backgroundColor],
+      })}
       onMouseEnter={() => setHover(isBooked ? false : true)}
       onMouseLeave={() => setHover(false)}
-      onClick={handleClick}
     >
-      {hover && <span style={{ color: "white" }}>+</span>}
-      {isBooked ? (
-        <BookingTile reservation={hourData} durationBlocks={durationBlocks} />
-      ) : (
-        ""
+      {isBooked && (
+        <BookingTile
+          reservation={hourData}
+          durationBlocks={durationBlocks}
+          weekday={weekday}
+        />
       )}
-      {Object.keys(reservationToReschedule).length > 0 ? (
+      <p className={styles.time}>
+        {Intl.DateTimeFormat("pl-PL", {
+          hour: "numeric",
+          minute: "numeric",
+        }).format(new Date(0, 0, 0, hour, minute))}
+      </p>
+      {Object.keys(reservationToReschedule).length > 0 && (
         <BookingTile
           reservation={reservationToReschedule}
           durationBlocks={rescheduleDurationBlocks}
         />
-      ) : (
-        ""
       )}
     </div>
   );
@@ -146,4 +147,5 @@ CalendarHalfHourBlock.propTypes = {
   hourData: PropTypes.object,
   isBooked: PropTypes.bool,
   date: PropTypes.string,
+  weekday: PropTypes.number,
 };

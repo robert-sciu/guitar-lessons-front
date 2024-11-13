@@ -7,6 +7,7 @@ import {
   deleteEventHandler,
   moveEventHandler,
   setDatesHandler,
+  setDetailsModalWindowDataHandler,
   setEventToDeleteHandler,
   setFetchCompleteForNewReservationHandler,
   setFetchCompleteForRescheduleHandler,
@@ -34,10 +35,14 @@ const calendarSlice = createSlice({
     fetchCompleteForNewReservation: false,
 
     dates: {},
+    datesAvailableForReschedule: [],
     updateData: {},
     newReservationData: {},
+    detailsModalWindowData: {},
     deleteEventData: {},
 
+    showNewReservationModalWindow: false,
+    showDetailsModalWindow: false,
     rescheduleConfirmationNeeded: false,
     createReservationConfirmationNeeded: false,
     deleteReservationConfirmationNeeded: false,
@@ -54,6 +59,7 @@ const calendarSlice = createSlice({
     clearCalendarError: clearCalendarErrorHandler,
     clearNewReservationData: clearNewReservationDataHandler,
     addEvent: addEventHandler,
+    setDetailsModalWindowData: setDetailsModalWindowDataHandler,
     deleteEvent: deleteEventHandler,
     moveEvent: moveEventHandler,
   },
@@ -77,6 +83,7 @@ export const {
   clearCalendarError,
   clearNewReservationData,
   addEvent,
+  setDetailsModalWindowData,
   deleteEvent,
   moveEvent,
 } = calendarSlice.actions;

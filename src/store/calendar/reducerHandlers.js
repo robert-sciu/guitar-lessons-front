@@ -1,11 +1,13 @@
 export const setDatesHandler = (state) => {
-  const daysArray = Array.from({ length: 7 }, (_, i) => i);
+  const daysArray = Array.from({ length: 14 }, (_, i) => i);
   const today = new Date();
   const todayWeekday = today.getDay();
+  const datesAvailableForReschedule = [];
 
   daysArray.map((weekday) => {
     if (weekday === todayWeekday) {
       const date = today.toISOString().split("T")[0];
+      datesAvailableForReschedule.push(date);
       state.dates[date] = {
         weekday,
         isCurrentDay: true,
@@ -16,6 +18,12 @@ export const setDatesHandler = (state) => {
       const relativeDate = new Date(today);
       relativeDate.setDate(today.getDate() + (weekday - todayWeekday));
       const date = relativeDate.toISOString().split("T")[0];
+      if (
+        datesAvailableForReschedule.length > 0 &&
+        datesAvailableForReschedule.length < 6
+      ) {
+        datesAvailableForReschedule.push(date);
+      }
       state.dates[date] = {
         weekday,
         isCurrentDay: false,
@@ -25,6 +33,7 @@ export const setDatesHandler = (state) => {
     }
   });
   state.datesSet = true;
+  state.datesAvailableForReschedule = datesAvailableForReschedule;
 };
 
 export const moveEventHandler = (state, action) => {
@@ -56,6 +65,11 @@ export const addEventHandler = (state, action) => {
   });
 };
 
+export const setDetailsModalWindowDataHandler = (state, action) => {
+  state.detailsModalWindowData = action.payload;
+  state.showDetailsModalWindow = true;
+};
+
 export const deleteEventHandler = (state) => {
   const date = state.deleteEventData.date;
   const id = state.deleteEventData.id;
@@ -73,6 +87,7 @@ export const setUpdateDataHandler = (state, action) => {
 };
 export const setNewReservationDataHandler = (state, action) => {
   state.newReservationData = action.payload;
+  state.showNewReservationModalWindow = true;
 };
 export const clearUpdateDataHandler = (state) => {
   state.updateData = {};

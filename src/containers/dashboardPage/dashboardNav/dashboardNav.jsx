@@ -6,6 +6,7 @@ import { logoutUser, selectIsAuthenticated } from "../../../store/authSlice";
 import { useEffect, useState } from "react";
 import styles from "./dashboardNav.module.scss";
 import {
+  clearRefetchNeeded,
   clearUserInfoError,
   fetchUserInfo,
   selectUserInfo,
@@ -13,6 +14,7 @@ import {
   selectUserInfoFetchComplete,
   selectUserInfoHasError,
   selectUserInfoIsLoading,
+  selectUserRefetchNeeded,
 } from "../../../store/userInfoSlice";
 import {
   clearPlanInfoError,
@@ -58,6 +60,8 @@ export default function DashboardNav() {
   const userTaskError = useSelector(selectUserTasksError);
   const userTaskFetchComplete = useSelector(selectUserTasksFetchComplete);
 
+  const userRefetchNeeded = useSelector(selectUserRefetchNeeded);
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login");
@@ -79,6 +83,13 @@ export default function DashboardNav() {
     userInfoHasError,
     dispatch,
   ]);
+
+  useEffect(() => {
+    if (userRefetchNeeded) {
+      dispatch(clearRefetchNeeded());
+      dispatch(fetchUserInfo());
+    }
+  }, [userRefetchNeeded, dispatch]);
 
   useEffect(() => {
     if (

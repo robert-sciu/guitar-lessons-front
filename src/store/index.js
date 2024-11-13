@@ -3,7 +3,8 @@ import authReducer from "./authSlice";
 import tasksReducer from "./tasksSlice";
 import userTasksReducer from "./userTasksSlice";
 import tagsReducer from "./tagsSlice";
-import calendarReducer from "./calendar/calendarSlice";
+import fullCalendarReducer from "./fullCalendarSlice";
+// import calendarReducer from "./calendar/calendarSlice";
 import userInfoReducer from "./userInfoSlice";
 import planInfoReducer from "./planInfoSlice";
 
@@ -13,7 +14,8 @@ export default configureStore({
     tasks: tasksReducer,
     userTasks: userTasksReducer,
     tags: tagsReducer,
-    calendar: calendarReducer,
+    fullCalendar: fullCalendarReducer,
+    // calendar: calendarReducer,
     userInfo: userInfoReducer,
     planInfo: planInfoReducer,
   },

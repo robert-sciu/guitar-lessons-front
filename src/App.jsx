@@ -37,8 +37,12 @@ const LazyCompletedUserTasksPage = React.lazy(() =>
     "./containers/dashboardPage/completedUserTasksPage/completedUserTasksMain/completedUserTasksMain"
   )
 );
-const LazyCalendarPage = React.lazy(() =>
-  import("./containers/dashboardPage/calendar/calendar")
+// const LazyCalendarPage = React.lazy(() =>
+//   import("./containers/dashboardPage/calendar/calendarMain/calendarMain")
+// );
+
+const LazyFullCalendarPage = React.lazy(() =>
+  import("./containers/dashboardPage/fullCalendarPage/fullCalendarPage")
 );
 
 function App() {
@@ -114,7 +118,7 @@ function App() {
             path="/dashboard/calendar"
             element={
               <Suspense fallback={<div>Loading...</div>}>
-                <LazyCalendarPage />
+                <LazyFullCalendarPage />
               </Suspense>
             }
           />

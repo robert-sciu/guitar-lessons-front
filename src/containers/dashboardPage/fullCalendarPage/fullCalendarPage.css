@@ -1,0 +1,8 @@
+.fc-timegrid-slot:hover {
+  background-color: rgba(27, 197, 98, 0.404);
+}
+
+.fc-timegrid-slot {
+  transition: all 0.4s ease-in-out;
+  border: 1px solid black;
+}

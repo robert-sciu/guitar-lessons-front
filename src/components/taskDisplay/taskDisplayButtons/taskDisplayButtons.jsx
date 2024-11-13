@@ -21,7 +21,10 @@ export default function TaskDisplayButtons({
   return (
     <div className={styles.buttonsContainer}>
       {enableAdd && (
-        <button onClick={handleAddTask} className={styles.addTask}>
+        <button
+          className={`${styles.taskButton} ${styles.addTaskButton}`}
+          onClick={handleAddTask}
+        >
           {addingTask ? (
             <>
               <LoadingState spinnerOnly={true} /> {t("taskDisplay.addingTask")}
@@ -32,12 +35,15 @@ export default function TaskDisplayButtons({
         </button>
       )}
       {enableShowMore && (
-        <button onClick={() => setShowMore(!showMore)}>
+        <button
+          className={styles.taskButton}
+          onClick={() => setShowMore(!showMore)}
+        >
           {showMore ? t("taskDisplay.showLess") : t("taskDisplay.showMore")}{" "}
         </button>
       )}
       {enableDelete && (
-        <button onClick={handleDeleteTask}>
+        <button className={styles.taskButton} onClick={handleDeleteTask}>
           {deletingTask ? (
             <>
               <LoadingState spinnerOnly={true} />{" "}

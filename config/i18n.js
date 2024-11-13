@@ -61,6 +61,9 @@ i18n
           availableTasks: {
             title: "Wszystkie Zadania",
             selectedTags: "Zaznaczone Tagi",
+            tags: "Tagi",
+            levelFilter: "Ukryj zadania poniżej poziomu",
+            saving: "Zapisuję",
           },
           completedTasks: {
             title: "Wykonane Zadania",
@@ -81,7 +84,10 @@ i18n
             tutorial: "Tutorial",
             note: "Notka",
             file: "Plik",
-            isTyping: "zapisuję...",
+            isTyping: "Zapisuję...",
+          },
+          calendar: {
+            myReservation: "Moja lekcja",
           },
           daysOfTheWeek: {
             0: "Niedziela",
@@ -93,8 +99,23 @@ i18n
             6: "Sobota",
             label: "godzina",
           },
+          months: {
+            1: "Stycznia",
+            2: "Lutego",
+            3: "Marca",
+            4: "Kwietnia",
+            5: "Maja",
+            6: "Czerwca",
+            7: "Lipca",
+            8: "Sierpnia",
+            9: "Wrzesnia",
+            10: "Pażdziernika",
+            11: "Listopada",
+            12: "Grudnia",
+          },
           buttons: {
             edit: "Edytuj",
+            change: "Zmień",
             save: "Zapisz",
             delete: "Usuń",
             logout: "wyloguj",
@@ -102,10 +123,12 @@ i18n
             cancel: "Anuluj",
             close: "Zamknij",
             download: "Pobierz",
+            wait: "Czekaj",
           },
           modals: {
             codeRequired: "Kod wymagany",
             codePlaceholder: "Kod",
+            myLesson: "Moja lekcja",
           },
         },
       },
@@ -167,6 +190,9 @@ i18n
           availableTasks: {
             title: "Available tasks",
             selectedTags: "Selected tags",
+            tags: "Tags",
+            levelFilter: "Hide tasks below level",
+            saving: "Saving",
           },
           completedTasks: {
             title: "Completed tasks",
@@ -189,6 +215,10 @@ i18n
             file: "File",
             isTyping: "is typing...",
           },
+          calendar: {
+            myReservation: "My reservation",
+          },
+
           daysOfTheWeek: {
             0: "Sunday",
             1: "Monday",
@@ -198,8 +228,23 @@ i18n
             5: "Friday",
             6: "Saturday",
           },
+          months: {
+            1: "January",
+            2: "February",
+            3: "March",
+            4: "April",
+            5: "May",
+            6: "June",
+            7: "July",
+            8: "August",
+            9: "September",
+            10: "October",
+            11: "November",
+            12: "December",
+          },
           buttons: {
             edit: "Edit",
+            change: "Change",
             save: "Save",
             delete: "Delete",
             logout: "logout",
@@ -207,10 +252,12 @@ i18n
             confirm: "Confirm",
             close: "Close",
             download: "Download",
+            wait: "Wait",
           },
           modals: {
             codeRequired: "Code required",
             codePlaceholder: "Code",
+            myLesson: "My lesson",
           },
         },
       },

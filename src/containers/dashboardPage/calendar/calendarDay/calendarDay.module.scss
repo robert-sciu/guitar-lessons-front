@@ -1,0 +1,28 @@
+@import "../../../../../styles/variables.module.scss";
+
+.calendarDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  .calendarDayHeader {
+    height: $size-xxxl;
+  }
+  .currentDay {
+    color: $main-green;
+  }
+  .calendarHoursContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    .calendarHour {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      border: 0.3px solid $main-gray-lightest;
+    }
+  }
+}

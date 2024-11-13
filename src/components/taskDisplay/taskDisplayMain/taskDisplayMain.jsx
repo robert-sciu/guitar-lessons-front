@@ -134,7 +134,6 @@ export default function TaskDisplayMain({ task, ...props }) {
             setTaskIdToDelete(null);
           }}
           dataForHandler={taskIdToDelete}
-          dispatch={dispatch}
         />
       )}
     </div>

@@ -11,9 +11,9 @@ export default function NewReservationWindow({
   function handleClick(isConfirmed) {
     if (isConfirmed) {
       const data = {
-        date: reservation.date,
-        hour: reservation.hour,
-        minute: reservation.minute,
+        start_UTC: reservation.start_UTC,
+        hour: reservation.start_UTC.split("T")[1].split(":")[0],
+        minute: reservation.start_UTC.split("T")[1].split(":")[1],
         duration: selectedTime,
       };
       dispatch(confirmHandler(data));
@@ -46,9 +46,10 @@ export default function NewReservationWindow({
         }}
       >
         <p style={{ color: "black" }}>New reservation</p>
-        <p style={{ color: "black" }}>date: {reservation.date}</p>
+        <p style={{ color: "black" }}>date: {reservation.start_UTC}</p>
         <p style={{ color: "black" }}>
-          hour: {reservation.hour}:{reservation.minute}
+          hour: {reservation.start_UTC.split("T")[1].split(":")[0]}:
+          {reservation.start_UTC.split("T")[1].split(":")[1]}
           {reservation.minute === 0 ? "0" : ""}
         </p>
         <label htmlFor="time-select">choose time:</label>

@@ -2,6 +2,8 @@
 @import "../../../../styles/classes.module.scss";
 
 .editButton {
-  @extend .button;
+  @extend .commonButton;
   position: relative;
+  min-width: 7rem;
+  justify-content: center;
 }

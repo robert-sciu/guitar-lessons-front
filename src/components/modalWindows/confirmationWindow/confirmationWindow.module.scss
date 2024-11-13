@@ -10,8 +10,9 @@
       display: flex;
       gap: $size-xxs;
       button {
-        @extend .button;
+        @extend .commonButton;
         min-width: $size-giant;
+        justify-content: center;
       }
     }
   }

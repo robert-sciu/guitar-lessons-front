@@ -7,14 +7,13 @@ export default function ConfirmationWindow({
   confirmHandler,
   dataForHandler,
   dismissHandler,
-  dispatch,
 }) {
   const { t } = useTranslation();
   function handleClick(isConfirmed) {
     if (isConfirmed) {
-      dispatch(confirmHandler(dataForHandler));
+      confirmHandler(dataForHandler);
     } else {
-      dispatch(dismissHandler());
+      dismissHandler();
     }
   }
   return (
@@ -38,6 +37,5 @@ ConfirmationWindow.propTypes = {
   confirmationInfoHTML: PropTypes.node.isRequired,
   confirmHandler: PropTypes.func.isRequired,
   dismissHandler: PropTypes.func.isRequired,
-  dataForHandler: PropTypes.object.isRequired,
-  dispatch: PropTypes.func.isRequired,
+  dataForHandler: PropTypes.any.isRequired,
 };

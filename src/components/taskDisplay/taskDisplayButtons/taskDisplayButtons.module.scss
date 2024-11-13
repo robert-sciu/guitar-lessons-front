@@ -8,11 +8,11 @@
   justify-content: center;
   gap: $size-xxxxs;
 }
-button {
-  @extend .button;
+.taskButton {
+  @extend .commonButton;
   justify-content: center;
 }
-.addTask {
+.addTaskButton {
   background-color: $add-green;
   &:hover {
     background-color: $add-green-hover;

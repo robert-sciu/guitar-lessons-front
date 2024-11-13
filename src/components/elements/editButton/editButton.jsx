@@ -18,11 +18,16 @@ export default function EditButton({
       disabled={isLoading}
     >
       {isLoading ? (
-        <LoadingState spinnerOnly={true} />
+        <>
+          <LoadingState spinnerOnly={true} />
+          <p>{t("buttons.wait")}</p>
+        </>
       ) : (
-        <HiOutlinePencilSquare />
+        <>
+          <HiOutlinePencilSquare />
+          <p>{t(`buttons.${isEditing ? "save" : "edit"}`)}</p>
+        </>
       )}
-      <p>{t(`buttons.${isEditing ? "save" : "edit"}`)}</p>
     </button>
   );
 }
@@ -32,4 +37,5 @@ EditButton.propTypes = {
   onClick: PropTypes.func,
   isLoading: PropTypes.bool,
   isEditing: PropTypes.bool,
+  specialText: PropTypes.bool,
 };

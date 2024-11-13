@@ -33,7 +33,12 @@ export default function TaskDisplayMoreInfo({
             <h6>{t("taskDisplay.file")}:</h6>
             <div className={styles.fileContainer}>
               {task.filename}
-              <button onClick={handleDownload}>{t("buttons.download")}</button>
+              <button
+                className={styles.downloadButton}
+                onClick={handleDownload}
+              >
+                {t("buttons.download")}
+              </button>
             </div>
           </div>
         )}

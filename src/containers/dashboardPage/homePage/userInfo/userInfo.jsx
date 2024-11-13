@@ -11,7 +11,7 @@ import {
   selectUserInfoIsLoading,
   updateEmail,
   updateUserMailCodeRequest,
-  updateUserUsername,
+  updateUser,
 } from "../../../../store/userInfoSlice";
 import CodeRequiredModal from "../../../../components/modalWindows/codeRequiredModal/codeRequiredModal";
 import EditButton from "../../../../components/elements/editButton/editButton";
@@ -39,9 +39,13 @@ export default function UserInfo({ userInfo }) {
 
   useEffect(() => {
     if (!usernameEditMode && username !== userInfo.username) {
-      dispatch(updateUserUsername({ username }));
+      const data = {
+        username,
+        id: userInfo.id,
+      };
+      dispatch(updateUser(data));
     }
-  }, [usernameEditMode, username, userInfo.username, dispatch]);
+  }, [usernameEditMode, username, userInfo.username, userInfo.id, dispatch]);
 
   useEffect(() => {
     if (!emailEditMode && email !== userInfo.email) {
@@ -67,9 +71,7 @@ export default function UserInfo({ userInfo }) {
   function handleSubmit(e) {
     e.preventDefault();
     if (confirmationCode) {
-      dispatch(
-        updateEmail({ email: email, change_email_token: confirmationCode })
-      );
+      dispatch(updateEmail({ change_email_token: confirmationCode }));
     }
   }
 

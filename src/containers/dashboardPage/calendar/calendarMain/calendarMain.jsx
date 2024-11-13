@@ -1,18 +1,18 @@
 import { useDispatch, useSelector } from "react-redux";
-import CalendarWeek from "./calendarWeek.jsx/calendarWeek";
+import CalendarWeek from "../calendarWeek.jsx/calendarWeek";
 import {
   clearNewReservationData,
   clearUpdateData,
   setDates,
   setFetchCompleteForReschedule,
   clearCalendarError,
-} from "../../../store/calendar/calendarSlice";
+} from "../../../../store/calendar/calendarSlice";
 import { useEffect } from "react";
-import { selectIsAuthenticated, selectUser } from "../../../store/authSlice";
-import ConfirmationWindow from "./modalWindows/confirmationWindow/confirmationWindow";
-import { fetchPlanInfo } from "../../../store/planInfoSlice";
-import ErrorWindow from "./modalWindows/errorWindow/errorWindow";
-import NewReservationWindow from "./modalWindows/newReservationWIndow/newReservationWindow";
+import { selectIsAuthenticated, selectUser } from "../../../../store/authSlice";
+import ConfirmationWindow from "../../../../components/modalWindows/confirmationWindow/confirmationWindow";
+import { fetchPlanInfo } from "../../../../store/planInfoSlice";
+import ErrorWindow from "../../../../components/modalWindows/errorWindow/errorWindow";
+import NewReservationWindow from "../../../../components/modalWindows/newReservationWIndow/newReservationWindow";
 
 import {
   selectUpdateData,
@@ -24,19 +24,23 @@ import {
   selectFetchReservationsComplete,
   selectNewReservation,
   selectRescheduleConfirmationNeeded,
-} from "../../../store/calendar/calendarSelectors";
+  selectShowDetailsModalWindow,
+  selectShowNewReservationModalWindow,
+} from "../../../../store/calendar/calendarSelectors";
 import {
   createLessonReservation,
   deleteLessonReservation,
   fetchLessonReservations,
   updateLessonReservation,
-} from "../../../store/calendar/calendarThunks";
+} from "../../../../store/calendar/calendarThunks";
+import styles from "./calendarMain.module.scss";
+import ReservationDetailsModal from "../reservationDetailsModal/reservationDetailsModal";
 
-export default function Calendar() {
+export default function CalendarMain() {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const datesSet = useSelector(selectDatesAreSet);
   const fetchComplete = useSelector(selectFetchReservationsComplete);
-  // const planInfo = useSelector(selectUserInfo).planInfo;
+
   const rescheduleConfirmationNeeded = useSelector(
     selectRescheduleConfirmationNeeded
   );
@@ -45,6 +49,10 @@ export default function Calendar() {
   );
   const fetchCompleteForNewReservation = useSelector(
     selectFetchCompleteForNewReservation
+  );
+  const showDetailsModalWindow = useSelector(selectShowDetailsModalWindow);
+  const showNewReservationWindow = useSelector(
+    selectShowNewReservationModalWindow
   );
   const updateData = useSelector(selectUpdateData);
   const newReservation = useSelector(selectNewReservation);
@@ -77,8 +85,9 @@ export default function Calendar() {
     }
   }, [dispatch, deleteEventData]);
   return (
-    <div>
+    <div className={styles.calendarMainContainer}>
       {datesSet && fetchComplete ? <CalendarWeek /> : <p>Loading...</p>}
+
       {rescheduleConfirmationNeeded && (
         <ConfirmationWindow
           confirmationInfoHTML={
@@ -106,7 +115,7 @@ export default function Calendar() {
           dispatch={dispatch}
         />
       )}
-      {Object.keys(newReservation).length > 0 && (
+      {showNewReservationWindow && (
         <NewReservationWindow
           reservation={newReservation}
           confirmHandler={createLessonReservation}
@@ -114,6 +123,8 @@ export default function Calendar() {
           dispatch={dispatch}
         />
       )}
+
+      {showDetailsModalWindow && <ReservationDetailsModal />}
     </div>
   );
 }

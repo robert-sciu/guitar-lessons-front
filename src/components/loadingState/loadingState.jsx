@@ -16,6 +16,7 @@ import { classNameFormatter } from "../../utilities/utilities";
 export default function LoadingState({
   fullscreen = false,
   spinnerOnly = false,
+  size = undefined,
 }) {
   return (
     <div
@@ -26,6 +27,7 @@ export default function LoadingState({
           spinnerOnly && "spinnerOnly",
           !spinnerOnly && "loadingStateContainer",
           !fullscreen && !spinnerOnly && "containerSize",
+          size && `size${size}`,
         ],
       })}
     >
@@ -44,4 +46,5 @@ export default function LoadingState({
 LoadingState.propTypes = {
   fullscreen: PropTypes.bool,
   spinnerOnly: PropTypes.bool,
+  size: PropTypes.string,
 };

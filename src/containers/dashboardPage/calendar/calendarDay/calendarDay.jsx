@@ -9,6 +9,8 @@ import {
   createDayHoursObject,
 } from "../../../../utilities/calendarUtilities";
 import CalendarHalfHourBlock from "../calendarHalfHourBlock/calendarHalfHourBlock";
+import styles from "./calendarDay.module.scss";
+import { classNameFormatter } from "../../../../utilities/utilities";
 
 export default function CalendarDay({ dayData }) {
   // a slot every half an hour from 8am to 10pm
@@ -25,62 +27,39 @@ export default function CalendarDay({ dayData }) {
   );
 
   return (
-    <div>
-      <p
-        style={{
-          color: isCurrentDay ? "green" : "black",
-          fontWeight: isCurrentDay ? "bold" : "normal",
-        }}
-      >
-        {date}
-      </p>
-      <p
-        style={{
-          color: isCurrentDay ? "green" : "black",
-          fontWeight: isCurrentDay ? "bold" : "normal",
-        }}
-      >
-        {t(`daysOfTheWeek.${weekday}`)}
-      </p>
+    <div className={styles.calendarDay}>
       <div
-        style={{
-          width: "100px",
-        }}
+        className={classNameFormatter({
+          styles,
+          classNames: ["calendarDayHeader", isCurrentDay && "currentDay"],
+        })}
       >
-        {Object.entries(dayHoursWithReservations).map(
-          (hourData) => {
-            return (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  border: "1px solid gray",
-                }}
-                key={hourData[0]}
-              >
-                <CalendarHalfHourBlock
-                  date={date}
-                  hour={Number(hourData[0])}
-                  minute={0}
-                  hourData={hourData[1][0]}
-                  isBooked={checkIsBooked(hourData[1][0])}
-                />
-                <CalendarHalfHourBlock
-                  date={date}
-                  hour={Number(hourData[0])}
-                  minute={30}
-                  hourData={hourData[1][30]}
-                  isBooked={checkIsBooked(hourData[1][30])}
-                />
-              </div>
-            );
-          }
-          // <CalendarHour
-          //   key={hourData[0]}
-          //   hourData={hourData}
-          //   isBooked={checkIsBooked(hourData)}
-          // />
-        )}
+        <p>{t(`daysOfTheWeek.${weekday > 6 ? weekday - 7 : weekday}`)}</p>
+        <p>{date}</p>
+      </div>
+      <div className={styles.calendarHoursContainer}>
+        {Object.entries(dayHoursWithReservations).map((hourData) => {
+          return (
+            <div className={styles.calendarHour} key={hourData[0]}>
+              <CalendarHalfHourBlock
+                date={date}
+                weekday={weekday}
+                hour={Number(hourData[0])}
+                minute={0}
+                hourData={hourData[1][0]}
+                isBooked={checkIsBooked(hourData[1][0])}
+              />
+              <CalendarHalfHourBlock
+                date={date}
+                weekday={weekday}
+                hour={Number(hourData[0])}
+                minute={30}
+                hourData={hourData[1][30]}
+                isBooked={checkIsBooked(hourData[1][30])}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
