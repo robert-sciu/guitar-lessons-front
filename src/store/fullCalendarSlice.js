@@ -6,6 +6,11 @@ import {
   manageRejectedState,
 } from "../utilities/reduxUtilities";
 import apiClient from "../api/api";
+import {
+  getEndHourFromWorkingHoursArray,
+  getStartHourFromWorkingHoursArray,
+  getWorkingHoursArray,
+} from "../utilities/calendarUtilities";
 
 export const fetchReservations = createAsyncThunk(
   "fullCalendar/fetchReservations",
@@ -42,15 +47,22 @@ const fullCalendarSlice = createSlice({
     hasError: false,
     error: null,
     fetchComplete: false,
+    tempEventData: {},
     events: [],
+    workingHours: getWorkingHoursArray(),
   },
   reducers: {
-    addGhostEvent: (state, action) => {
-      console.log(action);
-      state.events = [...state.events, action.payload];
+    addTempEvent: (state, action) => {
+      state.tempEventData = action.payload;
     },
-    clearGhostEvents: (state) => {
-      state.events = state.events.filter((event) => event.id !== "ghost");
+    clearTempEvents: (state) => {
+      state.tempEventData = {};
+    },
+    updateTempEvent: (state, action) => {
+      state.tempEventData = {
+        ...state.tempEventData,
+        ...action.payload,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -71,9 +83,17 @@ const fullCalendarSlice = createSlice({
   },
 });
 
-export const { addGhostEvent, clearGhostEvents } = fullCalendarSlice.actions;
+export const { addTempEvent, clearTempEvents, updateTempEvent } =
+  fullCalendarSlice.actions;
 
 export const selectEvents = (state) => state.fullCalendar.events;
+export const selectTempEventData = (state) => state.fullCalendar.tempEventData;
+export const selectWorkingHoursArray = (state) =>
+  state.fullCalendar.workingHours;
+export const selectWorkingHoursStart = (state) =>
+  getStartHourFromWorkingHoursArray(state.fullCalendar.workingHours);
+export const selectWorkingHoursEnd = (state) =>
+  getEndHourFromWorkingHoursArray(state.fullCalendar.workingHours);
 
 export const selectReservationsFetchComplete = (state) =>
   state.fullCalendar.fetchComplete;

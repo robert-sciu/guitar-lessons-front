@@ -6,29 +6,42 @@ import styles from "./fullCalendarPage.module.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import {
-  addGhostEvent,
-  clearGhostEvents,
+  addTempEvent,
+  clearTempEvents,
   fetchReservations,
   selectEvents,
   selectReservationsFetchComplete,
+  selectTempEventData,
+  selectWorkingHoursEnd,
+  selectWorkingHoursStart,
   updateReservation,
 } from "../../../store/fullCalendarSlice";
 import { selectUserId } from "../../../store/userInfoSlice";
 import { useTranslation } from "react-i18next";
 import "./fullCalendarPage.css";
-import NewReservationWindow from "../../../components/modalWindows/newReservationWIndow/newReservationWindow";
+import ReservationWindow from "../../../components/modalWindows/reservationWIndow/reservationWindow";
+import {
+  addMinutesToIsoString,
+  dateOnlyFromISOString,
+  formatBusinessHours,
+  fullDateToISOString,
+  getMinMaxSlots,
+  getTodayDate,
+} from "../../../utilities/calendarUtilities";
 
 export default function FullCalendarPage() {
   const dispatch = useDispatch();
   const events = useSelector(selectEvents);
   const [eventsToDisplay, setEventsToDisplay] = useState([]);
+  const [tempEventToDisplay, setTempEventToDisplay] = useState({});
   const reservationsFetchComplete = useSelector(
     selectReservationsFetchComplete
   );
   const { t } = useTranslation();
-
+  const tempEvent = useSelector(selectTempEventData);
   const userId = useSelector(selectUserId);
-
+  const calendarStart = useSelector(selectWorkingHoursStart);
+  const calendarEnd = useSelector(selectWorkingHoursEnd);
   useEffect(() => {
     if (reservationsFetchComplete) return;
     dispatch(fetchReservations());
@@ -46,10 +59,16 @@ export default function FullCalendarPage() {
   }, [events, reservationsFetchComplete, eventsToDisplay, userId, t]);
 
   useEffect(() => {
-    if (events !== eventsToDisplay) {
+    if (tempEvent) {
+      setTempEventToDisplay(tempEvent);
+    }
+  }, [tempEvent]);
+
+  useEffect(() => {
+    if (events !== eventsToDisplay || tempEvent !== tempEventToDisplay) {
       setEventsToDisplay(events);
     }
-  }, [events, eventsToDisplay]);
+  }, [events, eventsToDisplay, tempEvent, tempEventToDisplay]);
 
   function rescheduleEvent(e) {
     const start_UTC = new Date(e.event.start).toISOString();
@@ -67,14 +86,13 @@ export default function FullCalendarPage() {
     rescheduleEvent(e);
   }
 
-  function addGhostEventHandler(e) {
-    dispatch(clearGhostEvents());
-    const today = new Date().toISOString().split("T")[0];
-    const start_UTC = new Date(e.dateStr).toISOString();
-    if (start_UTC.split("T")[0] <= today) return;
-    const end_UTC = new Date(
-      new Date(start_UTC).getTime() + 60 * 60 * 1000
-    ).toISOString();
+  function addTempEventHandler(e) {
+    dispatch(clearTempEvents());
+    const today = getTodayDate();
+    const start_UTC = fullDateToISOString(e.dateStr);
+    if (dateOnlyFromISOString(start_UTC) <= today) return;
+    // 60 min lesson by default
+    const end_UTC = addMinutesToIsoString(start_UTC, 60);
     const event = {
       id: "ghost",
       user_id: userId,
@@ -82,16 +100,18 @@ export default function FullCalendarPage() {
       start: start_UTC,
       end: end_UTC,
     };
-    dispatch(addGhostEvent(event));
+    dispatch(addTempEvent(event));
   }
+
+  const { minTime, maxTime } = getMinMaxSlots(calendarStart, calendarEnd);
 
   return (
     <div className={styles.fullCalendarPageContainer}>
       <FullCalendar
         plugins={[timeGridPlugin, interactionPlugin]}
         slotDuration={"00:30:00"}
-        slotMinTime={"08:00:00"}
-        slotMaxTime={"22:00:00"}
+        slotMinTime={minTime}
+        slotMaxTime={maxTime}
         allDaySlot={false}
         expandRows={true}
         height={"100%"}
@@ -100,7 +120,8 @@ export default function FullCalendarPage() {
           center: "title",
           right: null,
         }}
-        events={eventsToDisplay}
+        businessHours={formatBusinessHours(calendarStart, calendarEnd)}
+        events={[...eventsToDisplay, tempEvent]}
         editable={true}
         eventStartEditable={true}
         eventDurationEditable={true}
@@ -108,11 +129,15 @@ export default function FullCalendarPage() {
         eventOverlap={false}
         eventDrop={handleEventDragStop}
         eventResize={handleEventResize}
-        dateClick={addGhostEventHandler}
+        dateClick={addTempEventHandler}
       />
-      <NewReservationWindow
-        reservation={{ start_UTC: new Date().toISOString() }}
-      />
+      {Object.keys(tempEvent).length > 0 && (
+        <ReservationWindow
+          reservation={tempEvent}
+          dismissHandler={clearTempEvents}
+          dispatch={dispatch}
+        />
+      )}
     </div>
   );
 }
