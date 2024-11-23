@@ -1,34 +1,20 @@
 import PropTypes from "prop-types";
-import { useDispatch } from "react-redux";
 
 import styles from "./errorWindow.module.scss";
 import { useTranslation } from "react-i18next";
 
-export default function ErrorWindow({ error, dismissHandler, showError }) {
-  const dispatch = useDispatch();
+export default function ErrorWindow({ error, onCancel, dispatch }) {
   const { t } = useTranslation();
   return (
-    showError && (
-      <div
-        className={styles.errorWindowContainer}
-        onClick={() => dispatch(dismissHandler())}
-      >
-        <div
-          className={styles.errorWindow}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <p style={{ color: "black" }}>{error}</p>
-          <button onClick={() => dispatch(dismissHandler())}>
-            {t("buttons.close")}
-          </button>
-        </div>
-      </div>
-    )
+    <div className={styles.modalWindow} onClick={(e) => e.stopPropagation()}>
+      <p>{error}</p>
+      <button onClick={() => dispatch(onCancel())}>{t("buttons.close")}</button>
+    </div>
   );
 }
 
 ErrorWindow.propTypes = {
   error: PropTypes.string,
-  dismissHandler: PropTypes.func.isRequired,
-  showError: PropTypes.bool.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
 };

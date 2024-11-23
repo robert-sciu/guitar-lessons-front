@@ -142,6 +142,14 @@ i18n
             cancel: "Anuluj",
             minutes: "minut",
           },
+          errors: {
+            cannotBookEarlierThanTomorrow:
+              "Nie możesz rezerwowac lekcji wcześniej niż jutro",
+            invalidDuration: "Można rezerwowac lekcje od 1 do 2 godzin",
+            thatsPast: "Było, minęło ;)",
+            thatsToday: "Nie można zmieniać dzisiejszej rezerwacji",
+            thatsNotMine: "To nie jest twoja lekcja :P",
+          },
         },
       },
       en: {
@@ -282,6 +290,13 @@ i18n
             cancel: "Cancel",
             confirm: "Confirm",
             minutes: "minutes",
+          },
+          errors: {
+            cannotBookEarlierThanTomorrow: "Cannot book earlier than tomorrow",
+            invalidDuration: "You can book lessons from 1 to 2 hours",
+            thatsPast: "You cannot change a past reservation",
+            thatsToday: "You cannot change today's reservation",
+            thatsNotMine: "This is not your lesson :P",
           },
         },
       },

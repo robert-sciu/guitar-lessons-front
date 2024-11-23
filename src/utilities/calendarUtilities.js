@@ -56,7 +56,10 @@ function changeISOStringMinutes(isoString, newMinutes) {
 }
 
 function checkIfReservationDurationIsAllowed(isoStart, isoEnd) {
-  return (new Date(isoEnd) - new Date(isoStart)) / (60 * 1000) <= 120;
+  return (
+    (new Date(isoEnd) - new Date(isoStart)) / (60 * 1000) <= 120 &&
+    (new Date(isoEnd) - new Date(isoStart)) / (60 * 1000) >= 60
+  );
 }
 
 function getWorkingHoursArray() {
@@ -139,8 +142,6 @@ function configureEvents(events, userId) {
     ...event,
     editable:
       event.user_id === userId && getDateOnlyFromISOString(event.start) > today,
-    // eventStartEditable: event.user_id === userId,
-    // eventDurationEditable: event.user_id === userId,
     title: event.user_id === userId ? t("calendar.myReservation") : event.title,
   }));
 }
@@ -156,6 +157,17 @@ function configureRescheduleDataFromEvent(event) {
 
 function objectHasData(obj) {
   return Object.keys(obj).length > 0;
+}
+
+function utcTimeToLocalTimeString(utcHour) {
+  const date = new Date();
+  const hour = utcHour.split(":")[0];
+  const minutes = utcHour.split(":")[1];
+  date.setUTCHours(hour, minutes, 0, 0);
+  const localTime = `${date.getHours()}:${
+    date.getMinutes() === 0 ? "00" : date.getMinutes()
+  }`;
+  return localTime;
 }
 
 export {
@@ -176,4 +188,5 @@ export {
   checkIfReservationDurationIsAllowed,
   configureRescheduleDataFromEvent,
   objectHasData,
+  utcTimeToLocalTimeString,
 };

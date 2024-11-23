@@ -1,17 +1,13 @@
 @import "../../../../styles/classes.module.scss";
 @import "../../../../styles/classes.module.scss";
 
-.errorWindowContainer {
-  @extend .modalBackground;
-  .errorWindow {
-    @extend .smallModalWindow;
-    cursor: default;
-    button {
-      @extend .commonButton;
-    }
+.modalWindow {
+  @extend .modalWindowContent;
+  p {
+    text-align: center;
   }
-}
 
-.errorWindowContainer::before {
-  @extend .backdropBlur;
+  button {
+    @extend .commonButton;
+  }
 }

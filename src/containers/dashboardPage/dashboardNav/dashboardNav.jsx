@@ -1,12 +1,9 @@
-// import { I18nextProvider } from "react-i18next";
-// import i18n from "../../../../config/i18n";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser, selectIsAuthenticated } from "../../../store/authSlice";
 import { useEffect, useState } from "react";
 import styles from "./dashboardNav.module.scss";
 import {
-  clearRefetchNeeded,
   clearUserInfoError,
   fetchUserInfo,
   selectUserInfo,
@@ -16,32 +13,20 @@ import {
   selectUserInfoIsLoading,
   selectUserRefetchNeeded,
 } from "../../../store/userInfoSlice";
-import {
-  clearPlanInfoError,
-  fetchPlanInfo,
-  selectPlanInfoError,
-  selectPlanInfoFetchComplete,
-  selectPlanInfoHasError,
-  selectPlanInfoIsLoading,
-} from "../../../store/planInfoSlice";
 import DashboardWelcome from "../../../components/dashboard/dashboardWelcome/dashboardWelcome";
 import DashboardNavLinks from "../../../components/dashboard/dashboardNavLinks/dashboardNavLinks";
-import ErrorWindow from "../../../components/modalWindows/errorWindow/errorWindow";
 import {
-  clearUserTasksError,
-  fetchUserTasks,
-  selectUserTasksError,
-  selectUserTasksFetchComplete,
-  selectUserTasksHasError,
-  selectUserTasksIsLoading,
-} from "../../../store/userTasksSlice";
-import { classNameFormatter } from "../../../utilities/utilities";
+  classNameFormatter,
+  setTrueWithTimeout,
+} from "../../../utilities/utilities";
+import ModalWindowMain from "../../../components/modalWindows/modalWindow/modalWindowMain";
 
 export default function DashboardNav() {
-  const [loaded, setLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const userInfo = useSelector(selectUserInfo);
@@ -49,16 +34,6 @@ export default function DashboardNav() {
   const userInfoHasError = useSelector(selectUserInfoHasError);
   const userInfoError = useSelector(selectUserInfoError);
   const userInfoFetchComplete = useSelector(selectUserInfoFetchComplete);
-
-  const planInfoIsLoading = useSelector(selectPlanInfoIsLoading);
-  const planInfoHasError = useSelector(selectPlanInfoHasError);
-  const planInfoError = useSelector(selectPlanInfoError);
-  const planInfoFetchComplete = useSelector(selectPlanInfoFetchComplete);
-
-  const userTaskIsLoading = useSelector(selectUserTasksIsLoading);
-  const userTaskHasError = useSelector(selectUserTasksHasError);
-  const userTaskError = useSelector(selectUserTasksError);
-  const userTaskFetchComplete = useSelector(selectUserTasksFetchComplete);
 
   const userRefetchNeeded = useSelector(selectUserRefetchNeeded);
 
@@ -86,50 +61,13 @@ export default function DashboardNav() {
 
   useEffect(() => {
     if (userRefetchNeeded) {
-      dispatch(clearRefetchNeeded());
       dispatch(fetchUserInfo());
     }
   }, [userRefetchNeeded, dispatch]);
 
   useEffect(() => {
-    if (
-      isAuthenticated &&
-      !planInfoFetchComplete &&
-      !planInfoIsLoading &&
-      !planInfoHasError
-    ) {
-      dispatch(fetchPlanInfo());
-    }
-  }, [
-    isAuthenticated,
-    planInfoFetchComplete,
-    planInfoIsLoading,
-    planInfoHasError,
-    dispatch,
-  ]);
-
-  useEffect(() => {
-    if (
-      isAuthenticated &&
-      !userTaskFetchComplete &&
-      !userTaskIsLoading &&
-      !userTaskHasError
-    ) {
-      dispatch(fetchUserTasks());
-    }
-  }, [
-    isAuthenticated,
-    userTaskFetchComplete,
-    userTaskIsLoading,
-    userTaskHasError,
-    dispatch,
-  ]);
-
-  useEffect(() => {
     if (!userInfoFetchComplete) return;
-    setTimeout(() => {
-      setLoaded(true);
-    }, 40);
+    setTrueWithTimeout(setIsLoaded, 40);
   }, [userInfoFetchComplete]);
 
   function handleLogout(e) {
@@ -143,7 +81,7 @@ export default function DashboardNav() {
       <div
         className={classNameFormatter({
           styles,
-          classNames: ["dashboardNav", loaded ? "show" : "hide"],
+          classNames: ["dashboardNav", isLoaded ? "show" : "hide"],
         })}
       >
         {userInfoFetchComplete && (
@@ -153,21 +91,13 @@ export default function DashboardNav() {
       </div>
       <div className={styles.dashboardContent}>
         <Outlet />
-        <ErrorWindow
-          error={userInfoError}
-          showError={userInfoHasError}
-          dismissHandler={clearUserInfoError}
-        />
-        <ErrorWindow
-          error={planInfoError}
-          showError={planInfoHasError}
-          dismissHandler={clearPlanInfoError}
-        />
-        <ErrorWindow
-          error={userTaskError}
-          showError={userTaskHasError}
-          dismissHandler={clearUserTasksError}
-        />
+        {userInfoHasError && (
+          <ModalWindowMain
+            modalType="error"
+            data={userInfoError}
+            onCancel={clearUserInfoError}
+          />
+        )}
       </div>
     </div>
   );

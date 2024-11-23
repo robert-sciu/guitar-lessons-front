@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  extractErrorResponse,
   extractResponseData,
   manageFulfilledState,
   managePendingState,
@@ -36,7 +37,7 @@ export const updateReservation = createAsyncThunk(
       );
       return extractResponseData(response);
     } catch (error) {
-      return rejectWithValue(extractResponseData(error));
+      return rejectWithValue(extractErrorResponse(error));
     }
   }
 );
@@ -48,7 +49,8 @@ export const createReservation = createAsyncThunk(
       const response = await apiClient.post("/lessonReservations", data);
       return extractResponseData(response);
     } catch (error) {
-      return rejectWithValue(extractResponseData(error));
+      console.log(error);
+      return rejectWithValue(extractErrorResponse(error));
     }
   }
 );
@@ -60,7 +62,7 @@ export const deleteReservation = createAsyncThunk(
       const response = await apiClient.delete(`/lessonReservations/${id}`);
       return extractResponseData(response);
     } catch (error) {
-      return rejectWithValue(extractResponseData(error));
+      return rejectWithValue(extractErrorResponse(error));
     }
   }
 );
@@ -77,10 +79,10 @@ const fullCalendarSlice = createSlice({
     events: [],
     workingHours: getWorkingHoursArray(),
     today: getTodayDate(),
-
-    eventForUpdateId: null,
     moreInfoEvent: {},
     refetchNeeded: false,
+    eventsUpdated: false,
+    updateFailed: false,
   },
   reducers: {
     addTempEvent: (state, action) => {
@@ -99,9 +101,6 @@ const fullCalendarSlice = createSlice({
     clearCalendarRefetchNeeded: (state) => {
       state.refetchNeeded = false;
     },
-    setEventForUpdateId: (state, action) => {
-      state.eventForUpdateId = action.payload;
-    },
     setTempRescheduleData: (state, action) => {
       state.tempRescheduleData = action.payload;
     },
@@ -111,6 +110,18 @@ const fullCalendarSlice = createSlice({
     clearMoreInfoEvent: (state) => {
       state.moreInfoEvent = {};
     },
+    clearEventsUpdated: (state) => {
+      state.eventsUpdated = false;
+    },
+    setCalendarError: (state, action) => {
+      state.hasError = true;
+      state.error = action.payload;
+    },
+    clearCalendarError: (state) => {
+      state.hasError = false;
+      state.error = null;
+      state.updateFailed = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -118,6 +129,10 @@ const fullCalendarSlice = createSlice({
       .addCase(fetchReservations.fulfilled, (state, action) => {
         state.events = action.payload;
         state.fetchComplete = true;
+        state.refetchNeeded = false;
+        state.tempRescheduleData = {};
+        state.tempEventData = {};
+        state.moreInfoEvent = {};
         manageFulfilledState(state);
       })
       .addCase(fetchReservations.rejected, manageRejectedState)
@@ -125,34 +140,37 @@ const fullCalendarSlice = createSlice({
       .addCase(updateReservation.pending, managePendingState)
       .addCase(updateReservation.fulfilled, (state) => {
         manageFulfilledState(state);
+        state.events = state.events.filter((event) => {
+          event.id !== state.tempRescheduleData.id;
+        });
         state.refetchNeeded = true;
-        state.eventForUpdateId = null;
-        state.tempRescheduleData = {};
       })
       .addCase(updateReservation.rejected, (state, action) => {
         manageRejectedState(state, action);
-        state.events = state.events.filter(
-          (event) => event.id !== state.eventForUpdateId
-        );
-        state.eventForUpdateId = null;
-        state.refetchNeeded = true;
+        state.tempRescheduleData = {};
+        state.updateFailed = true;
       })
 
       .addCase(createReservation.pending, managePendingState)
       .addCase(createReservation.fulfilled, (state) => {
         manageFulfilledState(state);
-        state.tempEventData = {};
         state.refetchNeeded = true;
+        state.eventsUpdated = true;
       })
-      .addCase(createReservation.rejected, manageRejectedState)
+      .addCase(createReservation.rejected, (state, action) => {
+        manageRejectedState(state, action);
+        state.tempEventData = {};
+      })
 
       .addCase(deleteReservation.pending, managePendingState)
       .addCase(deleteReservation.fulfilled, (state) => {
         manageFulfilledState(state);
         state.refetchNeeded = true;
-        state.moreInfoEvent = {};
       })
-      .addCase(deleteReservation.rejected, manageRejectedState);
+      .addCase(deleteReservation.rejected, (state, action) => {
+        manageRejectedState(state, action);
+        state.moreInfoEvent = {};
+      });
   },
 });
 
@@ -165,7 +183,14 @@ export const {
   setTempRescheduleData,
   setMoreInfoEvent,
   clearMoreInfoEvent,
+  setCalendarError,
+  clearCalendarError,
+  clearEventsUpdated,
 } = fullCalendarSlice.actions;
+
+export const selectCalendarIsLoading = (state) => state.fullCalendar.isLoading;
+export const selectCalendarHasError = (state) => state.fullCalendar.hasError;
+export const selectCalendarError = (state) => state.fullCalendar.error;
 
 export const selectEvents = (state) => state.fullCalendar.events;
 export const selectTempEventData = (state) => state.fullCalendar.tempEventData;
@@ -187,5 +212,10 @@ export const selectTempRescheduleData = (state) =>
   state.fullCalendar.tempRescheduleData;
 
 export const selectMoreInfoEvent = (state) => state.fullCalendar.moreInfoEvent;
+
+export const selectEventsUpdated = (state) => state.fullCalendar.eventsUpdated;
+
+export const selectCalendarUpdateFailed = (state) =>
+  state.fullCalendar.updateFailed;
 
 export default fullCalendarSlice.reducer;

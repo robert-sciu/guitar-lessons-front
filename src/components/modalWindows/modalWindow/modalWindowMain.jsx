@@ -8,22 +8,22 @@ import { useDispatch } from "react-redux";
 import MoreInfoModal from "../moreInfoWindow/moreInfoModal";
 import RescheduleModal from "../RescheduleModal/rescheduleModal";
 import TaskDeleteModal from "../TaskDeleteModal/taskDeleteModal";
+import CodeRequiredModal from "../codeRequiredModal/codeRequiredModal";
+import ErrorWindow from "../errorWindow/errorWindow";
 export default function ModalWindowMain({
   modalType,
   onSubmit,
   onCancel,
-  onClose,
   onDeleteSubmit,
   data,
 }) {
   const dispatch = useDispatch();
   const nodeRef = useRef(null);
-  function handleBgClick() {
-    if (onCancel) {
-      dispatch(onCancel());
-    }
-    if (onClose) {
-      dispatch(onClose());
+  function handleBgClick(e) {
+    if (e.target.className === styles.modalWindowBackground) {
+      if (onCancel) {
+        dispatch(onCancel());
+      }
     }
   }
   return (
@@ -64,6 +64,16 @@ export default function ModalWindowMain({
               dispatch={dispatch}
             />
           )}
+          {modalType === "codeRequired" && (
+            <CodeRequiredModal
+              onSubmit={onSubmit}
+              onCancel={onCancel}
+              dispatch={dispatch}
+            />
+          )}
+          {modalType === "error" && (
+            <ErrorWindow error={data} onCancel={onCancel} dispatch={dispatch} />
+          )}
         </div>
       </Draggable>
     </div>
@@ -76,5 +86,5 @@ ModalWindowMain.propTypes = {
   onCancel: PropTypes.func,
   onClose: PropTypes.func,
   onDeleteSubmit: PropTypes.func,
-  data: PropTypes.object,
+  data: PropTypes.any,
 };

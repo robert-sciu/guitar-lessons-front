@@ -3,48 +3,41 @@ import styles from "./codeRequiredModal.module.scss";
 
 import PropTypes from "prop-types";
 import LoadingState from "../../loadingState/loadingState";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { selectUserInfoIsLoading } from "../../../store/userInfoSlice";
 
-export default function CodeRequiredModal({
-  onInput,
-  onSubmit,
-  onCancel,
-  showModal,
-  isLoading,
-  message,
-}) {
+export default function CodeRequiredModal({ onSubmit, onCancel, dispatch }) {
   const { t } = useTranslation();
+  const [confirmationCode, setConfirmationCode] = useState("");
+  const isLoading = useSelector(selectUserInfoIsLoading);
+  function handleSubmit() {
+    dispatch(onSubmit({ change_email_token: confirmationCode }));
+  }
+  function handleCancel() {
+    dispatch(onCancel());
+  }
   return (
-    showModal && (
-      <div className={styles.codeRequiredModalBg} onClick={onCancel}>
-        <div
-          className={styles.codeRequiredModalContainer}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <h4>{t("modals.codeRequired")}</h4>
-          <p>{message}</p>
-          <input
-            type="text"
-            onChange={onInput}
-            placeholder={t("modals.codePlaceholder")}
-          />
-          <div className={styles.buttonsContainer}>
-            <button onClick={onSubmit}>
-              {t("buttons.confirm")}{" "}
-              {isLoading && <LoadingState spinnerOnly={true} />}
-            </button>
-            <button onClick={onCancel}>{t("buttons.cancel")}</button>
-          </div>
-        </div>
+    <div className={styles.modalWindow} onClick={(e) => e.stopPropagation()}>
+      <h4>{t("modals.codeRequired")}</h4>
+      <input
+        type="text"
+        onChange={(e) => setConfirmationCode(e.target.value)}
+        placeholder={t("modals.codePlaceholder")}
+      />
+      <div className={styles.buttonsContainer}>
+        <button onClick={handleSubmit}>
+          {t("buttons.confirm")}{" "}
+          {isLoading && <LoadingState spinnerOnly={true} />}
+        </button>
+        <button onClick={handleCancel}>{t("buttons.cancel")}</button>
       </div>
-    )
+    </div>
   );
 }
 
 CodeRequiredModal.propTypes = {
-  onInput: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  showModal: PropTypes.bool.isRequired,
-  isLoading: PropTypes.bool.isRequired,
-  message: PropTypes.string.isRequired,
   onCancel: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
 };

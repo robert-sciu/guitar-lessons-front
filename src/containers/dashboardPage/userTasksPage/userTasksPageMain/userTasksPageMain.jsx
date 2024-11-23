@@ -1,33 +1,53 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  clearUserTasksError,
   fetchUserTasks,
   selectUserTasks,
+  selectUserTasksError,
   selectUserTasksFetchComplete,
+  selectUserTasksHasError,
+  selectUserTasksIsLoading,
   selectUserTasksRefetchNeeded,
 } from "../../../../store/userTasksSlice";
 import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/taskDisplayMain";
 import styles from "./userTasksPageMain.module.scss";
 import { useTranslation } from "react-i18next";
 import { selectIsAuthenticated } from "../../../../store/authSlice";
+import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
 
 export default function UserTasksPageMain() {
   const [userTasksState, setUserTasksState] = useState([]);
-  // const userTasks = useSelector(selectUserTasks);
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  // const isLoading = useSelector(selectIsLoadingUserTasks);
-  const fetchComplete = useSelector(selectUserTasksFetchComplete);
+
   const dispatch = useDispatch();
   const { t } = useTranslation();
+
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
   const fetchedUserTasks = useSelector(selectUserTasks);
+  const userTaskIsLoading = useSelector(selectUserTasksIsLoading);
+  const userTaskHasError = useSelector(selectUserTasksHasError);
+  const userTaskError = useSelector(selectUserTasksError);
+  const userTaskFetchComplete = useSelector(selectUserTasksFetchComplete);
   const userTasksFetchComplete = useSelector(selectUserTasksFetchComplete);
   const userTasksRefetchNeeded = useSelector(selectUserTasksRefetchNeeded);
 
   useEffect(() => {
-    if (isAuthenticated && !fetchComplete && fetchedUserTasks?.length === 0) {
+    if (
+      isAuthenticated &&
+      !userTaskFetchComplete &&
+      !userTaskIsLoading &&
+      !userTaskHasError
+    ) {
       dispatch(fetchUserTasks());
     }
-  }, [dispatch, isAuthenticated, fetchComplete, fetchedUserTasks]);
+  }, [
+    isAuthenticated,
+    userTaskFetchComplete,
+    userTaskIsLoading,
+    userTaskHasError,
+    dispatch,
+  ]);
 
   useEffect(() => {
     if (userTasksRefetchNeeded) {
@@ -46,7 +66,6 @@ export default function UserTasksPageMain() {
   return (
     <div className={styles.myTasksPageMainContainer}>
       <h3>{t("myTasks.title")}</h3>
-      {/* {isLoading && !userTasksFetchComplete && <p>Loading...</p>} */}
       {userTasksFetchComplete && userTasksState?.length === 0 && (
         <p>No tasks yet</p>
       )}
@@ -60,6 +79,13 @@ export default function UserTasksPageMain() {
             enableShowMore={true}
           />
         ))}
+      {userTaskHasError && (
+        <ModalWindowMain
+          modalType={"error"}
+          data={userTaskError}
+          onCancel={clearUserTasksError}
+        />
+      )}
     </div>
   );
 }

@@ -4,54 +4,40 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  cancelEmailChange,
+  // cancelEmailChange,
   selectEmailChangeConfirmationCodeRequired,
-  selectEmailChangeResponse,
+  // selectEmailChangeResponse,
   selectUserInfoHasError,
   selectUserInfoIsLoading,
   updateEmail,
   updateUserMailCodeRequest,
   updateUser,
+  cancelEmailChange,
 } from "../../../../store/userInfoSlice";
-import CodeRequiredModal from "../../../../components/modalWindows/codeRequiredModal/codeRequiredModal";
+// import CodeRequiredModal from "../../../../components/modalWindows/codeRequiredModal/codeRequiredModal";
 import EditButton from "../../../../components/elements/editButton/editButton";
 import InputToggler from "../../../../components/elements/inputToggler/inputToggler";
+import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
 
 export default function UserInfo({ userInfo }) {
-  const [showModal, setShowModal] = useState(false);
   const [usernameEditMode, setUsernameEditMode] = useState(false);
   const [username, setUsername] = useState(userInfo.username);
   const [emailEditMode, setEmailEditMode] = useState(false);
-  const [email, setEmail] = useState(userInfo.email);
-  const [confirmationCode, setConfirmationCode] = useState("");
+  const [email, setEmail] = useState("");
 
   const userInfoHasError = useSelector(selectUserInfoHasError);
-
   const emailChangeConfirmationCodeRequired = useSelector(
     selectEmailChangeConfirmationCodeRequired
   );
-  const emailChangeResponse = useSelector(selectEmailChangeResponse);
-
   const userInfoIsLoading = useSelector(selectUserInfoIsLoading);
   const { t } = useTranslation();
-
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!usernameEditMode && username !== userInfo.username) {
-      const data = {
-        username,
-        id: userInfo.id,
-      };
-      dispatch(updateUser(data));
+    if (!emailChangeConfirmationCodeRequired) {
+      setEmail(userInfo.email);
     }
-  }, [usernameEditMode, username, userInfo.username, userInfo.id, dispatch]);
-
-  useEffect(() => {
-    if (!emailEditMode && email !== userInfo.email) {
-      dispatch(updateUserMailCodeRequest({ email }));
-    }
-  }, [emailEditMode, email, userInfo.email, dispatch]);
+  }, [emailChangeConfirmationCodeRequired, userInfo.email]);
 
   useEffect(() => {
     if (userInfoHasError) {
@@ -60,27 +46,22 @@ export default function UserInfo({ userInfo }) {
     }
   }, [userInfoHasError, userInfo.email, userInfo.username]);
 
-  useEffect(() => {
-    if (emailChangeConfirmationCodeRequired && !userInfoHasError) {
-      setShowModal(true);
-    } else {
-      setShowModal(false);
-    }
-  }, [emailChangeConfirmationCodeRequired, userInfoHasError]);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (confirmationCode) {
-      dispatch(updateEmail({ change_email_token: confirmationCode }));
+  function handleEditUsernameBtnClick() {
+    setUsernameEditMode(!usernameEditMode);
+    if (username !== userInfo.username) {
+      const data = {
+        username,
+        id: userInfo.id,
+      };
+      dispatch(updateUser(data));
     }
   }
 
-  function handleCancelCode() {
-    setConfirmationCode("");
-    setShowModal(false);
-    setEmailEditMode(false);
-    setEmail(userInfo.email);
-    dispatch(cancelEmailChange());
+  function handleEditEmailBtnClick() {
+    setEmailEditMode(!emailEditMode);
+    if (email !== userInfo.email) {
+      dispatch(updateUserMailCodeRequest({ email }));
+    }
   }
 
   return (
@@ -115,7 +96,7 @@ export default function UserInfo({ userInfo }) {
               inputIsActive={usernameEditMode}
             />
             <EditButton
-              onClick={() => setUsernameEditMode(!usernameEditMode)}
+              onClick={handleEditUsernameBtnClick}
               isLoading={username !== userInfo.username && userInfoIsLoading}
               isEditing={usernameEditMode}
             />
@@ -132,21 +113,20 @@ export default function UserInfo({ userInfo }) {
             />
             <EditButton
               style={styles.editBtn}
-              onClick={() => setEmailEditMode(!emailEditMode)}
+              onClick={handleEditEmailBtnClick}
               isLoading={email !== userInfo.email && userInfoIsLoading}
               isEditing={emailEditMode}
             />
           </div>
         </div>
       </div>
-      <CodeRequiredModal
-        onInput={(e) => setConfirmationCode(e.target.value)}
-        onSubmit={handleSubmit}
-        onCancel={handleCancelCode}
-        showModal={showModal}
-        isLoading={userInfoIsLoading}
-        message={emailChangeResponse}
-      />
+      {emailChangeConfirmationCodeRequired && (
+        <ModalWindowMain
+          modalType={"codeRequired"}
+          onSubmit={updateEmail}
+          onCancel={cancelEmailChange}
+        />
+      )}
     </div>
   );
 }

@@ -29,6 +29,7 @@ export const updateUser = createAsyncThunk(
       await apiClient.patch(`/users/${id}`, updateData);
       return true;
     } catch (error) {
+      console.log(error);
       return rejectWithValue(extractErrorResponse(error));
     }
   }
@@ -70,7 +71,7 @@ export const userInfoSlice = createSlice({
     fetchComplete: false,
 
     emailChangeConfirmationCodeRequired: false,
-    emailChangeResponse: "",
+    // emailChangeResponse: "",
     userInfo: {},
 
     refetchNeeded: false,
@@ -82,11 +83,11 @@ export const userInfoSlice = createSlice({
     },
     cancelEmailChange: (state) => {
       state.emailChangeConfirmationCodeRequired = false;
-      state.emailChangeResponse = "";
+      // state.emailChangeResponse = "";
     },
-    clearRefetchNeeded: (state) => {
-      state.refetchNeeded = false;
-    },
+    // clearRefetchNeeded: (state) => {
+    //   state.refetchNeeded = false;
+    // },
   },
   extraReducers: (builder) => {
     builder
@@ -94,6 +95,7 @@ export const userInfoSlice = createSlice({
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
         manageFulfilledState(state);
         state.fetchComplete = true;
+        state.refetchNeeded = false;
         state.userInfo = action.payload;
       })
       .addCase(fetchUserInfo.rejected, manageRejectedState)
@@ -106,10 +108,9 @@ export const userInfoSlice = createSlice({
       .addCase(updateUser.rejected, manageRejectedState)
 
       .addCase(updateUserMailCodeRequest.pending, managePendingState)
-      .addCase(updateUserMailCodeRequest.fulfilled, (state, action) => {
+      .addCase(updateUserMailCodeRequest.fulfilled, (state) => {
         manageFulfilledState(state);
         state.emailChangeConfirmationCodeRequired = true;
-        state.emailChangeResponse = action.payload;
       })
       .addCase(updateUserMailCodeRequest.rejected, manageRejectedState)
 
@@ -126,8 +127,7 @@ export const userInfoSlice = createSlice({
   },
 });
 
-export const { clearUserInfoError, cancelEmailChange, clearRefetchNeeded } =
-  userInfoSlice.actions;
+export const { clearUserInfoError, cancelEmailChange } = userInfoSlice.actions;
 
 export const selectUserInfo = (state) => state.userInfo.userInfo;
 export const selectUserId = (state) => state.userInfo.userInfo.id;
@@ -140,8 +140,8 @@ export const selectUserInfoHasError = (state) => state.userInfo.hasError;
 export const selectUserInfoError = (state) => state.userInfo.error;
 export const selectUserRefetchNeeded = (state) => state.userInfo.refetchNeeded;
 
-export const selectEmailChangeResponse = (state) =>
-  state.userInfo.emailChangeResponse;
+// export const selectEmailChangeResponse = (state) =>
+//   state.userInfo.emailChangeResponse;
 
 export const selectEmailChangeConfirmationCodeRequired = (state) =>
   state.userInfo.emailChangeConfirmationCodeRequired;

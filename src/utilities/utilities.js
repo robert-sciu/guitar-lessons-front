@@ -5,4 +5,10 @@ function classNameFormatter({ styles, classNames }) {
   return formatted.join(" ");
 }
 
-export { classNameFormatter };
+function setTrueWithTimeout(callback, time) {
+  setTimeout(() => {
+    callback(true);
+  }, time);
+}
+
+export { classNameFormatter, setTrueWithTimeout };

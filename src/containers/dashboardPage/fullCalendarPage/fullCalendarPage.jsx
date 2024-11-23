@@ -1,5 +1,4 @@
 import FullCalendar from "@fullcalendar/react";
-// import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import styles from "./fullCalendarPage.module.scss";
@@ -7,14 +6,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import {
   addTempEvent,
-  clearCalendarRefetchNeeded,
+  clearCalendarError,
   clearMoreInfoEvent,
   clearTempEvents,
   createReservation,
   deleteReservation,
   fetchReservations,
+  selectCalendarError,
+  selectCalendarHasError,
   selectCalendarRefetchNeeded,
+  selectCalendarUpdateFailed,
   selectEvents,
+  selectEventsUpdated,
   selectMoreInfoEvent,
   selectReservationsFetchComplete,
   selectTempEventData,
@@ -22,7 +25,7 @@ import {
   selectToday,
   selectWorkingHoursEnd,
   selectWorkingHoursStart,
-  setEventForUpdateId,
+  setCalendarError,
   setMoreInfoEvent,
   setTempRescheduleData,
   updateReservation,
@@ -30,7 +33,6 @@ import {
 import { selectUserId } from "../../../store/userInfoSlice";
 import { useTranslation } from "react-i18next";
 import "./fullCalendarPage.css";
-// import ReservationWindow from "../../../components/modalWindows/reservationWIndow/reservationWindow";
 import {
   addMinutesToIsoString,
   checkIfReservationDurationIsAllowed,
@@ -38,10 +40,8 @@ import {
   configureRescheduleDataFromEvent,
   getDateOnlyFromISOString,
   fullDateToISOString,
-  // getHourFromISOString,
   getMinMaxSlots,
   objectHasData,
-  // getMinutesFromISOString,
 } from "../../../utilities/calendarUtilities";
 import config from "../../../../config/config";
 import ModalWindowMain from "../../../components/modalWindows/modalWindow/modalWindowMain";
@@ -64,12 +64,27 @@ export default function FullCalendarPage() {
   const calendarEnd = useSelector(selectWorkingHoursEnd);
   const today = useSelector(selectToday);
   const calendarRefetchNeeded = useSelector(selectCalendarRefetchNeeded);
+  const eventsUpdated = useSelector(selectEventsUpdated);
+  const calendarHasError = useSelector(selectCalendarHasError);
+  const calendarError = useSelector(selectCalendarError);
+  const updateFailed = useSelector(selectCalendarUpdateFailed);
 
   useEffect(() => {
     if (reservationsFetchComplete && !calendarRefetchNeeded) return;
     dispatch(fetchReservations());
-    dispatch(clearCalendarRefetchNeeded());
   }, [dispatch, reservationsFetchComplete, calendarRefetchNeeded]);
+
+  useEffect(() => {
+    if (updateFailed) {
+      setEventsToDisplay(configureEvents(events, userId));
+    }
+  }, [updateFailed, events, userId]);
+
+  useEffect(() => {
+    if (eventsUpdated && !calendarRefetchNeeded) {
+      setEventsToDisplay(configureEvents(events, userId));
+    }
+  }, [eventsUpdated, calendarRefetchNeeded, events, userId]);
 
   useEffect(() => {
     if (
@@ -86,10 +101,10 @@ export default function FullCalendarPage() {
     const data = configureRescheduleDataFromEvent(e.event);
     if (!checkIfReservationDurationIsAllowed(data.start_UTC, data.end_UTC)) {
       setEventsToDisplay(configureEvents(events, userId));
+      dispatch(setCalendarError(t("errors.invalidDuration")));
       return;
     }
     dispatch(setTempRescheduleData(data));
-    dispatch(setEventForUpdateId(data.event_id));
   }
 
   function handleEventDragStop(e) {
@@ -103,7 +118,10 @@ export default function FullCalendarPage() {
   function addTempEventHandler(e) {
     dispatch(clearTempEvents());
     const start_UTC = fullDateToISOString(e.dateStr);
-    if (getDateOnlyFromISOString(start_UTC) <= today) return;
+    if (getDateOnlyFromISOString(start_UTC) <= today) {
+      dispatch(setCalendarError(t("errors.cannotBookEarlierThanTomorrow")));
+      return;
+    }
     const event = {
       id: "ghost",
       user_id: userId,
@@ -115,12 +133,27 @@ export default function FullCalendarPage() {
   }
 
   function showEventInfo(e) {
-    const event = {
-      id: e.event.id,
-      title: e.event.title,
-      start: getDateOnlyFromISOString(e.event.start),
+    const event = e.event;
+    const date = getDateOnlyFromISOString(event.start);
+    if (event.extendedProps.user_id !== userId) {
+      dispatch(setCalendarError(t("errors.thatsNotMine")));
+      return;
+    }
+    if (date < today) {
+      dispatch(setCalendarError(t("errors.thatsPast")));
+      return;
+    }
+    if (date === today) {
+      dispatch(setCalendarError(t("errors.thatsToday")));
+      return;
+    }
+
+    const eventData = {
+      id: event.id,
+      title: event.title,
+      start: getDateOnlyFromISOString(event.start),
     };
-    dispatch(setMoreInfoEvent(event));
+    dispatch(setMoreInfoEvent(eventData));
   }
   const { minTime, maxTime } = getMinMaxSlots(calendarStart, calendarEnd);
 
@@ -169,6 +202,13 @@ export default function FullCalendarPage() {
           data={moreInfoEvent}
           onDeleteSubmit={deleteReservation}
           onCancel={clearMoreInfoEvent}
+        />
+      )}
+      {calendarHasError && (
+        <ModalWindowMain
+          modalType={"error"}
+          data={calendarError}
+          onCancel={clearCalendarError}
         />
       )}
     </div>

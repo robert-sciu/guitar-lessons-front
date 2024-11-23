@@ -1,5 +1,10 @@
 @import "../../../styles/variables.module.scss";
 
+.defaultVisibility {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
 .loadingStateContainer {
   display: flex;
   justify-content: center;
@@ -28,6 +33,15 @@
 .fullscreen {
   position: fixed;
 }
+
+.fadeOut {
+  opacity: 0;
+}
+
+.displayNone {
+  display: none;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);

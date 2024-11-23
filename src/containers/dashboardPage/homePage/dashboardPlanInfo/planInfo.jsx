@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import styles from "./planInfo.module.scss";
 import PropTypes from "prop-types";
+import { utcTimeToLocalTimeString } from "../../../../utilities/calendarUtilities";
 // import { useDispatch } from "react-redux";
 
 export default function PlanInfo({ planInfo }) {
@@ -11,13 +12,9 @@ export default function PlanInfo({ planInfo }) {
     planInfo.special_discount;
 
   const date = t(`daysOfTheWeek.${planInfo.permanent_reservation_weekday}`);
-  const time = `${planInfo.permanent_reservation_hour}:${
-    planInfo.permanent_reservation_minute === 0
-      ? "00"
-      : planInfo.permanent_reservation_minute
-  }`;
-
-  // const dispatch = useDispatch()
+  const time = utcTimeToLocalTimeString(
+    planInfo.permanent_reservation_start_hour_UTC
+  );
 
   return (
     <div className={styles.planInfoContainer}>
@@ -56,7 +53,7 @@ export default function PlanInfo({ planInfo }) {
           <div className={styles.planInfoData}>
             <p>{t("planInfo.lessonDuration")}:</p>
             <div className={styles.planInfoDataStatus}>
-              {planInfo.permanent_reservation_lesson_length} min
+              {planInfo.permanent_reservation_lesson_duration} min
             </div>
           </div>
         </div>
