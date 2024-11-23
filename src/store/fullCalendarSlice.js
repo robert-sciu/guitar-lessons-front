@@ -9,6 +9,7 @@ import apiClient from "../api/api";
 import {
   getEndHourFromWorkingHoursArray,
   getStartHourFromWorkingHoursArray,
+  getTodayDate,
   getWorkingHoursArray,
 } from "../utilities/calendarUtilities";
 
@@ -40,6 +41,30 @@ export const updateReservation = createAsyncThunk(
   }
 );
 
+export const createReservation = createAsyncThunk(
+  "fullCalendar/createReservation",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post("/lessonReservations", data);
+      return extractResponseData(response);
+    } catch (error) {
+      return rejectWithValue(extractResponseData(error));
+    }
+  }
+);
+
+export const deleteReservation = createAsyncThunk(
+  "fullCalendar/deleteReservation",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.delete(`/lessonReservations/${id}`);
+      return extractResponseData(response);
+    } catch (error) {
+      return rejectWithValue(extractResponseData(error));
+    }
+  }
+);
+
 const fullCalendarSlice = createSlice({
   name: "fullCalendar",
   initialState: {
@@ -48,8 +73,14 @@ const fullCalendarSlice = createSlice({
     error: null,
     fetchComplete: false,
     tempEventData: {},
+    tempRescheduleData: {},
     events: [],
     workingHours: getWorkingHoursArray(),
+    today: getTodayDate(),
+
+    eventForUpdateId: null,
+    moreInfoEvent: {},
+    refetchNeeded: false,
   },
   reducers: {
     addTempEvent: (state, action) => {
@@ -57,12 +88,28 @@ const fullCalendarSlice = createSlice({
     },
     clearTempEvents: (state) => {
       state.tempEventData = {};
+      state.tempRescheduleData = {};
     },
     updateTempEvent: (state, action) => {
       state.tempEventData = {
         ...state.tempEventData,
         ...action.payload,
       };
+    },
+    clearCalendarRefetchNeeded: (state) => {
+      state.refetchNeeded = false;
+    },
+    setEventForUpdateId: (state, action) => {
+      state.eventForUpdateId = action.payload;
+    },
+    setTempRescheduleData: (state, action) => {
+      state.tempRescheduleData = action.payload;
+    },
+    setMoreInfoEvent: (state, action) => {
+      state.moreInfoEvent = action.payload;
+    },
+    clearMoreInfoEvent: (state) => {
+      state.moreInfoEvent = {};
     },
   },
   extraReducers: (builder) => {
@@ -78,16 +125,51 @@ const fullCalendarSlice = createSlice({
       .addCase(updateReservation.pending, managePendingState)
       .addCase(updateReservation.fulfilled, (state) => {
         manageFulfilledState(state);
+        state.refetchNeeded = true;
+        state.eventForUpdateId = null;
+        state.tempRescheduleData = {};
       })
-      .addCase(updateReservation.rejected, manageRejectedState);
+      .addCase(updateReservation.rejected, (state, action) => {
+        manageRejectedState(state, action);
+        state.events = state.events.filter(
+          (event) => event.id !== state.eventForUpdateId
+        );
+        state.eventForUpdateId = null;
+        state.refetchNeeded = true;
+      })
+
+      .addCase(createReservation.pending, managePendingState)
+      .addCase(createReservation.fulfilled, (state) => {
+        manageFulfilledState(state);
+        state.tempEventData = {};
+        state.refetchNeeded = true;
+      })
+      .addCase(createReservation.rejected, manageRejectedState)
+
+      .addCase(deleteReservation.pending, managePendingState)
+      .addCase(deleteReservation.fulfilled, (state) => {
+        manageFulfilledState(state);
+        state.refetchNeeded = true;
+        state.moreInfoEvent = {};
+      })
+      .addCase(deleteReservation.rejected, manageRejectedState);
   },
 });
 
-export const { addTempEvent, clearTempEvents, updateTempEvent } =
-  fullCalendarSlice.actions;
+export const {
+  addTempEvent,
+  clearTempEvents,
+  updateTempEvent,
+  clearCalendarRefetchNeeded,
+  setEventForUpdateId,
+  setTempRescheduleData,
+  setMoreInfoEvent,
+  clearMoreInfoEvent,
+} = fullCalendarSlice.actions;
 
 export const selectEvents = (state) => state.fullCalendar.events;
 export const selectTempEventData = (state) => state.fullCalendar.tempEventData;
+export const selectToday = (state) => state.fullCalendar.today;
 export const selectWorkingHoursArray = (state) =>
   state.fullCalendar.workingHours;
 export const selectWorkingHoursStart = (state) =>
@@ -97,5 +179,13 @@ export const selectWorkingHoursEnd = (state) =>
 
 export const selectReservationsFetchComplete = (state) =>
   state.fullCalendar.fetchComplete;
+
+export const selectCalendarRefetchNeeded = (state) =>
+  state.fullCalendar.refetchNeeded;
+
+export const selectTempRescheduleData = (state) =>
+  state.fullCalendar.tempRescheduleData;
+
+export const selectMoreInfoEvent = (state) => state.fullCalendar.moreInfoEvent;
 
 export default fullCalendarSlice.reducer;

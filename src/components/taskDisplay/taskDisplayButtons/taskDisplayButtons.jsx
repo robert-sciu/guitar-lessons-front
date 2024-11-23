@@ -3,6 +3,7 @@ import LoadingState from "../../loadingState/loadingState";
 import styles from "./taskDisplayButtons.module.scss";
 
 import PropTypes from "prop-types";
+import { useState } from "react";
 export default function TaskDisplayButtons({
   enableAdd,
   enableShowMore,
@@ -17,13 +18,26 @@ export default function TaskDisplayButtons({
   showMore,
   setShowMore,
 }) {
+  const [deleting, setDeleting] = useState(false);
+  function deleteTaskHandler(e) {
+    if (!deletingTask) {
+      setDeleting(true);
+      handleDeleteTask(e);
+    }
+  }
+
+  function addTasksHandler(e) {
+    if (!addingTask) {
+      handleAddTask(e);
+    }
+  }
   const { t } = useTranslation();
   return (
     <div className={styles.buttonsContainer}>
       {enableAdd && (
         <button
           className={`${styles.taskButton} ${styles.addTaskButton}`}
-          onClick={handleAddTask}
+          onClick={addTasksHandler}
         >
           {addingTask ? (
             <>
@@ -43,8 +57,8 @@ export default function TaskDisplayButtons({
         </button>
       )}
       {enableDelete && (
-        <button className={styles.taskButton} onClick={handleDeleteTask}>
-          {deletingTask ? (
+        <button className={styles.taskButton} onClick={deleteTaskHandler}>
+          {deletingTask && deleting ? (
             <>
               <LoadingState spinnerOnly={true} />{" "}
               {t("taskDisplay.deletingTask")}

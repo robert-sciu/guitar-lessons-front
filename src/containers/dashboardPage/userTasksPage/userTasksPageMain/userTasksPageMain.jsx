@@ -4,6 +4,7 @@ import {
   fetchUserTasks,
   selectUserTasks,
   selectUserTasksFetchComplete,
+  selectUserTasksRefetchNeeded,
 } from "../../../../store/userTasksSlice";
 import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/taskDisplayMain";
 import styles from "./userTasksPageMain.module.scss";
@@ -20,12 +21,19 @@ export default function UserTasksPageMain() {
   const { t } = useTranslation();
   const fetchedUserTasks = useSelector(selectUserTasks);
   const userTasksFetchComplete = useSelector(selectUserTasksFetchComplete);
+  const userTasksRefetchNeeded = useSelector(selectUserTasksRefetchNeeded);
 
   useEffect(() => {
     if (isAuthenticated && !fetchComplete && fetchedUserTasks?.length === 0) {
       dispatch(fetchUserTasks());
     }
   }, [dispatch, isAuthenticated, fetchComplete, fetchedUserTasks]);
+
+  useEffect(() => {
+    if (userTasksRefetchNeeded) {
+      dispatch(fetchUserTasks());
+    }
+  });
 
   useEffect(() => {
     if (fetchedUserTasks?.length > 0) {

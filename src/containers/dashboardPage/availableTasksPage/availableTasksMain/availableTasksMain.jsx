@@ -111,18 +111,6 @@ export default function AvailableTasksMain() {
     }
   }, [dispatch, isAuthenticated, fetchTagsComplete]);
 
-  // useEffect(() => {
-  //   if (!userInfoFetchComplete || minimumTaskLevel === 0) return;
-  //   if (minimumTaskLevel !== minimumTaskLevelToDisplay) {
-  //     dispatch(updateUser({ minimum_task_level_to_display: minimumTaskLevel }));
-  //   }
-  // }, [
-  //   dispatch,
-  //   minimumTaskLevel,
-  //   minimumTaskLevelToDisplay,
-  //   userInfoFetchComplete,
-  // ]);
-
   useEffect(() => {
     if (userTaskUpdated) {
       dispatch(clearUserTaskUpdated());

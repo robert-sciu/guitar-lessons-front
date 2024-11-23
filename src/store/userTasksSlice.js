@@ -80,6 +80,8 @@ const userTasksSlice = createSlice({
     userTasks: [],
     completedTasks: [],
     userTaskUpdated: false,
+    taskToDeleteId: null,
+    refetchNeeded: false,
   },
   reducers: {
     clearUserTasksError: (state) => {
@@ -88,6 +90,12 @@ const userTasksSlice = createSlice({
     },
     clearUserTaskUpdated: (state) => {
       state.userTaskUpdated = false;
+    },
+    setTaskToDeleteId: (state, action) => {
+      state.taskToDeleteId = action.payload;
+    },
+    clearTaskToDeleteId: (state) => {
+      state.taskToDeleteId = null;
     },
   },
   extraReducers: (builder) => {
@@ -110,6 +118,7 @@ const userTasksSlice = createSlice({
         manageFulfilledState(state);
         state.userTasks = action.payload;
         state.fetchComplete = true;
+        state.refetchNeeded = false;
       })
       .addCase(fetchUserTasks.rejected, (state, action) => {
         manageRejectedState(state, action);
@@ -127,10 +136,11 @@ const userTasksSlice = createSlice({
       .addCase(deleteUserTask.pending, (state) => {
         managePendingState(state);
       })
-      .addCase(deleteUserTask.fulfilled, (state, action) => {
+      .addCase(deleteUserTask.fulfilled, (state) => {
         manageFulfilledState(state);
-        state.userTasks = action.payload;
+        state.taskToDeleteId = null;
         state.userTaskUpdated = true;
+        state.refetchNeeded = true;
       })
       .addCase(deleteUserTask.rejected, (state, action) => {
         manageRejectedState(state, action);
@@ -153,8 +163,12 @@ const userTasksSlice = createSlice({
   },
 });
 
-export const { clearUserTasksError, clearUserTaskUpdated } =
-  userTasksSlice.actions;
+export const {
+  clearUserTasksError,
+  clearUserTaskUpdated,
+  setTaskToDeleteId,
+  clearTaskToDeleteId,
+} = userTasksSlice.actions;
 
 export const selectUserTasks = (state) => state.userTasks.userTasks;
 export const selectCompletedTasks = (state) => state.userTasks.completedTasks;
@@ -166,4 +180,7 @@ export const selectUserTasksFetchComplete = (state) =>
 export const selectCompletedTasksFetchComplete = (state) =>
   state.userTasks.completedTasksFetchComplete;
 export const selectUserTaskUpdated = (state) => state.userTasks.userTaskUpdated;
+export const selectTaskToDeleteId = (state) => state.userTasks.taskToDeleteId;
+export const selectUserTasksRefetchNeeded = (state) =>
+  state.userTasks.refetchNeeded;
 export default userTasksSlice.reducer;

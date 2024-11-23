@@ -1,56 +1,5 @@
-// function createDayHoursObject() {
-//   const dayStartHour = 8;
-//   const dayEndHour = 22;
-//   const dayHours = {};
-//   for (let i = dayStartHour; i < dayEndHour; i++) {
-//     dayHours[i] = {
-//       0: {},
-//       30: {},
-//       // isBooked: false,
-//     };
-//   }
-//   return dayHours;
-// }
-
-// function calculateReservationStartAndEnd(reservation) {
-//   const reservationStart = `${reservation.hour}:${reservation.minute}${
-//     reservation.minute === 0 ? "0" : ""
-//   }`;
-//   const hoursToAdd = Math.floor(reservation.duration / 60);
-//   const minutesToAdd = reservation.duration % 60;
-
-//   const reservationEnd = `${reservation.hour + hoursToAdd}:${
-//     reservation.minute + minutesToAdd
-//   }${minutesToAdd === 0 ? "0" : ""}`;
-//   return { reservationStart, reservationEnd };
-// }
-
-// function attachLessonReservationsToDayHoursObject(
-//   dayHours,
-//   lessonReservations
-// ) {
-//   const dayObjectWithReservations = { ...dayHours };
-//   lessonReservations.forEach((reservation) => {
-//     // prettier-ignore
-//     dayObjectWithReservations[reservation.hour][reservation.minute] = {...reservation, isBooked: true};
-//     dayObjectWithReservations[reservation.hour]["isBooked"] = true;
-//     // prettier-ignore
-//     dayObjectWithReservations[reservation.hour]["bookingMinute"] = reservation.minute;
-//   });
-//   // console.log(dayObjectWithReservations);
-//   return dayObjectWithReservations;
-// }
-
-// function checkIsBooked(hourData) {
-//   return hourData.isBooked;
-// }
-
-// export {
-//   createDayHoursObject,
-//   attachLessonReservationsToDayHoursObject,
-//   checkIsBooked,
-//   calculateReservationStartAndEnd,
-// };
+import config from "../../config/config";
+import { t } from "i18next";
 
 /**
  * Returns today's date in ISO format (YYYY-MM-DD).
@@ -74,7 +23,7 @@ function fullDateToISOString(date) {
  * @param {string} date The ISO-formatted date string to extract the date from.
  * @returns {string} The date part of the ISO-formatted date string.
  */
-function dateOnlyFromISOString(date) {
+function getDateOnlyFromISOString(date) {
   return new Date(date).toISOString().split("T")[0];
 }
 
@@ -106,11 +55,15 @@ function changeISOStringMinutes(isoString, newMinutes) {
   return new Date(new Date(isoString).setMinutes(newMinutes)).toISOString();
 }
 
+function checkIfReservationDurationIsAllowed(isoStart, isoEnd) {
+  return (new Date(isoEnd) - new Date(isoStart)) / (60 * 1000) <= 120;
+}
+
 function getWorkingHoursArray() {
   const array = [];
   const hourLength = 60 * 60 * 1000;
-  const start = new Date().setUTCHours(7, 0, 0, 0);
-  const dayLengthInHours = 14;
+  const start = new Date().setUTCHours(config.openHourUTC, 0, 0, 0);
+  const dayLengthInHours = config.workingDayLengthInHours;
 
   for (let i = 0; i < dayLengthInHours; i++) {
     array.push(new Date(start + i * hourLength).getHours());
@@ -135,80 +88,80 @@ function getEndHourFromWorkingHoursArray(array) {
     .split(".")[0];
 }
 
-/**
- * Formats business hours into an object or array of objects representing the weekly schedule.
- * If the end time is greater than the start time, returns a single object with business hours.
- * If the start time is greater than the end time, returns an array with two objects,
- * representing hours spanning across midnight.
- *
- * @param {string} startTime - The start time in "HH:MM:SS" format.
- * @param {string} endTime - The end time in "HH:MM:SS" format.
- * @returns {Object|Array} - An object or array of objects representing business hours.
- */
-function formatBusinessHours(startTime, endTime) {
-  if (endTime > startTime) {
-    return {
-      daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
-      startTime,
-      endTime,
-    };
-  }
-
-  if (startTime > endTime) {
-    return [
-      {
-        daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
-        startTime,
-        endTime: "24:00:00",
-      },
-      {
-        daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
-        startTime: "00:00:00",
-        endTime,
-      },
-    ];
-  }
-}
-
 function getMinMaxSlots(startTime, endTime) {
   const nightInTheMiddle = startTime > endTime;
-  console.log("starttime", startTime);
-  console.log("endtime", endTime);
+  const defaultStart = config.openHourString;
+  const defaultEnd = config.closeHourString;
   let start;
   let end;
   if (nightInTheMiddle) {
-    console.log("nightInTheMiddle");
-    if (endTime >= "08:00:00") {
-      start = "08:00:00";
+    if (endTime >= defaultStart) {
+      start = defaultStart;
     } else {
       start = startTime;
     }
-    if (startTime >= "22:00:00") {
+    if (startTime >= defaultEnd) {
       end = endTime;
     } else {
-      end = "22:00:00";
+      end = defaultEnd;
     }
     return { minTime: start, maxTime: end };
   } else {
-    if (startTime < "08:00:00") {
-      start = "08:00:00";
+    if (startTime < defaultStart) {
+      start = defaultStart;
     } else {
       start = startTime;
     }
-    if (endTime > "22:00:00") {
-      end = "22:00:00";
+    if (endTime > defaultEnd) {
+      end = defaultEnd;
     } else {
       end = endTime;
     }
 
     return { minTime: start, maxTime: end };
   }
+}
+
+/**
+ * Configure events for fullCalendar.
+ *
+ * For each event, if the event belongs to the user (i.e. the event.user_id === userId),
+ * then set the event as editable, event start editable, and event duration editable.
+ * Also, change the title of the event to "My reservation".
+ *
+ * @param {array} events - an array of events
+ * @param {number} userId - the user id
+ * @returns {array} - the configured events
+ */
+function configureEvents(events, userId) {
+  const today = getTodayDate();
+  return events.map((event) => ({
+    ...event,
+    editable:
+      event.user_id === userId && getDateOnlyFromISOString(event.start) > today,
+    // eventStartEditable: event.user_id === userId,
+    // eventDurationEditable: event.user_id === userId,
+    title: event.user_id === userId ? t("calendar.myReservation") : event.title,
+  }));
+}
+
+function configureRescheduleDataFromEvent(event) {
+  return {
+    event_id: Number(event.id),
+    start_UTC: new Date(event.start).toISOString(),
+    end_UTC: new Date(event.end).toISOString(),
+    duration: (event.end - event.start) / 60000,
+  };
+}
+
+function objectHasData(obj) {
+  return Object.keys(obj).length > 0;
 }
 
 export {
   getTodayDate,
   fullDateToISOString,
-  dateOnlyFromISOString,
+  getDateOnlyFromISOString,
   addMinutesToIsoString,
   getHourFromISOString,
   getMinutesFromISOString,
@@ -217,6 +170,10 @@ export {
   getStartHourFromWorkingHoursArray,
   getEndHourFromWorkingHoursArray,
   getWorkingHoursArray,
-  formatBusinessHours,
+  // formatBusinessHours,
   getMinMaxSlots,
+  configureEvents,
+  checkIfReservationDurationIsAllowed,
+  configureRescheduleDataFromEvent,
+  objectHasData,
 };

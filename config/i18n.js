@@ -88,6 +88,11 @@ i18n
           },
           calendar: {
             myReservation: "Moja lekcja",
+            bookIt: "Zarezerwuj",
+            acceptReschedule: "Potwierdzasz nowe dane rezerwacji?",
+            date: "Data",
+            time: "Godzina",
+            duration: "Długość",
           },
           daysOfTheWeek: {
             0: "Niedziela",
@@ -224,6 +229,11 @@ i18n
           },
           calendar: {
             myReservation: "My reservation",
+            bookIt: "Book it",
+            acceptReschedule: "Do you confirm the new date?",
+            date: "Date",
+            time: "Time",
+            duration: "Duration",
           },
 
           daysOfTheWeek: {
