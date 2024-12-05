@@ -1,5 +1,13 @@
 @import "./variables.module.scss";
 
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $size-s;
+  // margin: $size-s;
+  // transition: $reveal-transition;
+}
+
 .backdropBlur {
   content: "";
   position: absolute;
@@ -35,28 +43,6 @@
   padding: $size-xxxxs;
   box-shadow: $inset-soft-shadow;
   text-align: center;
-  &:focus {
-    outline: none;
-  }
-}
-
-.commonButton {
-  border-radius: $size-xxxxs;
-  border: none;
-  padding: $size-xxxxs $size-xs;
-  background-color: $main-gray;
-  color: $main-white;
-  transition: $basic-transition;
-  box-shadow: $inset-soft-shadow;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  gap: $size-xxxs;
-  cursor: pointer;
-  &:hover,
-  &:active {
-    background-color: $main-gray-light;
-  }
   &:focus {
     outline: none;
   }

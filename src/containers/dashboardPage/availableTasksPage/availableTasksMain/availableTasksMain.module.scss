@@ -1,43 +1,13 @@
 @import "../../../../../styles/variables.module.scss";
 @import "../../../../../styles/classes.module.scss";
 
-.tasksContainer {
-  display: flex;
-  flex-direction: column;
-  gap: $size-s;
-  // .selectedTags {
-  //   display: flex;
-  //   gap: $size-xxxs;
-  //   flex-wrap: wrap;
-  //   .tags {
-  //     color: $tag-green;
-  //     font-weight: 500;
-  //   }
-  // }
+.mainContainer {
+  @extend .dashboardContainer;
+
   .availableTasksHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-  .levelFilter {
-    display: flex;
-    gap: $size-xxxs;
-    align-items: center;
-    .levelButtons {
-      @extend .commonButton;
-      padding: $size-tiny $size-xs;
-    }
-    .levelInput {
-      @extend .input;
-      width: 3rem;
-    }
-    .levelSaving {
-      display: flex;
-      gap: $size-xxxs;
-      align-items: center;
-
-      color: $main-gray;
-    }
   }
   .tagsContainer {
     display: flex;

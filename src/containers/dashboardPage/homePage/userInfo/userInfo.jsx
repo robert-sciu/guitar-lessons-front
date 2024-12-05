@@ -1,23 +1,26 @@
-import { useTranslation } from "react-i18next";
-import styles from "./userInfo.module.scss";
-import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+
+import InputToggler from "../../../../components/elements/inputToggler/inputToggler";
+import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
+import Button from "../../../../components/elements/button/button";
+import { HiOutlinePencilSquare } from "react-icons/hi2";
+
 import {
-  // cancelEmailChange,
   selectEmailChangeConfirmationCodeRequired,
-  // selectEmailChangeResponse,
   selectUserInfoHasError,
   selectUserInfoIsLoading,
   updateEmail,
   updateUserMailCodeRequest,
   updateUser,
   cancelEmailChange,
+  selectUserInfoError,
+  clearUserInfoError,
 } from "../../../../store/userInfoSlice";
-// import CodeRequiredModal from "../../../../components/modalWindows/codeRequiredModal/codeRequiredModal";
-import EditButton from "../../../../components/elements/editButton/editButton";
-import InputToggler from "../../../../components/elements/inputToggler/inputToggler";
-import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
+
+import styles from "./userInfo.module.scss";
+import PropTypes from "prop-types";
 
 export default function UserInfo({ userInfo }) {
   const [usernameEditMode, setUsernameEditMode] = useState(false);
@@ -26,6 +29,8 @@ export default function UserInfo({ userInfo }) {
   const [email, setEmail] = useState("");
 
   const userInfoHasError = useSelector(selectUserInfoHasError);
+
+  const userInfoError = useSelector(selectUserInfoError);
   const emailChangeConfirmationCodeRequired = useSelector(
     selectEmailChangeConfirmationCodeRequired
   );
@@ -65,7 +70,7 @@ export default function UserInfo({ userInfo }) {
   }
 
   return (
-    <div className={styles.userInfoContainer}>
+    <div className={styles.mainContainer}>
       <h4>{t("userInfo.basicInfo")}</h4>
       <div className={styles.detailsContainer}>
         <div className={styles.userData}>
@@ -95,10 +100,14 @@ export default function UserInfo({ userInfo }) {
               onChange={(e) => setUsername(e.target.value)}
               inputIsActive={usernameEditMode}
             />
-            <EditButton
+            <Button
+              label={t("buttons.edit")}
+              isActive={usernameEditMode}
+              activeLabel={t("buttons.save")}
+              icon={<HiOutlinePencilSquare />}
               onClick={handleEditUsernameBtnClick}
               isLoading={username !== userInfo.username && userInfoIsLoading}
-              isEditing={usernameEditMode}
+              loadingLabel={t("buttons.wait")}
             />
           </div>
         </div>
@@ -111,11 +120,15 @@ export default function UserInfo({ userInfo }) {
               onChange={(e) => setEmail(e.target.value)}
               inputIsActive={emailEditMode}
             />
-            <EditButton
-              style={styles.editBtn}
+
+            <Button
+              label={t("buttons.edit")}
+              isActive={emailEditMode}
+              activeLabel={t("buttons.save")}
+              icon={<HiOutlinePencilSquare />}
               onClick={handleEditEmailBtnClick}
               isLoading={email !== userInfo.email && userInfoIsLoading}
-              isEditing={emailEditMode}
+              loadingLabel={t("buttons.wait")}
             />
           </div>
         </div>
@@ -125,6 +138,13 @@ export default function UserInfo({ userInfo }) {
           modalType={"codeRequired"}
           onSubmit={updateEmail}
           onCancel={cancelEmailChange}
+        />
+      )}
+      {userInfoHasError && (
+        <ModalWindowMain
+          modalType="error"
+          data={userInfoError}
+          onCancel={clearUserInfoError}
         />
       )}
     </div>

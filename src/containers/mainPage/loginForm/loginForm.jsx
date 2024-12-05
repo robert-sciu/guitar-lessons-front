@@ -6,11 +6,13 @@ import { useNavigate } from "react-router-dom";
 
 import {
   loginUser,
+  selectAuthLoadingState,
   selectIsAuthenticated,
-  selectIsLoading,
 } from "../../../store/authSlice";
 
 import { useTranslation } from "react-i18next";
+import LoadingState from "../../../components/loadingState/loadingState";
+import styles from "./loginForm.module.scss";
 
 export default function LoginForm() {
   const { t } = useTranslation();
@@ -24,7 +26,7 @@ export default function LoginForm() {
   const navigate = useNavigate();
 
   const loggedIn = useSelector(selectIsAuthenticated);
-  const isLoading = useSelector(selectIsLoading);
+  const isLoading = useSelector(selectAuthLoadingState);
 
   useEffect(() => {
     if (loggedIn) {
@@ -46,14 +48,14 @@ export default function LoginForm() {
     dispatch(loginUser({ email, password }));
   }
   return (
-    <div>
+    <div className={styles.loginContainer}>
       {isLoading ? (
-        <p>loading...</p>
+        <LoadingState fullscreen={true} spinnerOnly={true} />
       ) : (
         showLogin && (
           <form onSubmit={handleSubmit}>
-            <h2>{t("loginForm.login")}</h2>
-            <div>
+            <h4>{t("loginForm.login")}</h4>
+            <div className={styles.formContainer}>
               <label>{t("loginForm.email")}</label>
               <input
                 type="email"

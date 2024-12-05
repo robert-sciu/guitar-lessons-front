@@ -2,10 +2,10 @@ import { useTranslation } from "react-i18next";
 import styles from "./codeRequiredModal.module.scss";
 
 import PropTypes from "prop-types";
-import LoadingState from "../../loadingState/loadingState";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectUserInfoIsLoading } from "../../../store/userInfoSlice";
+import Button from "../../elements/button/button";
 
 export default function CodeRequiredModal({ onSubmit, onCancel, dispatch }) {
   const { t } = useTranslation();
@@ -26,11 +26,13 @@ export default function CodeRequiredModal({ onSubmit, onCancel, dispatch }) {
         placeholder={t("modals.codePlaceholder")}
       />
       <div className={styles.buttonsContainer}>
-        <button onClick={handleSubmit}>
-          {t("buttons.confirm")}{" "}
-          {isLoading && <LoadingState spinnerOnly={true} />}
-        </button>
-        <button onClick={handleCancel}>{t("buttons.cancel")}</button>
+        <Button
+          label={t("buttons.confirm")}
+          onClick={handleSubmit}
+          isLoading={isLoading}
+          loadingLabel={t("buttons.wait")}
+        />
+        <Button label={t("buttons.cancel")} onClick={handleCancel} />
       </div>
     </div>
   );

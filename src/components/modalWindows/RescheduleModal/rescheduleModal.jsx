@@ -6,6 +6,7 @@ import {
   getHourFromISOString,
   getMinutesFromISOString,
 } from "../../../utilities/calendarUtilities";
+import Button from "../../elements/button/button";
 
 export default function RescheduleModal({
   onSubmit,
@@ -46,12 +47,14 @@ export default function RescheduleModal({
         </div>
       </div>
       <div className={styles.buttonsContainer}>
-        <button onClick={() => handleClick(true)}>
-          {t("buttons.confirm")}
-        </button>
-        <button onClick={() => handleClick(false)}>
-          {t("buttons.cancel")}
-        </button>
+        <Button
+          label={t("buttons.confirm")}
+          onClick={() => handleClick(true)}
+        />
+        <Button
+          label={t("buttons.cancel")}
+          onClick={() => handleClick(false)}
+        />
       </div>
     </div>
   );

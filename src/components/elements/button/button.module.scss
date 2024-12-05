@@ -1,0 +1,46 @@
+@import "./../../../../styles/variables.module.scss";
+
+.button {
+  border-radius: $size-xxxxs;
+  border: none;
+  padding: $size-xxxxs $size-xs;
+  background-color: $main-gray;
+  color: $main-white;
+  transition: $basic-transition;
+  box-shadow: $inset-soft-shadow;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: $size-xxxs;
+  cursor: pointer;
+  position: relative;
+  justify-content: center;
+  flex: 1;
+  min-width: 7rem;
+  &:hover,
+  &:active {
+    background-color: $main-gray-light;
+  }
+  &:focus {
+    outline: none;
+  }
+}
+
+.greenBtn {
+  background-color: $add-green;
+  &:hover {
+    background-color: $add-green-hover;
+  }
+}
+
+.smallBtn {
+  min-width: 0 !important;
+}
+
+.button.disabled {
+  cursor: default;
+  background-color: $main-gray-light;
+  &:hover {
+    background-color: $main-gray-light;
+  }
+}

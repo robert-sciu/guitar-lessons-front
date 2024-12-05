@@ -1,7 +1,6 @@
-import { NavLink } from "react-router-dom";
-import styles from "./dashboardNavLinks.module.scss";
 import { useTranslation } from "react-i18next";
-import PropTypes from "prop-types";
+
+import NavLinkBtn from "../../elements/navLinkBtn/navLinkBtn";
 
 import {
   HiOutlineHome,
@@ -12,74 +11,51 @@ import {
   HiOutlineCurrencyDollar,
   HiOutlinePower,
 } from "react-icons/hi2";
+import styles from "./dashboardNavLinks.module.scss";
+import PropTypes from "prop-types";
 
 export default function DashboardNavLinks({ onLogout }) {
   const { t } = useTranslation();
-  function activeStateStyle({ isActive }) {
-    const className = isActive
-      ? `${styles.navLink} ${styles.active}`
-      : styles.navLink;
-
-    return className;
-  }
   return (
     <div className={styles.dashboardNavLinksContainer}>
-      <ul>
-        <li>
-          <NavLink className={activeStateStyle} to="/dashboard/welcome">
-            {t("dashboardNav.home")}
-            <div className={styles.icon}>
-              <HiOutlineHome />
-            </div>
-          </NavLink>
-        </li>
-        <li>
-          <NavLink className={activeStateStyle} to="/dashboard/tasks">
-            {t("dashboardNav.tasks")}
-            <div className={styles.icon}>
-              <HiOutlineInboxStack />
-            </div>
-          </NavLink>
-        </li>
-        <li>
-          <NavLink className={activeStateStyle} to="/dashboard/availableTasks">
-            {t("dashboardNav.availableTasks")}
-            <div className={styles.icon}>
-              <HiMagnifyingGlassPlus />
-            </div>
-          </NavLink>
-        </li>
-        <li>
-          <NavLink className={activeStateStyle} to="/dashboard/completedTasks">
-            {t("dashboardNav.completedTasks")}
-            <div className={styles.icon}>
-              <HiCheck />
-            </div>
-          </NavLink>
-        </li>
-        <li>
-          <NavLink className={activeStateStyle} to="/dashboard/calendar">
-            {t("dashboardNav.calendar")}
-            <div className={styles.icon}>
-              <HiCalendarDays />
-            </div>
-          </NavLink>
-        </li>
-        <li>
-          <NavLink className={activeStateStyle} to="/dashboard/payments">
-            {t("dashboardNav.payments")}
-            <div className={styles.icon}>
-              <HiOutlineCurrencyDollar />
-            </div>
-          </NavLink>
-        </li>
+      <ul className={styles.dashboardNavLinks}>
+        <NavLinkBtn
+          to="/dashboard/welcome"
+          label={t("dashboardNav.home")}
+          icon={<HiOutlineHome />}
+        />
+        <NavLinkBtn
+          to="/dashboard/tasks"
+          label={t("dashboardNav.tasks")}
+          icon={<HiOutlineInboxStack />}
+        />
+        <NavLinkBtn
+          to="/dashboard/availableTasks"
+          label={t("dashboardNav.availableTasks")}
+          icon={<HiMagnifyingGlassPlus />}
+        />
+        <NavLinkBtn
+          to="/dashboard/completedTasks"
+          label={t("dashboardNav.completedTasks")}
+          icon={<HiCheck />}
+        />
+        <NavLinkBtn
+          to="/dashboard/calendar"
+          label={t("dashboardNav.calendar")}
+          icon={<HiCalendarDays />}
+        />
+        <NavLinkBtn
+          to="/dashboard/payments"
+          label={t("dashboardNav.payments")}
+          icon={<HiOutlineCurrencyDollar />}
+        />
       </ul>
-      <button className={styles.navLink} onClick={onLogout}>
-        {t("buttons.logout")}
-        <div className={styles.icon}>
-          <HiOutlinePower />
-        </div>
-      </button>
+      <NavLinkBtn
+        to="/"
+        label={t("buttons.logout")}
+        icon={<HiOutlinePower />}
+        onClick={onLogout}
+      />
     </div>
   );
 }

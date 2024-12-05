@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  checkAuthenticated,
   extractErrorResponse,
   extractResponseData,
   manageFulfilledState,
@@ -11,8 +12,9 @@ import apiClient from "../api/api";
 
 export const fetchUserInfo = createAsyncThunk(
   "userInfo/fetchUserInfo",
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
+      checkAuthenticated(getState);
       const response = await apiClient.get("/users");
       return extractResponseData(response);
     } catch (error) {
@@ -23,13 +25,13 @@ export const fetchUserInfo = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   "userInfo/updateUser",
-  async (data, { rejectWithValue }) => {
+  async (data, { getState, rejectWithValue }) => {
     const { id, ...updateData } = data;
     try {
+      checkAuthenticated(getState);
       await apiClient.patch(`/users/${id}`, updateData);
       return true;
     } catch (error) {
-      console.log(error);
       return rejectWithValue(extractErrorResponse(error));
     }
   }
@@ -37,8 +39,9 @@ export const updateUser = createAsyncThunk(
 
 export const updateUserMailCodeRequest = createAsyncThunk(
   "userInfo/updateUserEmallCodeRequest",
-  async (email, { rejectWithValue }) => {
+  async (email, { getState, rejectWithValue }) => {
     try {
+      checkAuthenticated(getState);
       const response = await apiClient.post(
         "/users/change_email_address",
         email
@@ -52,8 +55,9 @@ export const updateUserMailCodeRequest = createAsyncThunk(
 
 export const updateEmail = createAsyncThunk(
   "userInfo/updateEmail",
-  async (changeEmailToken, { rejectWithValue }) => {
+  async (changeEmailToken, { getState, rejectWithValue }) => {
     try {
+      checkAuthenticated(getState);
       await apiClient.patch("/users/change_email_address", changeEmailToken);
       return true;
     } catch (error) {
@@ -68,13 +72,13 @@ export const userInfoSlice = createSlice({
     isLoading: false,
     hasError: false,
     error: null,
+    refetchNeeded: false,
+
     fetchComplete: false,
 
     emailChangeConfirmationCodeRequired: false,
     // emailChangeResponse: "",
     userInfo: {},
-
-    refetchNeeded: false,
   },
   reducers: {
     clearUserInfoError: (state) => {
@@ -85,15 +89,13 @@ export const userInfoSlice = createSlice({
       state.emailChangeConfirmationCodeRequired = false;
       // state.emailChangeResponse = "";
     },
-    // clearRefetchNeeded: (state) => {
-    //   state.refetchNeeded = false;
-    // },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserInfo.pending, managePendingState)
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
         manageFulfilledState(state);
+
         state.fetchComplete = true;
         state.refetchNeeded = false;
         state.userInfo = action.payload;
@@ -131,7 +133,7 @@ export const { clearUserInfoError, cancelEmailChange } = userInfoSlice.actions;
 
 export const selectUserInfo = (state) => state.userInfo.userInfo;
 export const selectUserId = (state) => state.userInfo.userInfo.id;
-export const selectUserMinimumTaskLevel = (state) =>
+export const selectUserInfoMinimumDifficultyLevel = (state) =>
   state.userInfo.userInfo.minimum_task_level_to_display;
 export const selectUserInfoIsLoading = (state) => state.userInfo.isLoading;
 //prettier-ignore
@@ -139,7 +141,6 @@ export const selectUserInfoFetchComplete = (state) => state.userInfo.fetchComple
 export const selectUserInfoHasError = (state) => state.userInfo.hasError;
 export const selectUserInfoError = (state) => state.userInfo.error;
 export const selectUserRefetchNeeded = (state) => state.userInfo.refetchNeeded;
-
 // export const selectEmailChangeResponse = (state) =>
 //   state.userInfo.emailChangeResponse;
 

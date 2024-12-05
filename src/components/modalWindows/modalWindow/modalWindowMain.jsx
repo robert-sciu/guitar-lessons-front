@@ -3,7 +3,7 @@ import styles from "./modalWindowMain.module.scss";
 import Draggable from "react-draggable";
 import { useRef } from "react";
 import PropTypes from "prop-types";
-import ReservationModal from "../reservationWIndow/reservationModal";
+import ReservationModal from "../reservationWindow/reservationModal";
 import { useDispatch } from "react-redux";
 import MoreInfoModal from "../moreInfoWindow/moreInfoModal";
 import RescheduleModal from "../RescheduleModal/rescheduleModal";

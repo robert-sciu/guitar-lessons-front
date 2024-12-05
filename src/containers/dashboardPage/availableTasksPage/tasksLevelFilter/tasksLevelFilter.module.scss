@@ -1,0 +1,19 @@
+@import "../../../../../styles/variables.module.scss";
+@import "../../../../../styles/classes.module.scss";
+.levelFilter {
+  display: flex;
+  gap: $size-xxxs;
+  align-items: center;
+
+  .levelInput {
+    @extend .input;
+    width: 3rem;
+  }
+  .levelSaving {
+    display: flex;
+    gap: $size-xxxs;
+    align-items: center;
+
+    color: $main-gray;
+  }
+}

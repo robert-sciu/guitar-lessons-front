@@ -1,9 +1,10 @@
-import { useTranslation } from "react-i18next";
-import LoadingState from "../../loadingState/loadingState";
-import styles from "./taskDisplayButtons.module.scss";
-
-import PropTypes from "prop-types";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+
+import Button from "../../elements/button/button";
+
+import styles from "./taskDisplayButtons.module.scss";
+import PropTypes from "prop-types";
 export default function TaskDisplayButtons({
   enableAdd,
   enableShowMore,
@@ -35,38 +36,29 @@ export default function TaskDisplayButtons({
   return (
     <div className={styles.buttonsContainer}>
       {enableAdd && (
-        <button
-          className={`${styles.taskButton} ${styles.addTaskButton}`}
+        <Button
+          label={t("taskDisplay.addTask")}
           onClick={addTasksHandler}
-        >
-          {addingTask ? (
-            <>
-              <LoadingState spinnerOnly={true} /> {t("taskDisplay.addingTask")}
-            </>
-          ) : (
-            t("taskDisplay.addTask")
-          )}
-        </button>
+          isLoading={addingTask}
+          loadingLabel={t("taskDisplay.addingTask")}
+          style={"greenBtn"}
+        />
       )}
       {enableShowMore && (
-        <button
-          className={styles.taskButton}
+        <Button
+          label={t("taskDisplay.showMore")}
+          isActive={showMore}
+          activeLabel={t("taskDisplay.showLess")}
           onClick={() => setShowMore(!showMore)}
-        >
-          {showMore ? t("taskDisplay.showLess") : t("taskDisplay.showMore")}{" "}
-        </button>
+        />
       )}
       {enableDelete && (
-        <button className={styles.taskButton} onClick={deleteTaskHandler}>
-          {deletingTask && deleting ? (
-            <>
-              <LoadingState spinnerOnly={true} />{" "}
-              {t("taskDisplay.deletingTask")}
-            </>
-          ) : (
-            t("taskDisplay.deleteTask")
-          )}
-        </button>
+        <Button
+          label={t("taskDisplay.deleteTask")}
+          onClick={deleteTaskHandler}
+          isLoading={deleting && deletingTask}
+          loadingLabel={t("taskDisplay.deletingTask")}
+        />
       )}
     </div>
   );

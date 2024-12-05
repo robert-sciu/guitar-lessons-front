@@ -14,10 +14,10 @@ i18n
         translation: {
           mainNav: {
             home: "Start",
-            login: "Zaloguj się",
+            login: "Zaloguj się",
           },
           loginForm: {
-            login: "Zaloguj się",
+            login: "Zaloguj się",
             username: "Nazwa użytkownika",
             email: "E-mail",
             emailError: "Wprowadź poprawny adres e-mail",
@@ -129,6 +129,9 @@ i18n
             close: "Zamknij",
             download: "Pobierz",
             wait: "Czekaj",
+            cancelReservation: "Odwołaj lekcję",
+            nextWeek: "Następny",
+            previousWeek: "Poprzedni",
           },
           modals: {
             codeRequired: "Kod wymagany",
@@ -145,6 +148,8 @@ i18n
           errors: {
             cannotBookEarlierThanTomorrow:
               "Nie możesz rezerwowac lekcji wcześniej niż jutro",
+            cannotBookOutsideWorkingHours:
+              "Nie można rezerwowac lekcji poza godzinami pracy",
             invalidDuration: "Można rezerwowac lekcje od 1 do 2 godzin",
             thatsPast: "Było, minęło ;)",
             thatsToday: "Nie można zmieniać dzisiejszej rezerwacji",
@@ -278,6 +283,7 @@ i18n
             close: "Close",
             download: "Download",
             wait: "Wait",
+            cancelReservation: "Cancel reservation",
           },
           modals: {
             codeRequired: "Code required",
@@ -293,6 +299,7 @@ i18n
           },
           errors: {
             cannotBookEarlierThanTomorrow: "Cannot book earlier than tomorrow",
+            cannotBookOutsideWorkingHours: "Cannot book outside working hours",
             invalidDuration: "You can book lessons from 1 to 2 hours",
             thatsPast: "You cannot change a past reservation",
             thatsToday: "You cannot change today's reservation",

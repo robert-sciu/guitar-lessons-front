@@ -1,6 +1,8 @@
 import apiClient from "../api/api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  extractErrorResponse,
+  extractResponseData,
   manageFulfilledState,
   managePendingState,
   manageRejectedState,
@@ -16,7 +18,7 @@ export const loginUser = createAsyncThunk(
       localStorage.setItem("access_token", token);
       return token;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return rejectWithValue(extractErrorResponse(error));
     }
   }
 );
@@ -28,11 +30,11 @@ export const verifyStoredToken = createAsyncThunk(
       if (token) {
         const response = await apiClient.post("/auth/verifyToken", { token });
         if (response.status === 200) {
-          return response.data.data;
+          return extractResponseData(response);
         }
       }
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return rejectWithValue(extractErrorResponse(error));
     }
   }
 );
@@ -100,7 +102,7 @@ const authSlice = createSlice({
 });
 
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
-export const selectIsLoading = (state) => state.auth.isLoading;
+export const selectAuthLoadingState = (state) => state.auth.isLoading;
 export const selectToken = (state) => state.auth.token;
 export const selectUser = (state) => state.auth.user;
 

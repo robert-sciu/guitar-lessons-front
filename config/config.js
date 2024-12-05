@@ -4,6 +4,7 @@ const config = {
   openHourString: "08:00:00",
   closeHourString: "22:00:00",
   openHourUTC: 7,
+  closeHourUTC: 21,
   workingDayLengthInHours: 14,
   defaultReservationLength: 60,
 };

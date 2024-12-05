@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import styles from "./reservationModal.module.scss";
 import { useTranslation } from "react-i18next";
-import { updateTempEvent } from "../../../store/fullCalendarSlice";
+import { updateTempDataForEventCreation } from "../../../store/fullCalendarSlice";
 import {
   addMinutesToIsoString,
   changeISOStringHour,
@@ -12,6 +12,7 @@ import {
   getMinutesFromISOString,
   getWorkingHoursArray,
 } from "../../../utilities/calendarUtilities";
+import Button from "../../elements/button/button";
 
 export default function ReservationModal({
   reservation,
@@ -48,7 +49,7 @@ export default function ReservationModal({
     const newDuration = e.target.value;
     setSelectedDuration(newDuration);
     const end_UTC = addMinutesToIsoString(reservation.start, newDuration);
-    dispatch(updateTempEvent({ end: end_UTC }));
+    dispatch(updateTempDataForEventCreation({ end: end_UTC }));
   }
 
   function handleHourChange(e) {
@@ -56,7 +57,7 @@ export default function ReservationModal({
     setReservationStartHour(newHour);
     const newStart = changeISOStringHour(reservation.start, newHour);
     const newEnd = addMinutesToIsoString(newStart, selectedDuration);
-    dispatch(updateTempEvent({ start: newStart, end: newEnd }));
+    dispatch(updateTempDataForEventCreation({ start: newStart, end: newEnd }));
   }
 
   function handleMinutesChange(e) {
@@ -64,7 +65,7 @@ export default function ReservationModal({
     setReservationStartMinutes(newMinutes);
     const newStart = changeISOStringMinutes(reservation.start, newMinutes);
     const newEnd = addMinutesToIsoString(newStart, selectedDuration);
-    dispatch(updateTempEvent({ start: newStart, end: newEnd }));
+    dispatch(updateTempDataForEventCreation({ start: newStart, end: newEnd }));
   }
 
   return (
@@ -114,12 +115,14 @@ export default function ReservationModal({
         </select>
       </div>
       <div className={styles.buttonsContainer}>
-        <button onClick={() => handleClick(true)}>
-          {t("buttons.confirm")}
-        </button>
-        <button onClick={() => handleClick(false)}>
-          {t("buttons.cancel")}
-        </button>
+        <Button
+          label={t("buttons.confirm")}
+          onClick={() => handleClick(true)}
+        />
+        <Button
+          label={t("buttons.cancel")}
+          onClick={() => handleClick(false)}
+        />
       </div>
     </div>
   );

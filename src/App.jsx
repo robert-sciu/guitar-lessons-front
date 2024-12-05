@@ -117,7 +117,7 @@ function App() {
           <Route
             path="/dashboard/calendar"
             element={
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<LoadingState />}>
                 <LazyFullCalendarPage />
               </Suspense>
             }

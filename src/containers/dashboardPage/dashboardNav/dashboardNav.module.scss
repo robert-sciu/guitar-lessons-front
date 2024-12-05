@@ -19,34 +19,38 @@
     transition: $reveal-transition;
   }
 
-  .dashboardContent {
+  .dashboardContentContainer {
     flex: 1;
     padding: $size-s;
     overflow: scroll;
     overflow-x: hidden;
     position: relative;
+    // display: flex;
+    // gap: $size-l;
+    // height: 100%;
+    // transition: $reveal-transition;
   }
-  .dashboardContent::-webkit-scrollbar {
+  .dashboardContentContainer::-webkit-scrollbar {
     width: $size-xxxxs; /* Width of the scrollbar */
   }
 
-  .dashboardContent::-webkit-scrollbar-track {
+  .dashboardContentContainer::-webkit-scrollbar-track {
     // background: $main-gray-lightest; /* Track color */
     border-radius: $size-xxxs;
   }
 
-  .dashboardContent::-webkit-scrollbar-thumb {
+  .dashboardContentContainer::-webkit-scrollbar-thumb {
     background-color: $main-gray; /* Scrollbar color */
     border-radius: 10px; /* Rounded corners */
     // border: 3px solid #f1f1f1; /* Add padding around the thumb */
   }
 
-  .dashboardContent::-webkit-scrollbar-thumb:hover {
+  .dashboardContentContainer::-webkit-scrollbar-thumb:hover {
     background: $main-gray-dark; /* Scrollbar color on hover */
   }
 
   .dashboardNav,
-  .dashboardContent {
+  .dashboardContentContainer {
     border-radius: $size-xxxxs;
     background-color: $main-gray-lightest;
     box-shadow: $soft-shadow-gray;

@@ -26,8 +26,11 @@ const planInfoSlice = createSlice({
     isLoading: false,
     hasError: false,
     error: null,
+    refetchNeeded: false,
+
     fetchComplete: false,
     planInfo: {},
+    discount: 0,
   },
   reducers: {
     clearPlanInfoError: (state) => {
@@ -40,8 +43,15 @@ const planInfoSlice = createSlice({
       .addCase(fetchPlanInfo.pending, managePendingState)
       .addCase(fetchPlanInfo.fulfilled, (state, action) => {
         manageFulfilledState(state);
+        const planInfo = action.payload;
+        if (!state.fetchComplete) {
+          state.discount =
+            planInfo.regular_discount +
+            planInfo.plan_discount +
+            planInfo.special_discount;
+        }
         state.fetchComplete = true;
-        state.planInfo = action.payload;
+        state.planInfo = planInfo;
       })
       .addCase(fetchPlanInfo.rejected, manageRejectedState);
   },
@@ -50,6 +60,7 @@ const planInfoSlice = createSlice({
 export const { clearPlanInfoError } = planInfoSlice.actions;
 
 export const selectPlanInfo = (state) => state.planInfo.planInfo;
+export const selectPlanInfoDiscount = (state) => state.planInfo.discount;
 export const selectPlanInfoIsLoading = (state) => state.planInfo.isLoading;
 //prettier-ignore
 export const selectPlanInfoFetchComplete = (state) => state.planInfo.fetchComplete;

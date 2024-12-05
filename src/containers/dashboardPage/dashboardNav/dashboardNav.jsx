@@ -4,10 +4,8 @@ import { logoutUser, selectIsAuthenticated } from "../../../store/authSlice";
 import { useEffect, useState } from "react";
 import styles from "./dashboardNav.module.scss";
 import {
-  clearUserInfoError,
   fetchUserInfo,
   selectUserInfo,
-  selectUserInfoError,
   selectUserInfoFetchComplete,
   selectUserInfoHasError,
   selectUserInfoIsLoading,
@@ -15,14 +13,10 @@ import {
 } from "../../../store/userInfoSlice";
 import DashboardWelcome from "../../../components/dashboard/dashboardWelcome/dashboardWelcome";
 import DashboardNavLinks from "../../../components/dashboard/dashboardNavLinks/dashboardNavLinks";
-import {
-  classNameFormatter,
-  setTrueWithTimeout,
-} from "../../../utilities/utilities";
-import ModalWindowMain from "../../../components/modalWindows/modalWindow/modalWindowMain";
+import { classNameFormatter } from "../../../utilities/utilities";
 
 export default function DashboardNav() {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [fetchComplete, setFetchComplete] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,9 +26,7 @@ export default function DashboardNav() {
   const userInfo = useSelector(selectUserInfo);
   const userInfoIsLoading = useSelector(selectUserInfoIsLoading);
   const userInfoHasError = useSelector(selectUserInfoHasError);
-  const userInfoError = useSelector(selectUserInfoError);
   const userInfoFetchComplete = useSelector(selectUserInfoFetchComplete);
-
   const userRefetchNeeded = useSelector(selectUserRefetchNeeded);
 
   useEffect(() => {
@@ -66,8 +58,9 @@ export default function DashboardNav() {
   }, [userRefetchNeeded, dispatch]);
 
   useEffect(() => {
-    if (!userInfoFetchComplete) return;
-    setTrueWithTimeout(setIsLoaded, 40);
+    if (userInfoFetchComplete) {
+      setFetchComplete(true);
+    }
   }, [userInfoFetchComplete]);
 
   function handleLogout(e) {
@@ -81,23 +74,14 @@ export default function DashboardNav() {
       <div
         className={classNameFormatter({
           styles,
-          classNames: ["dashboardNav", isLoaded ? "show" : "hide"],
+          classNames: ["dashboardNav", fetchComplete ? "show" : "hide"],
         })}
       >
-        {userInfoFetchComplete && (
-          <DashboardWelcome username={userInfo.username} />
-        )}
+        {fetchComplete && <DashboardWelcome username={userInfo.username} />}
         <DashboardNavLinks onLogout={handleLogout} />
       </div>
-      <div className={styles.dashboardContent}>
+      <div className={styles.dashboardContentContainer}>
         <Outlet />
-        {userInfoHasError && (
-          <ModalWindowMain
-            modalType="error"
-            data={userInfoError}
-            onCancel={clearUserInfoError}
-          />
-        )}
       </div>
     </div>
   );

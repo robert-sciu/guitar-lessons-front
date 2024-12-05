@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
  *
  * @param {boolean} [fullscreen=false] - Fullscreen, sets the spinner to full screen, false by default restricts to a relative container.
  * @param {boolean} [spinnerOnly=false] - Spinner only for use inside small components like buttons.
+ * @param {string} [size=undefined] - Size of the spinner, options are "sizeS" "sizeM" "sizeL" "sizeXL".
+ * @param {boolean} [fadeOut=false] - Fades out the loading state and sets the display to none.
  * @note dont use fullscreen and spinnerOnly together
  *
  * @return {ReactElement}
@@ -19,6 +21,7 @@ export default function LoadingState({
   spinnerOnly = false,
   size = undefined,
   fadeOut = false,
+  inactive = false,
 }) {
   const [displayNone, setDisplayNone] = useState(false);
 
@@ -42,6 +45,7 @@ export default function LoadingState({
           size && `size${size}`,
           fadeOut && "fadeOut",
           displayNone && "displayNone",
+          inactive && !fadeOut && "displayNone",
         ],
       })}
     >
@@ -62,4 +66,5 @@ LoadingState.propTypes = {
   spinnerOnly: PropTypes.bool,
   size: PropTypes.string,
   fadeOut: PropTypes.bool,
+  inactive: PropTypes.bool,
 };

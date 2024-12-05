@@ -4,50 +4,43 @@ import {
   clearUserTasksError,
   fetchUserTasks,
   selectUserTasks,
-  selectUserTasksError,
-  selectUserTasksFetchComplete,
-  selectUserTasksHasError,
-  selectUserTasksIsLoading,
+  selectUserTasksErrorMessage,
+  selectUserTasksErrorStatus,
+  selectUserTasksFetchStatus,
+  selectUserTasksLoadingStatus,
   selectUserTasksRefetchNeeded,
 } from "../../../../store/userTasksSlice";
 import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/taskDisplayMain";
 import styles from "./userTasksPageMain.module.scss";
 import { useTranslation } from "react-i18next";
-import { selectIsAuthenticated } from "../../../../store/authSlice";
 import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
+import {
+  selectUserTasksPageLoaded,
+  setUserTasksPageLoaded,
+} from "../../../../store/loadStateSlice";
+import LoadingState from "../../../../components/loadingState/loadingState";
 
 export default function UserTasksPageMain() {
-  const [userTasksState, setUserTasksState] = useState([]);
+  const [fetchComplete, setFetchComplete] = useState(false);
 
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
-  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const dataLoaded = useSelector(selectUserTasksPageLoaded);
 
-  const fetchedUserTasks = useSelector(selectUserTasks);
-  const userTaskIsLoading = useSelector(selectUserTasksIsLoading);
-  const userTaskHasError = useSelector(selectUserTasksHasError);
-  const userTaskError = useSelector(selectUserTasksError);
-  const userTaskFetchComplete = useSelector(selectUserTasksFetchComplete);
-  const userTasksFetchComplete = useSelector(selectUserTasksFetchComplete);
+  const userTasks = useSelector(selectUserTasks);
+  const isLoading = useSelector(selectUserTasksLoadingStatus);
+  const isFetchComplete = useSelector(selectUserTasksFetchStatus);
+  const hasError = useSelector(selectUserTasksErrorStatus);
+  const errorMessage = useSelector(selectUserTasksErrorMessage);
+  // const userTasksFetchComplete = useSelector(selectUserTasksFetchComplete);
   const userTasksRefetchNeeded = useSelector(selectUserTasksRefetchNeeded);
 
   useEffect(() => {
-    if (
-      isAuthenticated &&
-      !userTaskFetchComplete &&
-      !userTaskIsLoading &&
-      !userTaskHasError
-    ) {
+    if (!isFetchComplete && !isLoading && !hasError) {
       dispatch(fetchUserTasks());
     }
-  }, [
-    isAuthenticated,
-    userTaskFetchComplete,
-    userTaskIsLoading,
-    userTaskHasError,
-    dispatch,
-  ]);
+  }, [isFetchComplete, isLoading, hasError, dispatch]);
 
   useEffect(() => {
     if (userTasksRefetchNeeded) {
@@ -56,36 +49,38 @@ export default function UserTasksPageMain() {
   });
 
   useEffect(() => {
-    if (fetchedUserTasks?.length > 0) {
-      setUserTasksState(fetchedUserTasks);
-    } else {
-      setUserTasksState([]);
+    if (isFetchComplete) {
+      setFetchComplete(true);
+      dispatch(setUserTasksPageLoaded());
     }
-  }, [fetchedUserTasks]);
+  }, [isFetchComplete, dispatch]);
 
   return (
-    <div className={styles.myTasksPageMainContainer}>
-      <h3>{t("myTasks.title")}</h3>
-      {userTasksFetchComplete && userTasksState?.length === 0 && (
-        <p>No tasks yet</p>
+    <div className={styles.mainContainer}>
+      {(fetchComplete || dataLoaded) && (
+        <>
+          <h3>{t("myTasks.title")}</h3>
+          {userTasks?.length === 0 && <p>No tasks yet</p>}
+          {userTasks?.length > 0 &&
+            userTasks.map((task) => (
+              <TaskDisplay
+                key={task.id}
+                task={task}
+                enableDelete={true}
+                showTags={true}
+                enableShowMore={true}
+              />
+            ))}
+        </>
       )}
-      {userTasksState?.length > 0 &&
-        userTasksState.map((task) => (
-          <TaskDisplay
-            key={task.id}
-            task={task}
-            enableDelete={true}
-            showTags={true}
-            enableShowMore={true}
-          />
-        ))}
-      {userTaskHasError && (
+      {hasError && (
         <ModalWindowMain
           modalType={"error"}
-          data={userTaskError}
+          data={errorMessage}
           onCancel={clearUserTasksError}
         />
       )}
+      <LoadingState fadeOut={fetchComplete} inactive={dataLoaded} />
     </div>
   );
 }

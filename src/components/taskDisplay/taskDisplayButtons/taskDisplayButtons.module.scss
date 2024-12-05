@@ -1,5 +1,4 @@
 @import "../../../../styles/variables.module.scss";
-@import "../../../../styles/classes.module.scss";
 
 .buttonsContainer {
   font-size: $size-s;
@@ -7,14 +6,4 @@
   flex-direction: column;
   justify-content: center;
   gap: $size-xxxxs;
-}
-.taskButton {
-  @extend .commonButton;
-  justify-content: center;
-}
-.addTaskButton {
-  background-color: $add-green;
-  &:hover {
-    background-color: $add-green-hover;
-  }
 }

@@ -1,16 +1,32 @@
 @import "../../../../styles/variables.module.scss";
+@import "../../../../styles/classes.module.scss";
 
-.fullCalendarPageContainer {
-  background-color: $main-gray-light;
+.mainContainer {
+  @extend .dashboardContainer;
+  background: $card-background-gradient;
+  // box-shadow: $soft-shadow-gray;
+  box-shadow: $inset-medium-shadow;
+  border-radius: $size-xxxxs;
+  // padding: $size-xxxs;
+  overflow: hidden;
   height: 100%;
-  user-select: none;
-  cursor: pointer;
-  // display: flex;
-  // align-items: center;
-  // justify-content: center;
-  // height: 100%;
-  // width: 100%;
-  // min-height: 800px;
-  // border-radius: $size-xxxxs;
-  // overflow: hidden;
+
+  .calendarContainer {
+    height: 100%;
+    // user-select: none;
+    // cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    .buttonsContainer {
+      display: flex;
+      justify-content: space-between;
+      padding: $size-xs;
+      position: absolute;
+      width: 100%;
+
+      button {
+        flex: 0;
+      }
+    }
+  }
 }

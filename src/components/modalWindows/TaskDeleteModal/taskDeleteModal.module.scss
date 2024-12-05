@@ -6,10 +6,5 @@
   .buttonsContainer {
     display: flex;
     gap: $size-xxs;
-    button {
-      width: 8rem;
-      @extend .commonButton;
-      justify-content: center;
-    }
   }
 }

@@ -1,17 +1,28 @@
 export function managePendingState(state) {
   state.isLoading = true;
   state.hasError = false;
+  state.error = null;
 }
 
 export function manageFulfilledState(state) {
   state.isLoading = false;
   state.hasError = false;
+  state.error = null;
 }
 
 export function manageRejectedState(state, action) {
   state.isLoading = false;
   state.hasError = true;
   state.error = action.payload;
+}
+
+export function checkAuthenticated(getState) {
+  const state = getState();
+  const isAuthenticated = state.auth.isAuthenticated;
+
+  if (!isAuthenticated) {
+    throw new Error("User is not authenticated");
+  }
 }
 
 export function extractResponseData(response) {

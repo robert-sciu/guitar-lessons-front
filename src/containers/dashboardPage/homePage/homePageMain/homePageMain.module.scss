@@ -5,15 +5,12 @@
   display: flex;
   gap: $size-l;
   height: 100%;
-  transition: $reveal-transition;
+  // transition: $reveal-transition;
 
   .dashboardInfoContainer {
     flex: 1;
-    // background: $card-background-gradient;
     border-radius: $size-xxxxs;
     padding: $size-xxxl $size-xxxl;
-    // box-shadow: $soft-shadow-gray;
-    // background-color: $main-white-lightest;
   }
 }
 

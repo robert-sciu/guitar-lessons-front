@@ -17,17 +17,17 @@ $background-gradient: linear-gradient(135deg, #c4c4c4, #bdbdbd);
 $card-background-gradient: linear-gradient(135deg, #e7e7e7, #dddddd);
 $main-black: #272829;
 $main-white: #fff6e0;
-$main-white-light: #fff6e0;
-$main-white-calendar-hover: #ecebe8;
+// $main-white-light: #fff6e0;
+// $main-white-calendar-hover: #ecebe8;
 $main-white-lightest: #fffdf9;
 $main-gray-darkest: #3f3f3f;
 $main-gray-dark: #656565;
-$main-gray-dark-transparent: #44485591;
+// $main-gray-dark-transparent: #44485591;
 $main-gray: #7e7e7e;
 $main-gray-light: #a5a5a5;
 $main-gray-lightest: #d8d8d8;
 $active-yellow: #f2c94c;
-$light-gray: #d8d9da;
+// $light-gray: #d8d9da;
 $main-green: #10a710;
 $main-red: #9b0a0a;
 $icon-color: #375188;
@@ -38,6 +38,7 @@ $tag-green: #10a710;
 
 $reservation-green: #9bd39b;
 
+$test: #a5a5a559;
 $add-green: #10a710;
 $add-green-hover: #14c214;
 
@@ -46,6 +47,7 @@ $soft-shadow-gray-light: 0 0.04rem 0.3rem 0 $main-gray-light;
 $soft-shadow-yellow: 0 0.04rem 0.3rem 0 $active-yellow;
 $soft-shadow-green: 0 0.04rem 0.3rem 0 $main-green;
 $inset-soft-shadow: inset 0 0.04rem 0.3rem 0 $main-gray-light;
+$inset-medium-shadow: 0px 1px 3px 1px inset $main-gray;
 
 $basic-transition: all 0.2s ease-in-out;
 $reveal-transition: all 0.4s ease-in-out;

@@ -1,200 +1,177 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchAvailableTasks,
-  selectAvailableTasks,
-  selectIsLoadingTasks,
-  selectTasksFetchComplete,
-  selectTasksHasError,
-} from "../../../../store/tasksSlice";
-import { selectIsAuthenticated } from "../../../../store/authSlice";
-import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/taskDisplayMain";
-import {
-  fetchTags,
-  selectFetchTagsComplete,
-  selectTags,
-} from "../../../../store/tagsSlice";
-import TagDisplay from "../../../../components/tagDisplay/tagDisplay";
-
-import styles from "./availableTasksMain.module.scss";
 import { useTranslation } from "react-i18next";
+
+import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/taskDisplayMain";
+import LoadingState from "../../../../components/loadingState/loadingState";
+import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
 import {
   clearUserTaskUpdated,
   selectUserTaskUpdated,
 } from "../../../../store/userTasksSlice";
+import { selectUserInfoMinimumDifficultyLevel } from "../../../../store/userInfoSlice";
 import {
-  selectUserId,
-  selectUserInfoFetchComplete,
-  selectUserInfoIsLoading,
-  selectUserMinimumTaskLevel,
-  updateUser,
-} from "../../../../store/userInfoSlice";
-import { debounce } from "lodash";
-import LoadingState from "../../../../components/loadingState/loadingState";
+  selectAvailableTasksPageLoaded,
+  setAvailableTasksPageLoaded,
+} from "../../../../store/loadStateSlice";
+import {
+  clearTasksError,
+  fetchAvailableTasks,
+  selectTasks,
+  selectTasksErrorMessage,
+  selectTasksErrorStatus,
+  selectTasksFetchStatus,
+  selectTasksLoadingStatus,
+  selectTasksMinimumDifficultyLevel,
+  selectTasksRefetchNeeded,
+  setTasksMinimumDifficultyLevel,
+  setTasksRefetchNeeded,
+} from "../../../../store/tasksSlice";
+import {
+  clearTagsError,
+  selectTagsErrorMessage,
+  selectTagsErrorStatus,
+  selectTagsFetchStatus,
+} from "../../../../store/tagsSlice";
+
+import styles from "./availableTasksMain.module.scss";
+
+import TasksLevelFilter from "../tasksLevelFilter/tasksLevelFilter";
+import TagFilter from "../tagFilter/tagFilter";
 
 export default function AvailableTasksMain() {
-  const { t } = useTranslation();
+  const [fetchComplete, setFetchComplete] = useState(false);
+
   const [selectedTags, setSelectedTags] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
-  const [minimumTaskLevel, setMinimumTaskLevel] = useState(0);
-  const [minimumTaskLevelSaving, setMinimumTaskLevelSaving] = useState(false);
-  const allAvailableTasks = useSelector(selectAvailableTasks);
-  const allTags = useSelector(selectTags);
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const isLoadingTasks = useSelector(selectIsLoadingTasks);
-  const tasksHasError = useSelector(selectTasksHasError);
-  const fetchTasksComplete = useSelector(selectTasksFetchComplete);
-  const fetchTagsComplete = useSelector(selectFetchTagsComplete);
-  const userTaskUpdated = useSelector(selectUserTaskUpdated);
-  const minimumTaskLevelToDisplay = useSelector(selectUserMinimumTaskLevel);
-  const userInfoFetchComplete = useSelector(selectUserInfoFetchComplete);
-  const userInfoIsLoading = useSelector(selectUserInfoIsLoading);
-  const dispatch = useDispatch();
-  const userId = useSelector(selectUserId);
 
-  const debauncedSaveMinimumTaskLevel = useRef(
-    debounce((level, id) => {
-      const data = { minimum_task_level_to_display: level, id };
-      dispatch(updateUser(data));
-      setMinimumTaskLevelSaving(false);
-    }, 1500)
-  ).current;
+  const dispatch = useDispatch();
+
+  // const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  const dataLoaded = useSelector(selectAvailableTasksPageLoaded);
+
+  const tasks = useSelector(selectTasks);
+  const isLoadingTasks = useSelector(selectTasksLoadingStatus);
+  const isFetchCompleteTasks = useSelector(selectTasksFetchStatus);
+  const needsRefetchTasks = useSelector(selectTasksRefetchNeeded);
+  const hasErrorTasks = useSelector(selectTasksErrorStatus);
+  const errorMessageTasks = useSelector(selectTasksErrorMessage);
+  //prettier-ignore
+  const minimumDifficultyLevelTasks = useSelector(selectTasksMinimumDifficultyLevel);
+
+  const isFetchCompleteTags = useSelector(selectTagsFetchStatus);
+  const hasErrorTags = useSelector(selectTagsErrorStatus);
+  const errorMessageTags = useSelector(selectTagsErrorMessage);
+
+  //prettier-ignore
+  const userInfoMinimumDifficultyLevel = useSelector(selectUserInfoMinimumDifficultyLevel);
+
+  // if task is added to userTasks we use this state to refetch tasks excluding the added task
+  const userTaskUpdated = useSelector(selectUserTaskUpdated);
+
+  const { t } = useTranslation();
+
+  // fetch tasks on mount
+  useEffect(() => {
+    if (!isFetchCompleteTasks && !isLoadingTasks && !hasErrorTasks) {
+      dispatch(fetchAvailableTasks());
+      dispatch(setTasksMinimumDifficultyLevel(userInfoMinimumDifficultyLevel));
+    }
+  }, [
+    dispatch,
+    isFetchCompleteTasks,
+    isLoadingTasks,
+    hasErrorTasks,
+    userInfoMinimumDifficultyLevel,
+  ]);
+  // if user selected new minimum difficulty level and userState was updated through refetch
+  // we need to refetch tasks
+  useEffect(() => {
+    if (minimumDifficultyLevelTasks !== userInfoMinimumDifficultyLevel) {
+      dispatch(setTasksRefetchNeeded());
+    }
+  }, [dispatch, minimumDifficultyLevelTasks, userInfoMinimumDifficultyLevel]);
 
   useEffect(() => {
-    if (
-      userInfoFetchComplete &&
-      userInfoIsLoading &&
-      minimumTaskLevel !== minimumTaskLevelToDisplay
-    ) {
+    if (needsRefetchTasks) {
       dispatch(fetchAvailableTasks());
     }
-  });
+  }, [dispatch, needsRefetchTasks]);
 
+  // if task added to user tasks we need to refetch tasks
   useEffect(() => {
-    if (userInfoFetchComplete) {
-      setMinimumTaskLevel(minimumTaskLevelToDisplay);
+    if (userTaskUpdated) {
+      dispatch(clearUserTaskUpdated());
+      dispatch(setTasksRefetchNeeded());
     }
-  }, [userInfoFetchComplete, minimumTaskLevelToDisplay]);
+  }, [dispatch, userTaskUpdated]);
 
   useEffect(() => {
     if (selectedTags.length > 0) {
-      const filteredTasks = allAvailableTasks.filter((task) =>
+      const filteredTasks = tasks.filter((task) =>
         selectedTags.every((tag) => task.Tags.some((t) => t.id === tag.id))
       );
       setFilteredTasks(filteredTasks);
     } else {
-      const filteredTasks = allAvailableTasks;
+      const filteredTasks = tasks;
       setFilteredTasks(filteredTasks);
     }
-  }, [selectedTags, allAvailableTasks]);
+  }, [selectedTags, tasks]);
 
   useEffect(() => {
-    if (
-      isAuthenticated &&
-      !fetchTasksComplete &&
-      !isLoadingTasks &&
-      !tasksHasError
-    ) {
-      dispatch(fetchAvailableTasks());
+    if (isFetchCompleteTasks && isFetchCompleteTags) {
+      setFetchComplete(true);
+      dispatch(setAvailableTasksPageLoaded());
     }
-  }, [
-    dispatch,
-    isAuthenticated,
-    fetchTasksComplete,
-    isLoadingTasks,
-    tasksHasError,
-  ]);
+  }, [isFetchCompleteTasks, isFetchCompleteTags, setFetchComplete, dispatch]);
 
-  useEffect(() => {
-    if (isAuthenticated && !fetchTagsComplete) {
-      dispatch(fetchTags());
-    }
-  }, [dispatch, isAuthenticated, fetchTagsComplete]);
-
-  useEffect(() => {
-    if (userTaskUpdated) {
-      dispatch(clearUserTaskUpdated());
-      dispatch(fetchAvailableTasks());
-    }
-  }, [dispatch, userTaskUpdated]);
-
-  function handleTagClick(tag, selected) {
-    if (selected) {
-      setSelectedTags(selectedTags.filter((t) => t.id !== tag.id));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
-    }
-  }
-  function handleMinimumTaskLevelChange(e) {
-    // if (minimumTaskLevel <= 1) return;
-    const value = e?.target?.value || e;
-    if (value <= 0) return;
-    if (/^\d+$/.test(value)) {
-      setMinimumTaskLevelSaving(true);
-      setMinimumTaskLevel(parseInt(value));
-      debauncedSaveMinimumTaskLevel(value, userId);
-    }
-  }
   return (
-    <div className={styles.tasksContainer}>
-      <div className={styles.availableTasksHeader}>
-        <h4>{t("availableTasks.title")}</h4>
-        {/* <div className={styles.selectedTags}>
-        <p>{t("availableTasks.selectedTags")}:</p>
-        <div className={styles.tags}>
-        {selectedTags.map((tag) => tag.value).join(", ")}
-        </div>
-        </div> */}
-        <div className={styles.levelFilter}>
-          {minimumTaskLevelSaving && (
-            <div className={styles.levelSaving}>
-              <LoadingState spinnerOnly={true} size="Xl" />
-              <p>{t("availableTasks.saving")}</p>
-            </div>
-          )}
-          <p>{t("availableTasks.levelFilter")}:</p>
-          <input
-            className={styles.levelInput}
-            type="text"
-            value={minimumTaskLevel}
-            onChange={handleMinimumTaskLevelChange}
+    <div className={styles.mainContainer}>
+      {(fetchComplete || dataLoaded) && (
+        <>
+          <div className={styles.availableTasksHeader}>
+            <h4>{t("availableTasks.title")}</h4>
+            <TasksLevelFilter />
+          </div>
+
+          <TagFilter
+            selectedTags={selectedTags}
+            onSetSelectedTags={setSelectedTags}
           />
-          <button
-            className={styles.levelButtons}
-            onClick={() => handleMinimumTaskLevelChange(minimumTaskLevel - 1)}
-          >
-            -
-          </button>
-          <button
-            className={styles.levelButtons}
-            onClick={() => handleMinimumTaskLevelChange(minimumTaskLevel + 1)}
-          >
-            +
-          </button>
-        </div>
-      </div>
-      <div className={styles.tagsContainer}>
-        <p>{t("availableTasks.tags")}:</p>
-        {fetchTagsComplete &&
-          allTags?.length > 0 &&
-          allTags.map((tag) => (
-            <TagDisplay key={tag.id} tag={tag} onTagClick={handleTagClick} />
-          ))}
-      </div>
-      {fetchTasksComplete && filteredTasks?.length === 0 && (
-        <p>No available tasks</p>
+
+          {isFetchCompleteTasks && filteredTasks?.length === 0 && (
+            <p>No available tasks</p>
+          )}
+
+          <div className={styles.tasksList}>
+            {filteredTasks?.length > 0 &&
+              filteredTasks.map((task) => (
+                <TaskDisplay
+                  key={task.id}
+                  task={task}
+                  enableAdd={true}
+                  showTags={true}
+                />
+              ))}
+          </div>
+        </>
       )}
-      <div className={styles.tasksList}>
-        {filteredTasks?.length > 0 &&
-          filteredTasks.map((task) => (
-            <TaskDisplay
-              key={task.id}
-              task={task}
-              enableAdd={true}
-              showTags={true}
-            />
-          ))}
-      </div>
+      {hasErrorTasks && (
+        <ModalWindowMain
+          modalType={"error"}
+          data={errorMessageTasks}
+          onCancel={clearTasksError}
+        />
+      )}
+      {hasErrorTags && (
+        <ModalWindowMain
+          modalType={"error"}
+          data={errorMessageTags}
+          onCancel={clearTagsError}
+        />
+      )}
+      <LoadingState fadeOut={fetchComplete} inactive={dataLoaded} />
     </div>
   );
 }

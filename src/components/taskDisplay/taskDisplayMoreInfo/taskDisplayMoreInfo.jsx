@@ -3,6 +3,7 @@ import styles from "./taskDisplayMoreInfo.module.scss";
 import { useTranslation } from "react-i18next";
 
 import PropTypes from "prop-types";
+import Button from "../../elements/button/button";
 export default function TaskDisplayMoreInfo({
   task,
   notes,
@@ -33,12 +34,12 @@ export default function TaskDisplayMoreInfo({
             <h6>{t("taskDisplay.file")}:</h6>
             <div className={styles.fileContainer}>
               {task.filename}
-              <button
-                className={styles.downloadButton}
+
+              <Button
+                label={t("buttons.download")}
                 onClick={handleDownload}
-              >
-                {t("buttons.download")}
-              </button>
+                style={"greenBtn"}
+              />
             </div>
           </div>
         )}

@@ -6,44 +6,12 @@
   justify-content: space-between;
   flex-direction: column;
   gap: $size-xxxl;
-  ul {
+  list-style: none;
+
+  .dashboardNavLinks {
     display: flex;
     gap: $size-xxxxs;
     flex-direction: column;
     list-style: none;
-  }
-  .navLink,
-  button {
-    background-color: $main-gray;
-    border-radius: $size-xxxxs;
-    cursor: pointer;
-    font-weight: 500;
-    transition: $basic-transition;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: $size-xxxs $size-xs;
-    border-radius: $size-xxxxs;
-    text-decoration: none;
-    color: $main-white;
-    border: none;
-    box-shadow: $soft-shadow-gray;
-    &:hover,
-    &:active {
-      background-color: $main-gray-light;
-      .icon {
-        color: $main-gray-darkest;
-      }
-    }
-    .icon {
-      font-size: $size-l;
-      transition: $basic-transition;
-    }
-  }
-
-  .navLink.active {
-    background-color: $active-yellow;
-    color: $main-black;
-    box-shadow: $soft-shadow-yellow;
   }
 }

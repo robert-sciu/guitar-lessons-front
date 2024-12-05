@@ -34,9 +34,6 @@
       display: flex;
       align-items: center;
       gap: $size-s;
-      .downloadButton {
-        @extend .commonButton;
-      }
     }
   }
 }

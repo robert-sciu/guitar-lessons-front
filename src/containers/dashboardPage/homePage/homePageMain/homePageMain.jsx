@@ -1,36 +1,37 @@
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import styles from "./homePageMain.module.scss";
+
+import UserInfo from "../userInfo/userInfo";
+import PlanInfo from "../planInfo/planInfo";
+import LoadingState from "../../../../components/loadingState/loadingState";
 
 import {
   selectUserInfo,
   selectUserInfoFetchComplete,
 } from "../../../../store/userInfoSlice";
 import {
-  clearPlanInfoError,
   fetchPlanInfo,
   selectPlanInfo,
-  selectPlanInfoError,
   selectPlanInfoFetchComplete,
   selectPlanInfoHasError,
   selectPlanInfoIsLoading,
 } from "../../../../store/planInfoSlice";
-import UserInfo from "../userInfo/userInfo";
-import PlanInfo from "../dashboardPlanInfo/planInfo";
-import { useEffect, useState } from "react";
-import { selectIsAuthenticated } from "../../../../store/authSlice";
-import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
-import { setTrueWithTimeout } from "../../../../utilities/utilities";
-import LoadingState from "../../../../components/loadingState/loadingState";
+import {
+  selectDashboardHomePageLoaded,
+  setDashboardHomePageLoaded,
+} from "../../../../store/loadStateSlice";
+
+import styles from "./homePageMain.module.scss";
 
 export default function HomePageMain() {
-  const [isloaded, setIsLoaded] = useState(false);
+  const [fetchComplete, setFetchComplete] = useState(false);
 
   const dispatch = useDispatch();
-  const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  const dataLoaded = useSelector(selectDashboardHomePageLoaded);
 
   const planInfoIsLoading = useSelector(selectPlanInfoIsLoading);
   const planInfoHasError = useSelector(selectPlanInfoHasError);
-  const planInfoError = useSelector(selectPlanInfoError);
 
   const planInfoFetchComplete = useSelector(selectPlanInfoFetchComplete);
   const userInfoFetchComplete = useSelector(selectUserInfoFetchComplete);
@@ -38,35 +39,25 @@ export default function HomePageMain() {
   const planInfo = useSelector(selectPlanInfo);
   const userInfo = useSelector(selectUserInfo);
 
+  //user info is fetched at dashboard nav as it's needed in multiple places
+  //plan info is fetched here before displaying the main dashboard page
+
   useEffect(() => {
-    if (
-      isAuthenticated &&
-      !planInfoFetchComplete &&
-      !planInfoIsLoading &&
-      !planInfoHasError
-    ) {
+    if (!planInfoFetchComplete && !planInfoIsLoading && !planInfoHasError) {
       dispatch(fetchPlanInfo());
     }
-  }, [
-    isAuthenticated,
-    planInfoFetchComplete,
-    planInfoIsLoading,
-    planInfoHasError,
-    dispatch,
-  ]);
+  }, [planInfoFetchComplete, planInfoIsLoading, planInfoHasError, dispatch]);
 
   useEffect(() => {
-    if (!userInfoFetchComplete || !planInfoFetchComplete) return;
-    setTrueWithTimeout(setIsLoaded, 40);
-  }, [userInfoFetchComplete, planInfoFetchComplete]);
+    if (userInfoFetchComplete && planInfoFetchComplete) {
+      setFetchComplete(true);
+      dispatch(setDashboardHomePageLoaded());
+    }
+  }, [userInfoFetchComplete, planInfoFetchComplete, dispatch]);
 
   return (
-    <div
-      className={`${styles.dashboardHomePageContainer} ${
-        isloaded ? styles.show : styles.show
-      }`}
-    >
-      {isloaded && (
+    <div className={styles.dashboardHomePageContainer}>
+      {(fetchComplete || dataLoaded) && (
         <>
           <div className={styles.dashboardInfoContainer}>
             <UserInfo userInfo={userInfo} />
@@ -74,16 +65,9 @@ export default function HomePageMain() {
           <div className={styles.dashboardInfoContainer}>
             <PlanInfo planInfo={planInfo} />
           </div>
-          {planInfoHasError && (
-            <ModalWindowMain
-              modalType="error"
-              data={planInfoError}
-              onCancel={clearPlanInfoError}
-            />
-          )}
         </>
       )}
-      {<LoadingState fadeOut={isloaded} />}
+      {<LoadingState fadeOut={fetchComplete} inactive={dataLoaded} />}
     </div>
   );
 }

@@ -9,6 +9,14 @@ function getTodayDate() {
   return new Date().toISOString().split("T")[0];
 }
 
+function getReservationEndDate() {
+  const oneDay = 24 * 60 * 60 * 1000;
+  // 13 days is actually 14 days because we count from 0
+  return new Date(
+    new Date(getTodayDate()).getTime() + oneDay * 13
+  ).toISOString();
+}
+
 /**
  * Converts a Date object or string to ISO format (YYYY-MM-DDTHH:MM:SS.mmmZ).
  * @param {Date|string} date The Date object or string to convert.
@@ -59,6 +67,41 @@ function checkIfReservationDurationIsAllowed(isoStart, isoEnd) {
   return (
     (new Date(isoEnd) - new Date(isoStart)) / (60 * 1000) <= 120 &&
     (new Date(isoEnd) - new Date(isoStart)) / (60 * 1000) >= 60
+  );
+}
+
+function checkIfReservationDateIsAllowed(isoStart, isoEnd, todayDate) {
+  return (
+    getDateOnlyFromISOString(isoStart) > todayDate &&
+    getDateOnlyFromISOString(isoEnd) > todayDate
+  );
+}
+
+function checkIfReservationTimeIsAllowed(isoStart, isoEnd) {
+  const openHours = new Date(
+    new Date().setUTCHours(config.openHourUTC, 0, 0, 0)
+  ).toISOString();
+
+  const closeHours = new Date(
+    new Date().setUTCHours(config.closeHourUTC, 0, 0, 0)
+  ).toISOString();
+
+  const startHour = getHourFromISOString(isoStart);
+  const startMinute = getMinutesFromISOString(isoStart);
+  const endHour = getHourFromISOString(isoEnd);
+  const endMinute = getMinutesFromISOString(isoEnd);
+
+  const reservationStartHour = new Date(
+    new Date().setHours(startHour, startMinute, 0, 0)
+  ).toISOString();
+  const reservationEndHour = new Date(
+    new Date().setHours(endHour, endMinute, 0, 0)
+  ).toISOString();
+
+  return (
+    reservationStartHour >= openHours &&
+    reservationEndHour <= closeHours &&
+    reservationStartHour < reservationEndHour
   );
 }
 
@@ -138,11 +181,22 @@ function getMinMaxSlots(startTime, endTime) {
  */
 function configureEvents(events, userId) {
   const today = getTodayDate();
+
+  function getColor(event) {
+    const startDate = getDateOnlyFromISOString(event.start);
+    if (startDate < today) {
+      const color = event.user_id === userId ? "#10a71049" : "#a5a5a559";
+      return color;
+    }
+    const color = event.user_id === userId ? "#10a710" : "#a5a5a5";
+    return color;
+  }
   return events.map((event) => ({
     ...event,
     editable:
       event.user_id === userId && getDateOnlyFromISOString(event.start) > today,
     title: event.user_id === userId ? t("calendar.myReservation") : event.title,
+    color: getColor(event),
   }));
 }
 
@@ -182,11 +236,13 @@ export {
   getStartHourFromWorkingHoursArray,
   getEndHourFromWorkingHoursArray,
   getWorkingHoursArray,
-  // formatBusinessHours,
   getMinMaxSlots,
   configureEvents,
   checkIfReservationDurationIsAllowed,
+  checkIfReservationDateIsAllowed,
+  checkIfReservationTimeIsAllowed,
   configureRescheduleDataFromEvent,
   objectHasData,
   utcTimeToLocalTimeString,
+  getReservationEndDate,
 };

@@ -1,7 +1,10 @@
+import { useTranslation } from "react-i18next";
+import Button from "../../elements/button/button";
 import styles from "./moreInfoModal.module.scss";
-import { getDateOnlyFromISOString } from "../../../utilities/calendarUtilities";
 import PropTypes from "prop-types";
+import { getDateOnlyFromISOString } from "../../../utilities/calendarUtilities";
 export default function MoreInfoModal({ event, onDeleteSubmit, dispatch }) {
+  const { t } = useTranslation();
   function handleClick() {
     dispatch(onDeleteSubmit(event.id));
   }
@@ -10,7 +13,8 @@ export default function MoreInfoModal({ event, onDeleteSubmit, dispatch }) {
     <div className={styles.modalWindow}>
       <p>{event.title}</p>
       <p>{getDateOnlyFromISOString(event.start)}</p>
-      <button onClick={handleClick}>wypierdol</button>
+      <Button label={t("buttons.cancelReservation")} onClick={handleClick} />
+      <p>ale strzeż się Baby Jagi</p>
     </div>
   );
 }

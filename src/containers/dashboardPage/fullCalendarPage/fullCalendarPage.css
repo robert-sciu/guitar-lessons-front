@@ -1,8 +1,24 @@
 .fc-timegrid-slot:hover {
-  background-color: rgba(27, 197, 98, 0.404);
+  background-color: #8888882d;
 }
 
-.fc-timegrid-slot {
-  transition: all 0.4s ease-in-out;
-  border: 1px solid black;
+.fc-theme-standard .fc-scrollgrid,
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border: 1px solid #a5a5a5a1;
+}
+
+.fc-timegrid-event-harness-inset .fc-timegrid-event,
+.fc-timegrid-event.fc-event-mirror,
+.fc-timegrid-more-link {
+  box-shadow: 0 0 0 1px #858585a1;
+}
+
+.unavailable {
+  background-color: rgba(170, 170, 170, 0.363);
+  cursor: default;
+}
+
+.available {
+  cursor: pointer;
 }

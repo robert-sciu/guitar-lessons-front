@@ -10,8 +10,5 @@
   .buttonsContainer {
     display: flex;
     gap: $size-xxs;
-    button {
-      @extend .commonButton;
-    }
   }
 }

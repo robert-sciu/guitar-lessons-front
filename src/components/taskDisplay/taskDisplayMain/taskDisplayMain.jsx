@@ -2,20 +2,21 @@ import { useState, useRef } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addUserTask,
-  clearTaskToDeleteId,
-  deleteUserTask,
-  selectTaskToDeleteId,
-  selectUserTasksIsLoading,
-  updateUserTaskNotes,
-} from "../../../store/userTasksSlice";
+
 import TagDisplay from "../../tagDisplay/tagDisplay";
 import { debounce } from "lodash";
 import styles from "./taskDisplayMain.module.scss";
 import i18n from "../../../../config/i18n";
 import { downloadTaskFile } from "../../../store/tasksSlice";
-import { setTaskToDeleteId } from "../../../store/userTasksSlice";
+import {
+  addUserTask,
+  clearTaskToDeleteId,
+  deleteUserTask,
+  selectUserTasksLoadingStatus,
+  selectUserTaskToDeleteId,
+  setTaskToDeleteId,
+  updateUserTaskNotes,
+} from "../../../store/userTasksSlice";
 import TaskDisplayMoreInfo from "../taskDisplayMoreInfo/taskDisplayMoreInfo";
 import YouTubeLink from "../youTubeLink/youTubeLink";
 import TaskDisplayButtons from "../taskDisplayButtons/taskDisplayButtons";
@@ -36,8 +37,8 @@ export default function TaskDisplayMain({ task, ...props }) {
   const { t } = useTranslation();
   const [showMore, setShowMore] = useState(false);
   const tags = showTags ? task.Tags : null;
-  const taskToDeleteId = useSelector(selectTaskToDeleteId);
-  const dataIsLoading = useSelector(selectUserTasksIsLoading);
+  const taskToDeleteId = useSelector(selectUserTaskToDeleteId);
+  const dataIsLoading = useSelector(selectUserTasksLoadingStatus);
   const dispatch = useDispatch();
 
   const debouncedSaveNote = useRef(

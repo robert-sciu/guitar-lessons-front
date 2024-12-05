@@ -1,0 +1,20 @@
+@import "../../../../styles/variables.module.scss";
+
+.loginContainer {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  height: 50%;
+  background: $card-background-gradient;
+  border-radius: $size-xxxxs;
+  justify-content: center;
+  align-items: center;
+
+  .formContainer {
+    display: flex;
+    flex-direction: column;
+    gap: $size-s;
+    align-items: center;
+    justify-content: center;
+  }
+}

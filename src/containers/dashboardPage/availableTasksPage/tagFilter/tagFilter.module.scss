@@ -1,0 +1,7 @@
+@import "../../../../../styles/variables.module.scss";
+
+.tagsContainer {
+  display: flex;
+  gap: $size-xxxs;
+  flex-wrap: wrap;
+}

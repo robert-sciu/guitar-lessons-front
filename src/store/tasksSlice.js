@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  checkAuthenticated,
   downloadFile,
   extractResponseData,
   manageFulfilledState,
@@ -10,10 +11,10 @@ import apiClient from "../api/api";
 
 export const fetchAvailableTasks = createAsyncThunk(
   "tasks/fetchTasks",
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
+      checkAuthenticated(getState);
       const response = await apiClient.get("/tasks");
-
       return extractResponseData(response);
     } catch (error) {
       return rejectWithValue(extractResponseData(error));
@@ -23,8 +24,9 @@ export const fetchAvailableTasks = createAsyncThunk(
 
 export const downloadTaskFile = createAsyncThunk(
   "tasks/downloadTaskFile",
-  async (data, { rejectWithValue }) => {
+  async (data, { getState, rejectWithValue }) => {
     try {
+      checkAuthenticated(getState);
       const response = await apiClient.get("/tasks/download", {
         params: { filename: data.filename },
       });
@@ -46,11 +48,26 @@ const tasksSlice = createSlice({
   name: "tasks",
   initialState: {
     isLoading: false,
-    fetchComplete: false,
     hasError: false,
+    error: null,
+    refetchNeeded: false,
+
+    fetchComplete: false,
+    tasksMinimumDifficulty: 0,
     tasks: [],
   },
-  reducers: {},
+  reducers: {
+    setTasksRefetchNeeded: (state) => {
+      state.refetchNeeded = true;
+    },
+    clearTasksError: (state) => {
+      state.hasError = false;
+      state.error = null;
+    },
+    setTasksMinimumDifficultyLevel: (state, action) => {
+      state.tasksMinimumDifficulty = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchAvailableTasks.pending, (state) => {
       managePendingState(state);
@@ -59,6 +76,7 @@ const tasksSlice = createSlice({
       manageFulfilledState(state);
       state.tasks = action.payload;
       state.fetchComplete = true;
+      state.refetchNeeded = false;
     });
     builder.addCase(fetchAvailableTasks.rejected, (state, action) => {
       manageRejectedState(state, action);
@@ -67,12 +85,21 @@ const tasksSlice = createSlice({
   },
 });
 
-export const selectAvailableTasks = (state) => state.tasks.tasks;
-export const selectTasksAssignedToUser = (state, action) => {
-  console.log(action);
-};
-export const selectIsLoadingTasks = (state) => state.tasks.isLoading;
-export const selectTasksHasError = (state) => state.tasks.hasError;
-export const selectTasksFetchComplete = (state) => state.tasks.fetchComplete;
+export const {
+  clearTasksError,
+  setTasksRefetchNeeded,
+  setTasksMinimumDifficultyLevel,
+} = tasksSlice.actions;
+
+export const selectTasks = (state) => state.tasks.tasks;
+export const selectTasksLoadingStatus = (state) => state.tasks.isLoading;
+export const selectTasksFetchStatus = (state) => state.tasks.fetchComplete;
+export const selectTasksRefetchNeeded = (state) => state.tasks.refetchNeeded;
+
+export const selectTasksErrorStatus = (state) => state.tasks.hasError;
+export const selectTasksErrorMessage = (state) => state.tasks.error;
+
+export const selectTasksMinimumDifficultyLevel = (state) =>
+  state.tasks.tasksMinimumDifficulty;
 
 export default tasksSlice.reducer;
