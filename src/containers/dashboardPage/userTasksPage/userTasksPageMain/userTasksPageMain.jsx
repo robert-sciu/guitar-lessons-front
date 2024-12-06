@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  clearTaskToDeleteId,
   clearUserTasksError,
+  deleteUserTask,
   fetchUserTasks,
   selectUserTasks,
   selectUserTasksErrorMessage,
@@ -9,6 +11,7 @@ import {
   selectUserTasksFetchStatus,
   selectUserTasksLoadingStatus,
   selectUserTasksRefetchNeeded,
+  selectUserTaskToDeleteId,
 } from "../../../../store/userTasksSlice";
 import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/taskDisplayMain";
 import styles from "./userTasksPageMain.module.scss";
@@ -33,6 +36,7 @@ export default function UserTasksPageMain() {
   const isFetchComplete = useSelector(selectUserTasksFetchStatus);
   const hasError = useSelector(selectUserTasksErrorStatus);
   const errorMessage = useSelector(selectUserTasksErrorMessage);
+  const taskToDeleteId = useSelector(selectUserTaskToDeleteId);
   // const userTasksFetchComplete = useSelector(selectUserTasksFetchComplete);
   const userTasksRefetchNeeded = useSelector(selectUserTasksRefetchNeeded);
 
@@ -60,7 +64,7 @@ export default function UserTasksPageMain() {
       {(fetchComplete || dataLoaded) && (
         <>
           <h3>{t("myTasks.title")}</h3>
-          {userTasks?.length === 0 && <p>No tasks yet</p>}
+          {userTasks?.length === 0 && <p>{t("common.nothingHere")}</p>}
           {userTasks?.length > 0 &&
             userTasks.map((task) => (
               <TaskDisplay
@@ -72,6 +76,14 @@ export default function UserTasksPageMain() {
               />
             ))}
         </>
+      )}
+      {taskToDeleteId && (
+        <ModalWindowMain
+          modalType={"taskDelete"}
+          onSubmit={deleteUserTask}
+          onCancel={clearTaskToDeleteId}
+          data={taskToDeleteId}
+        />
       )}
       {hasError && (
         <ModalWindowMain

@@ -1,26 +1,25 @@
 import { useState, useRef } from "react";
-import PropTypes from "prop-types";
-import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
+import YouTubeLink from "../youTubeLink/youTubeLink";
 import TagDisplay from "../../tagDisplay/tagDisplay";
-import { debounce } from "lodash";
-import styles from "./taskDisplayMain.module.scss";
-import i18n from "../../../../config/i18n";
+import TaskDisplayButtons from "../taskDisplayButtons/taskDisplayButtons";
+import TaskDisplayMoreInfo from "../taskDisplayMoreInfo/taskDisplayMoreInfo";
+
 import { downloadTaskFile } from "../../../store/tasksSlice";
 import {
   addUserTask,
-  clearTaskToDeleteId,
-  deleteUserTask,
   selectUserTasksLoadingStatus,
   selectUserTaskToDeleteId,
   setTaskToDeleteId,
   updateUserTaskNotes,
 } from "../../../store/userTasksSlice";
-import TaskDisplayMoreInfo from "../taskDisplayMoreInfo/taskDisplayMoreInfo";
-import YouTubeLink from "../youTubeLink/youTubeLink";
-import TaskDisplayButtons from "../taskDisplayButtons/taskDisplayButtons";
-import ModalWindowMain from "../../modalWindows/modalWindow/modalWindowMain";
+
+import styles from "./taskDisplayMain.module.scss";
+import { debounce } from "lodash";
+import i18n from "../../../../config/i18n";
+import PropTypes from "prop-types";
 
 export default function TaskDisplayMain({ task, ...props }) {
   const language = i18n.language;
@@ -34,12 +33,15 @@ export default function TaskDisplayMain({ task, ...props }) {
   const [notes, setNotes] = useState(task?.user_task?.user_notes ? task.user_task.user_notes : "");
   const [addingTask, setAddingTask] = useState(false);
   const [isWritingNotes, setIsWritingNotes] = useState(false);
-  const { t } = useTranslation();
   const [showMore, setShowMore] = useState(false);
+
   const tags = showTags ? task.Tags : null;
+
   const taskToDeleteId = useSelector(selectUserTaskToDeleteId);
   const dataIsLoading = useSelector(selectUserTasksLoadingStatus);
+
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const debouncedSaveNote = useRef(
     debounce((note) => {
@@ -112,14 +114,6 @@ export default function TaskDisplayMain({ task, ...props }) {
           handleInputChange={handleInputChange}
           handleDownload={handleDownload}
           language={language}
-        />
-      )}
-      {taskToDeleteId && (
-        <ModalWindowMain
-          modalType={"taskDelete"}
-          onSubmit={deleteUserTask}
-          onCancel={clearTaskToDeleteId}
-          data={taskToDeleteId}
         />
       )}
     </div>

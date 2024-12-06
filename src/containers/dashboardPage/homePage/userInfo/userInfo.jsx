@@ -9,18 +9,19 @@ import { HiOutlinePencilSquare } from "react-icons/hi2";
 
 import {
   selectEmailChangeConfirmationCodeRequired,
-  selectUserInfoHasError,
-  selectUserInfoIsLoading,
   updateEmail,
   updateUserMailCodeRequest,
   updateUser,
   cancelEmailChange,
-  selectUserInfoError,
   clearUserInfoError,
+  selectUserInfoErrorStatus,
+  selectUserInfoErrorMessage,
+  selectUserInfoLoadingStatus,
 } from "../../../../store/userInfoSlice";
 
 import styles from "./userInfo.module.scss";
 import PropTypes from "prop-types";
+import InfoTile from "../infoTile/infoTile";
 
 export default function UserInfo({ userInfo }) {
   const [usernameEditMode, setUsernameEditMode] = useState(false);
@@ -28,14 +29,16 @@ export default function UserInfo({ userInfo }) {
   const [emailEditMode, setEmailEditMode] = useState(false);
   const [email, setEmail] = useState("");
 
-  const userInfoHasError = useSelector(selectUserInfoHasError);
+  const userInfoHasError = useSelector(selectUserInfoErrorStatus);
 
-  const userInfoError = useSelector(selectUserInfoError);
+  const userInfoError = useSelector(selectUserInfoErrorMessage);
   const emailChangeConfirmationCodeRequired = useSelector(
     selectEmailChangeConfirmationCodeRequired
   );
-  const userInfoIsLoading = useSelector(selectUserInfoIsLoading);
+  const userInfoIsLoading = useSelector(selectUserInfoLoadingStatus);
+
   const { t } = useTranslation();
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -73,16 +76,15 @@ export default function UserInfo({ userInfo }) {
     <div className={styles.mainContainer}>
       <h4>{t("userInfo.basicInfo")}</h4>
       <div className={styles.detailsContainer}>
-        <div className={styles.userData}>
-          <p>{t("userInfo.profileStatus")}:</p>
-          <div className={styles.userDataStatus}>
-            {userInfo.is_confirmed ? (
-              <p className={styles.active}>{t("userInfo.active")}</p>
-            ) : (
-              <p className={styles.inactive}>{t("userInfo.inactive")}</p>
-            )}
-          </div>
-        </div>
+        <InfoTile
+          label={t("userInfo.profileStatus")}
+          content={
+            userInfo.is_confirmed
+              ? t("userInfo.active")
+              : t("userInfo.inactive")
+          }
+          contentClassNames={userInfo.is_confirmed ? ["active"] : ["inactive"]}
+        />
         <div className={styles.userData}>
           <p>{t("userInfo.level")}:</p>
           <div className={styles.userDataStatus}>

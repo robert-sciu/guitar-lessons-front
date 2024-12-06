@@ -62,7 +62,7 @@ export default function UserTasksPageMain() {
       {(fetchComplete || dataLoaded) && (
         <>
           <h3>{t("completedTasks.title")}</h3>
-          {completedUserTasks.length === 0 && <p>No tasks yet</p>}
+          {completedUserTasks.length === 0 && <p>{t("common.nothingHere")}</p>}
           {completedUserTasks.length > 0 &&
             completedUserTasks.map((task) => (
               <TaskDisplay

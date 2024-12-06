@@ -14,6 +14,7 @@ import {
 import styles from "./tasksLevelFilter.module.scss";
 
 import { debounce } from "lodash";
+import InputElement from "../../../../components/elements/inputElement/inputElement";
 
 export default function TasksLevelFilter() {
   const [minimumTaskLevel, setMinimumTaskLevel] = useState(0);
@@ -60,11 +61,12 @@ export default function TasksLevelFilter() {
         </div>
       )}
       <p>{t("availableTasks.levelFilter")}:</p>
-      <input
-        className={styles.levelInput}
-        type="text"
+
+      <InputElement
+        type={"text"}
         value={minimumTaskLevel}
         onChange={handleMinimumTaskLevelChange}
+        width={"S"}
       />
 
       <Button

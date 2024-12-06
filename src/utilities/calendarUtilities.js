@@ -55,12 +55,17 @@ function getMinutesFromISOString(isoString) {
   return new Date(isoString).getMinutes();
 }
 
-function changeISOStringHour(isoString, newHour) {
-  return new Date(new Date(isoString).setHours(newHour)).toISOString();
+function getLocalHourFromIsoString(isoString) {
+  const date = new Date(isoString).toTimeString();
+  return date.split(":")[0] + ":" + date.split(":")[1];
 }
 
-function changeISOStringMinutes(isoString, newMinutes) {
-  return new Date(new Date(isoString).setMinutes(newMinutes)).toISOString();
+function changeISOStringHour(isoString, newHour) {
+  const hour = newHour.split(":")[0];
+  const minutes = newHour.split(":")[1];
+  return new Date(
+    new Date(isoString).setHours(hour, minutes, 0, 0)
+  ).toISOString();
 }
 
 function checkIfReservationDurationIsAllowed(isoStart, isoEnd) {
@@ -68,6 +73,15 @@ function checkIfReservationDurationIsAllowed(isoStart, isoEnd) {
     (new Date(isoEnd) - new Date(isoStart)) / (60 * 1000) <= 120 &&
     (new Date(isoEnd) - new Date(isoStart)) / (60 * 1000) >= 60
   );
+}
+
+function hourToLocaleStringHour(hour) {
+  const date = new Date();
+  date.setHours(hour.split(":")[0], hour.split(":")[1], 0, 0);
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "numeric", // Includes minutes, omits seconds
+  }).format(date);
 }
 
 function checkIfReservationDateIsAllowed(isoStart, isoEnd, todayDate) {
@@ -104,36 +118,6 @@ function checkIfReservationTimeIsAllowed(isoStart, isoEnd) {
     reservationStartHour < reservationEndHour
   );
 }
-
-function getWorkingHoursArray() {
-  const array = [];
-  const hourLength = 60 * 60 * 1000;
-  const start = new Date().setUTCHours(config.openHourUTC, 0, 0, 0);
-  const dayLengthInHours = config.workingDayLengthInHours;
-
-  for (let i = 0; i < dayLengthInHours; i++) {
-    array.push(new Date(start + i * hourLength).getHours());
-  }
-
-  return array;
-}
-
-function getStartHourFromWorkingHoursArray(array) {
-  const startHour = array[0];
-  return new Date(new Date().setUTCHours(startHour, 0, 0, 0))
-    .toISOString()
-    .split("T")[1]
-    .split(".")[0];
-}
-
-function getEndHourFromWorkingHoursArray(array) {
-  const endHour = array[array.length - 1];
-  return new Date(new Date().setUTCHours(endHour + 1, 0, 0, 0))
-    .toISOString()
-    .split("T")[1]
-    .split(".")[0];
-}
-
 function getMinMaxSlots(startTime, endTime) {
   const nightInTheMiddle = startTime > endTime;
   const defaultStart = config.openHourString;
@@ -166,6 +150,70 @@ function getMinMaxSlots(startTime, endTime) {
 
     return { minTime: start, maxTime: end };
   }
+}
+
+function getStartHourFromWorkingHoursArray(array) {
+  const startHour = array[0];
+  return new Date(new Date().setUTCHours(startHour, 0, 0, 0))
+    .toISOString()
+    .split("T")[1]
+    .split(".")[0];
+}
+
+function getEndHourFromWorkingHoursArray(array) {
+  const endHour = array[array.length - 1];
+  return new Date(new Date().setUTCHours(endHour + 1, 0, 0, 0))
+    .toISOString()
+    .split("T")[1]
+    .split(".")[0];
+}
+
+function configWorkingHours() {
+  const hourLength = 60 * 60 * 1000;
+  const start = new Date().setUTCHours(config.openHourUTC, 0, 0, 0);
+  const dayLengthInHours = config.workingDayLengthInHours;
+
+  // we get array of local hours so that we can implement further logic for local availability
+  const array = [];
+  for (let i = 0; i < dayLengthInHours; i++) {
+    array.push(new Date(start + i * hourLength).getHours());
+  }
+
+  const calendarStartHour = getStartHourFromWorkingHoursArray(array);
+  const calendarEndHour = getEndHourFromWorkingHoursArray(array);
+
+  // we get min and max time slots for the calendar in local time
+  const { minTime, maxTime } = getMinMaxSlots(
+    calendarStartHour,
+    calendarEndHour
+  );
+
+  const startHour = new Date(
+    new Date().setHours(minTime.split(":")[0], 0, 0)
+  ).getHours();
+  const endHour = new Date(
+    new Date().setHours(maxTime.split(":")[0], 0, 0)
+  ).getHours();
+
+  const hoursArray = [];
+
+  for (let i = startHour; i < endHour; i++) {
+    hoursArray.push(
+      new Date(new Date().setHours(i, 0, 0, 0)).toTimeString().split(":")[0] +
+        ":00"
+    );
+    if (i < endHour - 1) {
+      hoursArray.push(
+        new Date(new Date().setHours(i, 0, 0, 0)).toTimeString().split(":")[0] +
+          ":30"
+      );
+    }
+  }
+  return {
+    availableHoursArray: hoursArray,
+    startHour: minTime,
+    endHour: maxTime,
+  };
 }
 
 /**
@@ -232,11 +280,6 @@ export {
   getHourFromISOString,
   getMinutesFromISOString,
   changeISOStringHour,
-  changeISOStringMinutes,
-  getStartHourFromWorkingHoursArray,
-  getEndHourFromWorkingHoursArray,
-  getWorkingHoursArray,
-  getMinMaxSlots,
   configureEvents,
   checkIfReservationDurationIsAllowed,
   checkIfReservationDateIsAllowed,
@@ -245,4 +288,7 @@ export {
   objectHasData,
   utcTimeToLocalTimeString,
   getReservationEndDate,
+  configWorkingHours,
+  getLocalHourFromIsoString,
+  hourToLocaleStringHour,
 };

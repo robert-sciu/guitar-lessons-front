@@ -135,14 +135,12 @@ export const selectUserInfo = (state) => state.userInfo.userInfo;
 export const selectUserId = (state) => state.userInfo.userInfo.id;
 export const selectUserInfoMinimumDifficultyLevel = (state) =>
   state.userInfo.userInfo.minimum_task_level_to_display;
-export const selectUserInfoIsLoading = (state) => state.userInfo.isLoading;
+export const selectUserInfoLoadingStatus = (state) => state.userInfo.isLoading;
 //prettier-ignore
-export const selectUserInfoFetchComplete = (state) => state.userInfo.fetchComplete;
-export const selectUserInfoHasError = (state) => state.userInfo.hasError;
-export const selectUserInfoError = (state) => state.userInfo.error;
+export const selectUserInfoFetchStatus = (state) => state.userInfo.fetchComplete;
+export const selectUserInfoErrorStatus = (state) => state.userInfo.hasError;
+export const selectUserInfoErrorMessage = (state) => state.userInfo.error;
 export const selectUserRefetchNeeded = (state) => state.userInfo.refetchNeeded;
-// export const selectEmailChangeResponse = (state) =>
-//   state.userInfo.emailChangeResponse;
 
 export const selectEmailChangeConfirmationCodeRequired = (state) =>
   state.userInfo.emailChangeConfirmationCodeRequired;

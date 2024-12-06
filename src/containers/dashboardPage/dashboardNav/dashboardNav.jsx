@@ -6,9 +6,9 @@ import styles from "./dashboardNav.module.scss";
 import {
   fetchUserInfo,
   selectUserInfo,
-  selectUserInfoFetchComplete,
-  selectUserInfoHasError,
-  selectUserInfoIsLoading,
+  selectUserInfoErrorStatus,
+  selectUserInfoFetchStatus,
+  selectUserInfoLoadingStatus,
   selectUserRefetchNeeded,
 } from "../../../store/userInfoSlice";
 import DashboardWelcome from "../../../components/dashboard/dashboardWelcome/dashboardWelcome";
@@ -24,9 +24,9 @@ export default function DashboardNav() {
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const userInfo = useSelector(selectUserInfo);
-  const userInfoIsLoading = useSelector(selectUserInfoIsLoading);
-  const userInfoHasError = useSelector(selectUserInfoHasError);
-  const userInfoFetchComplete = useSelector(selectUserInfoFetchComplete);
+  const userInfoIsLoading = useSelector(selectUserInfoLoadingStatus);
+  const userInfoHasError = useSelector(selectUserInfoErrorStatus);
+  const userInfoFetchComplete = useSelector(selectUserInfoFetchStatus);
   const userRefetchNeeded = useSelector(selectUserRefetchNeeded);
 
   useEffect(() => {

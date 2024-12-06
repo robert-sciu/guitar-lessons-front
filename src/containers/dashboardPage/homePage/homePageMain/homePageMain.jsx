@@ -7,14 +7,15 @@ import LoadingState from "../../../../components/loadingState/loadingState";
 
 import {
   selectUserInfo,
-  selectUserInfoFetchComplete,
+  selectUserInfoFetchStatus,
 } from "../../../../store/userInfoSlice";
+
 import {
   fetchPlanInfo,
   selectPlanInfo,
-  selectPlanInfoFetchComplete,
-  selectPlanInfoHasError,
-  selectPlanInfoIsLoading,
+  selectPlanInfoErrorStatus,
+  selectPlanInfoFetchStatus,
+  selectPlanInfoLoadingStatus,
 } from "../../../../store/planInfoSlice";
 import {
   selectDashboardHomePageLoaded,
@@ -30,11 +31,11 @@ export default function HomePageMain() {
 
   const dataLoaded = useSelector(selectDashboardHomePageLoaded);
 
-  const planInfoIsLoading = useSelector(selectPlanInfoIsLoading);
-  const planInfoHasError = useSelector(selectPlanInfoHasError);
+  const planInfoIsLoading = useSelector(selectPlanInfoLoadingStatus);
+  const planInfoHasError = useSelector(selectPlanInfoErrorStatus);
 
-  const planInfoFetchComplete = useSelector(selectPlanInfoFetchComplete);
-  const userInfoFetchComplete = useSelector(selectUserInfoFetchComplete);
+  const planInfoFetchComplete = useSelector(selectPlanInfoFetchStatus);
+  const userInfoFetchComplete = useSelector(selectUserInfoFetchStatus);
 
   const planInfo = useSelector(selectPlanInfo);
   const userInfo = useSelector(selectUserInfo);

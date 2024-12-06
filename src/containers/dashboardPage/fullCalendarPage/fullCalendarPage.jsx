@@ -16,6 +16,8 @@ import {
   createCalendarEvent,
   deleteCalendarEvent,
   fetchCalendarEvents,
+  selectAvailabilityEndHour,
+  selectAvailabilityStartHour,
   selectEndDay,
   selectFullCalendarDataForMoreInfo,
   selectFullCalendarErrorMessage,
@@ -26,9 +28,10 @@ import {
   selectFullCalendarRefetchNeeded,
   selectFullCalendarTempDataForCreation,
   selectFullCalendarTempDataForReschedule,
-  selectFullCalendarWorkingHoursEnd,
-  selectFullCalendarWorkingHoursStart,
+  // selectFullCalendarWorkingHoursEnd,
+  // selectFullCalendarWorkingHoursStart,
   selectTodayDate,
+  // selectWokringHours2,
   setDataForEventMoreInfo,
   setFullCalendarError,
   setTempDataForEventCreation,
@@ -51,10 +54,11 @@ import {
   configureRescheduleDataFromEvent,
   getDateOnlyFromISOString,
   fullDateToISOString,
-  getMinMaxSlots,
+  // getMinMaxSlots,
   objectHasData,
   checkIfReservationDateIsAllowed,
   checkIfReservationTimeIsAllowed,
+  // configWorkingHours,
 } from "../../../utilities/calendarUtilities";
 
 export default function FullCalendarPage() {
@@ -82,8 +86,8 @@ export default function FullCalendarPage() {
   const dataForEventReschedule = useSelector(
     selectFullCalendarTempDataForReschedule
   );
-  const calendarStartHour = useSelector(selectFullCalendarWorkingHoursStart);
-  const calendarEndHour = useSelector(selectFullCalendarWorkingHoursEnd);
+  const calendarStartHour = useSelector(selectAvailabilityStartHour);
+  const calendarEndHour = useSelector(selectAvailabilityEndHour);
   const todayDate = useSelector(selectTodayDate);
   const endDay = useSelector(selectEndDay);
   const userId = useSelector(selectUserId);
@@ -102,16 +106,23 @@ export default function FullCalendarPage() {
     }
   }, [dispatch, needsRefetch]);
 
-  const { minTime, maxTime } = getMinMaxSlots(
-    calendarStartHour,
-    calendarEndHour
-  );
+  // const { minTime, maxTime } = getMinMaxSlots(
+  //   calendarStartHour,
+  //   calendarEndHour
+  // );
 
   function handleCreateEvent(e) {
     dispatch(clearTempData());
     const start_UTC = fullDateToISOString(e.dateStr);
+
     if (getDateOnlyFromISOString(start_UTC) <= todayDate) {
       dispatch(setFullCalendarError(t("errors.cannotBookEarlierThanTomorrow")));
+      return;
+    }
+    if (
+      getDateOnlyFromISOString(start_UTC) > getDateOnlyFromISOString(endDay)
+    ) {
+      dispatch(setFullCalendarError(t("errors.cannotBookAfterEndDay")));
       return;
     }
     const event = {
@@ -160,6 +171,12 @@ export default function FullCalendarPage() {
     }
     if (!checkIfReservationTimeIsAllowed(start_UTC, end_UTC)) {
       dispatch(setFullCalendarError(t("errors.cannotBookOutsideWorkingHours")));
+      return;
+    }
+    if (
+      getDateOnlyFromISOString(start_UTC) > getDateOnlyFromISOString(endDay)
+    ) {
+      dispatch(setFullCalendarError(t("errors.cannotBookAfterEndDay")));
       return;
     }
     dispatch(setTempDataForEventReschedule(data));
@@ -229,8 +246,8 @@ export default function FullCalendarPage() {
             ref={calendarRef}
             plugins={[timeGridPlugin, interactionPlugin]}
             slotDuration={"00:30:00"}
-            slotMinTime={minTime}
-            slotMaxTime={maxTime}
+            slotMinTime={calendarStartHour}
+            slotMaxTime={calendarEndHour}
             allDaySlot={false}
             expandRows={true}
             height={"100%"}

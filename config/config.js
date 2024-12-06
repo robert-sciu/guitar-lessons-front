@@ -7,6 +7,8 @@ const config = {
   closeHourUTC: 21,
   workingDayLengthInHours: 14,
   defaultReservationLength: 60,
+  availableReservationLengths: [60, 90, 120],
+  defaultReservationLength: 60,
 };
 
 export default config;

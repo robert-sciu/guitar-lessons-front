@@ -2,81 +2,72 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
 import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
+import InfoTile from "../infoTile/infoTile";
 
 import {
   clearPlanInfoError,
   selectPlanInfoDiscount,
-  selectPlanInfoError,
-  selectPlanInfoHasError,
+  selectPlanInfoErrorMessage,
+  selectPlanInfoErrorStatus,
 } from "../../../../store/planInfoSlice";
-// import { useDispatch } from "react-redux";
+
 import styles from "./planInfo.module.scss";
 
 import { utcTimeToLocalTimeString } from "../../../../utilities/calendarUtilities";
+
 import PropTypes from "prop-types";
 
 export default function PlanInfo({ planInfo }) {
-  const { t } = useTranslation();
+  //the discount is calculated at planInfoSlice
   const discount = useSelector(selectPlanInfoDiscount);
+  const planInfoHasError = useSelector(selectPlanInfoErrorStatus);
+  const planInfoError = useSelector(selectPlanInfoErrorMessage);
+
+  const { t } = useTranslation();
 
   const date = t(`daysOfTheWeek.${planInfo.permanent_reservation_weekday}`);
   const time = utcTimeToLocalTimeString(
     planInfo.permanent_reservation_start_hour_UTC
   );
-  const planInfoHasError = useSelector(selectPlanInfoHasError);
-  const planInfoError = useSelector(selectPlanInfoError);
+  const hasPermanentReservation = planInfo.has_permanent_reservation;
 
   return (
     <div className={styles.planInfoContainer}>
       <h4>{t("planInfo.basicInfo")}</h4>
-      {planInfo.has_permanent_reservation ? (
-        <div className={styles.detailsContainer}>
-          <div className={styles.planInfoData}>
-            <p>{t("planInfo.hasPermanentReservation")}:</p>
-            <div className={styles.planInfoDataStatus}>
-              <p className={styles.active}>{t("planInfo.active")}</p>
-            </div>
-          </div>
-          <div className={styles.planInfoData}>
-            <p>{t("planInfo.reschedulesLeftCount")}:</p>
-            <div className={styles.planInfoDataStatus}>
-              {planInfo.reschedules_left_count}
-            </div>
-          </div>
-          <div className={styles.planInfoData}>
-            <p>{t("planInfo.cancelledLessonsCount")}:</p>
-            <div className={styles.planInfoDataStatus}>
-              {planInfo.cancelled_lesson_count}
-            </div>
-          </div>
-          <div className={styles.planInfoData}>
-            <p>{t("planInfo.discount")}:</p>
-            <div className={styles.planInfoDataStatus}>{discount}%</div>
-          </div>
-          <div className={styles.planInfoData}>
-            <p>{t("planInfo.permanentReservationDate")}:</p>
-            <div className={styles.planInfoDataStatus}>
-              {date}, {time}
-            </div>
-          </div>
-
-          <div className={styles.planInfoData}>
-            <p>{t("planInfo.lessonDuration")}:</p>
-            <div className={styles.planInfoDataStatus}>
-              {planInfo.permanent_reservation_lesson_duration} min
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className={styles.detailsContainer}>
-          <div className={styles.planInfoData}>
-            <p>{t("planInfo.hasPermanentReservation")}:</p>
-            <div className={styles.planInfoDataStatus}>
-              <p className={styles.inactive}>{t("planInfo.inactive")}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      <div className={styles.detailsContainer}>
+        <InfoTile
+          label={t("planInfo.hasPermanentReservation")}
+          content={
+            hasPermanentReservation
+              ? t("planInfo.active")
+              : t("planInfo.inactive")
+          }
+          contentClassNames={
+            hasPermanentReservation ? ["active"] : ["inactive"]
+          }
+        />
+        <InfoTile
+          label={t("planInfo.reschedulesLeftCount")}
+          content={planInfo.reschedules_left_count}
+        />
+        <InfoTile
+          label={t("planInfo.cancelledLessonsCount")}
+          content={planInfo.cancelled_lesson_count}
+        />
+        <InfoTile label={t("planInfo.discount")} content={`${discount}%`} />
+        {hasPermanentReservation && (
+          <>
+            <InfoTile
+              label={t("planInfo.permanentReservationDate")}
+              content={`${date}, ${time}`}
+            />
+            <InfoTile
+              label={t("planInfo.lessonDuration")}
+              content={`${planInfo.permanent_reservation_lesson_duration} min`}
+            />
+          </>
+        )}
+      </div>
       {planInfoHasError && (
         <ModalWindowMain
           modalType="error"

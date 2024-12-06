@@ -61,10 +61,10 @@ export const { clearPlanInfoError } = planInfoSlice.actions;
 
 export const selectPlanInfo = (state) => state.planInfo.planInfo;
 export const selectPlanInfoDiscount = (state) => state.planInfo.discount;
-export const selectPlanInfoIsLoading = (state) => state.planInfo.isLoading;
+export const selectPlanInfoLoadingStatus = (state) => state.planInfo.isLoading;
 //prettier-ignore
-export const selectPlanInfoFetchComplete = (state) => state.planInfo.fetchComplete;
-export const selectPlanInfoHasError = (state) => state.planInfo.hasError;
-export const selectPlanInfoError = (state) => state.planInfo.error;
+export const selectPlanInfoFetchStatus = (state) => state.planInfo.fetchComplete;
+export const selectPlanInfoErrorStatus = (state) => state.planInfo.hasError;
+export const selectPlanInfoErrorMessage = (state) => state.planInfo.error;
 
 export default planInfoSlice.reducer;

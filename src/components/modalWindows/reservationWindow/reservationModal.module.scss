@@ -5,9 +5,11 @@
   @extend .modalWindowContent;
   cursor: default;
 
-  .timeSelectContainer {
+  .dropdownContainer {
     display: flex;
+    align-items: center;
     gap: $size-xxs;
+    align-items: center;
   }
   .buttonsContainer {
     display: flex;

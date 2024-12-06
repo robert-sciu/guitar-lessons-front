@@ -1,0 +1,15 @@
+@import "../../../../../styles/variables.module.scss";
+@import "../../../../../styles/classes.module.scss";
+
+.planInfoData {
+  @extend .mainPageInfoTile;
+  p {
+    font-size: $size-s;
+  }
+  .active {
+    color: $main-green;
+  }
+  .inactive {
+    color: $main-red;
+  }
+}

@@ -1,18 +1,26 @@
-import PropTypes from "prop-types";
 import { useState } from "react";
-import styles from "./reservationModal.module.scss";
+import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { updateTempDataForEventCreation } from "../../../store/fullCalendarSlice";
+
+import Button from "../../elements/button/button";
+
+import {
+  selectAvailabilityHours,
+  updateTempDataForEventCreation,
+} from "../../../store/fullCalendarSlice";
 import {
   addMinutesToIsoString,
   changeISOStringHour,
-  changeISOStringMinutes,
   getDateOnlyFromISOString,
-  getHourFromISOString,
-  getMinutesFromISOString,
-  getWorkingHoursArray,
+  getLocalHourFromIsoString,
 } from "../../../utilities/calendarUtilities";
-import Button from "../../elements/button/button";
+
+import styles from "./reservationModal.module.scss";
+
+import PropTypes from "prop-types";
+import CustomDropdown from "../customDropdown/customDropdown";
+
+import config from "../../../../config/config";
 
 export default function ReservationModal({
   reservation,
@@ -21,15 +29,13 @@ export default function ReservationModal({
   dispatch,
 }) {
   const { t } = useTranslation();
-  const [selectedDuration, setSelectedDuration] = useState(60);
+  const [selectedDuration, setSelectedDuration] = useState(
+    config.defaultReservationLength
+  );
   const [reservationStartHour, setReservationStartHour] = useState(
-    getHourFromISOString(reservation.start)
+    getLocalHourFromIsoString(reservation.start)
   );
-  const [reservationStartMinutes, setReservationStartMinutes] = useState(
-    getMinutesFromISOString(reservation.start)
-  );
-
-  // const nodeRef = useRef(null);
+  const availableReservationHours = useSelector(selectAvailabilityHours);
 
   function handleClick(isConfirmed) {
     if (isConfirmed) {
@@ -45,25 +51,15 @@ export default function ReservationModal({
     }
   }
 
-  function handleDurationChange(e) {
-    const newDuration = e.target.value;
+  function handleDurationChange(newDuration) {
     setSelectedDuration(newDuration);
     const end_UTC = addMinutesToIsoString(reservation.start, newDuration);
     dispatch(updateTempDataForEventCreation({ end: end_UTC }));
   }
 
-  function handleHourChange(e) {
-    const newHour = e.target.value;
+  function handleHourChange(newHour) {
     setReservationStartHour(newHour);
     const newStart = changeISOStringHour(reservation.start, newHour);
-    const newEnd = addMinutesToIsoString(newStart, selectedDuration);
-    dispatch(updateTempDataForEventCreation({ start: newStart, end: newEnd }));
-  }
-
-  function handleMinutesChange(e) {
-    const newMinutes = e.target.value;
-    setReservationStartMinutes(newMinutes);
-    const newStart = changeISOStringMinutes(reservation.start, newMinutes);
     const newEnd = addMinutesToIsoString(newStart, selectedDuration);
     dispatch(updateTempDataForEventCreation({ start: newStart, end: newEnd }));
   }
@@ -74,45 +70,26 @@ export default function ReservationModal({
       <p>
         {t("modals.date")}: {getDateOnlyFromISOString(reservation.start)}
       </p>
-      <p>
-        {t("modals.time")}:{" "}
-        <select
-          id="hour-select"
-          name="hour-select"
-          value={reservationStartHour}
-          onChange={handleHourChange}
-        >
-          {getWorkingHoursArray().map((hour) => {
-            return (
-              <option key={hour} value={hour}>
-                {hour < 10 ? `0${hour}` : hour}
-              </option>
-            );
-          })}
-        </select>
-        {" : "}
-        <select
-          id="minute-select"
-          name="minute-select"
-          value={reservationStartMinutes}
-          onChange={handleMinutesChange}
-        >
-          <option value={0}>00</option>
-          <option value={30}>30</option>
-        </select>
-      </p>
-      <div className={styles.timeSelectContainer}>
-        <label htmlFor="duration-select">{t("modals.duration")}:</label>
-        <select
-          id="duration-select"
-          name={"duration-select"}
-          onChange={handleDurationChange}
-          value={selectedDuration}
-        >
-          <option value={60}>60 {t("modals.minutes")}</option>
-          <option value={90}>90 {t("modals.minutes")}</option>
-          <option value={120}>120 {t("modals.minutes")}</option>
-        </select>
+      <div className={styles.dropdownContainer}>
+        <p>{t("modals.time")}:</p>
+
+        <CustomDropdown
+          availableReservationHours={availableReservationHours}
+          reservationStartHour={reservationStartHour}
+          onSelect={handleHourChange}
+          type={"hour"}
+        />
+      </div>
+
+      <div className={styles.dropdownContainer}>
+        <p>{t("modals.duration")}:</p>
+
+        <CustomDropdown
+          availableDurationValues={config.availableReservationLengths}
+          selectedDuration={selectedDuration}
+          onSelect={handleDurationChange}
+          type={"duration"}
+        />
       </div>
       <div className={styles.buttonsContainer}>
         <Button

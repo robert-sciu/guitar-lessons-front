@@ -4,13 +4,13 @@ import styles from "./codeRequiredModal.module.scss";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { selectUserInfoIsLoading } from "../../../store/userInfoSlice";
+import { selectUserInfoLoadingStatus } from "../../../store/userInfoSlice";
 import Button from "../../elements/button/button";
 
 export default function CodeRequiredModal({ onSubmit, onCancel, dispatch }) {
   const { t } = useTranslation();
   const [confirmationCode, setConfirmationCode] = useState("");
-  const isLoading = useSelector(selectUserInfoIsLoading);
+  const isLoading = useSelector(selectUserInfoLoadingStatus);
   function handleSubmit() {
     dispatch(onSubmit({ change_email_token: confirmationCode }));
   }

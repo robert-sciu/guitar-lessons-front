@@ -1,15 +1,18 @@
-import PropTypes from "prop-types";
+import styles from "./inputToggler.module.scss";
 
-export default function InputToggler({
-  style,
-  onChange,
-  value,
-  inputIsActive,
-}) {
+import PropTypes from "prop-types";
+import InputElement from "../inputElement/inputElement";
+
+export default function InputToggler({ onChange, value, inputIsActive }) {
   return (
-    <div className={style}>
+    <div className={styles.inputToggler}>
       {inputIsActive ? (
-        <input type="text" value={value} onChange={onChange} />
+        <InputElement
+          type="text"
+          value={value}
+          onChange={onChange}
+          width={80}
+        />
       ) : (
         <p>{value}</p>
       )}

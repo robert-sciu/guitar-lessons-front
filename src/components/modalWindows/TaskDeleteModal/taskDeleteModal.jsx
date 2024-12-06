@@ -37,6 +37,6 @@ export default function TaskDeleteModal({
 TaskDeleteModal.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  taskId: PropTypes.string.isRequired,
+  taskId: PropTypes.number.isRequired,
   dispatch: PropTypes.func.isRequired,
 };

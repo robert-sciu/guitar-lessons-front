@@ -12,6 +12,9 @@ i18n
     resources: {
       pl: {
         translation: {
+          common: {
+            nothingHere: "Nic tu jeszcze nie ma... 🏜️",
+          },
           mainNav: {
             home: "Start",
             login: "Zaloguj się",
@@ -47,7 +50,7 @@ i18n
           planInfo: {
             basicInfo: "Ustawienia Planu",
             hasPermanentReservation: "Stały termin",
-            permanentReservationDate: "Termin lekcji",
+            permanentReservationDate: "Termin stałej rezerwacji",
             lessonDuration: "Długość lekcji",
             reschedulesLeftCount: "Dostępne zmiany terminu",
             cancelledLessonsCount: "Anulowane lekcje",
@@ -148,6 +151,8 @@ i18n
           errors: {
             cannotBookEarlierThanTomorrow:
               "Nie możesz rezerwowac lekcji wcześniej niż jutro",
+            cannotBookAfterEndDay:
+              "Nie мożesz rezerwowac lekcji dalej niż za 14 dni",
             cannotBookOutsideWorkingHours:
               "Nie można rezerwowac lekcji poza godzinami pracy",
             invalidDuration: "Można rezerwowac lekcje od 1 do 2 godzin",
@@ -159,6 +164,9 @@ i18n
       },
       en: {
         translation: {
+          common: {
+            nothingHere: "Nothing here yet",
+          },
           mainNav: {
             home: "Home",
             login: "Login",
@@ -299,6 +307,7 @@ i18n
           },
           errors: {
             cannotBookEarlierThanTomorrow: "Cannot book earlier than tomorrow",
+            cannotBookAfterEndDay: "Cannot book later than 14 days from today",
             cannotBookOutsideWorkingHours: "Cannot book outside working hours",
             invalidDuration: "You can book lessons from 1 to 2 hours",
             thatsPast: "You cannot change a past reservation",

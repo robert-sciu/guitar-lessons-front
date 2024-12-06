@@ -29,9 +29,11 @@ import {
 } from "../../../../store/tasksSlice";
 import {
   clearTagsError,
+  fetchTags,
   selectTagsErrorMessage,
   selectTagsErrorStatus,
   selectTagsFetchStatus,
+  selectTagsLoadingStatus,
 } from "../../../../store/tagsSlice";
 
 import styles from "./availableTasksMain.module.scss";
@@ -61,6 +63,7 @@ export default function AvailableTasksMain() {
   const minimumDifficultyLevelTasks = useSelector(selectTasksMinimumDifficultyLevel);
 
   const isFetchCompleteTags = useSelector(selectTagsFetchStatus);
+  const isLoadingTags = useSelector(selectTagsLoadingStatus);
   const hasErrorTags = useSelector(selectTagsErrorStatus);
   const errorMessageTags = useSelector(selectTagsErrorMessage);
 
@@ -85,6 +88,12 @@ export default function AvailableTasksMain() {
     hasErrorTasks,
     userInfoMinimumDifficultyLevel,
   ]);
+
+  useEffect(() => {
+    if (!isFetchCompleteTags && !isLoadingTags && !hasErrorTags) {
+      dispatch(fetchTags());
+    }
+  }, [dispatch, isFetchCompleteTags, isLoadingTags, hasErrorTags]);
   // if user selected new minimum difficulty level and userState was updated through refetch
   // we need to refetch tasks
   useEffect(() => {
@@ -141,7 +150,7 @@ export default function AvailableTasksMain() {
           />
 
           {isFetchCompleteTasks && filteredTasks?.length === 0 && (
-            <p>No available tasks</p>
+            <p>{t("common.nothingHere")}</p>
           )}
 
           <div className={styles.tasksList}>

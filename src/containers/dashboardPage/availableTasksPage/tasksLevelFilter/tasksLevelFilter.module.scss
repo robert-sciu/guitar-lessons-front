@@ -5,10 +5,10 @@
   gap: $size-xxxs;
   align-items: center;
 
-  .levelInput {
-    @extend .input;
-    width: 3rem;
-  }
+  // .levelInput {
+  //   // @extend .input;
+  //   width: 3rem;
+  // }
   .levelSaving {
     display: flex;
     gap: $size-xxxs;

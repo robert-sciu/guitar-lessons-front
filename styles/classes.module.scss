@@ -43,7 +43,26 @@
   padding: $size-xxxxs;
   box-shadow: $inset-soft-shadow;
   text-align: center;
+  transition: $basic-transition;
   &:focus {
     outline: none;
   }
+}
+
+.inputHover {
+  background-color: $main-white-light;
+  text-decoration: underline;
+}
+
+.mainPageInfoTile {
+  box-shadow: $soft-shadow-gray-light;
+  border-radius: $size-xxxxs;
+  // padding: $size-m;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $size-xs;
+  font-weight: 500;
 }

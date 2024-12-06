@@ -10,11 +10,12 @@ import {
 import apiClient from "../api/api";
 import {
   configureEvents,
-  getEndHourFromWorkingHoursArray,
+  configWorkingHours,
+  // getEndHourFromWorkingHoursArray,
   getReservationEndDate,
-  getStartHourFromWorkingHoursArray,
+  // getStartHourFromWorkingHoursArray,
   getTodayDate,
-  getWorkingHoursArray,
+  // getWorkingHoursArray,
 } from "../utilities/calendarUtilities";
 
 export const fetchCalendarEvents = createAsyncThunk(
@@ -84,15 +85,13 @@ const fullCalendarSlice = createSlice({
     refetchNeeded: false,
 
     fetchComplete: false,
-    //needed only for calendar as it needs to know it that events have been updated
-    //to rebuild events in useState
-    // eventsUpdated: false,
-    // updateFailed: false,
+
     tempDataForEventCreation: {},
     tempDataForEventReschedule: {},
     dataForEventMoreInfo: {},
     calendarEvents: [],
-    workingHours: getWorkingHoursArray(),
+    availabilityHours: configWorkingHours(),
+    // workingHours2: getWorkingHoursArray(),
     today: getTodayDate(),
     endDay: getReservationEndDate(),
   },
@@ -120,12 +119,6 @@ const fullCalendarSlice = createSlice({
     setDataForEventMoreInfo: (state, action) => {
       state.dataForEventMoreInfo = action.payload;
     },
-    // clearDataForEventMoreInfo: (state) => {
-    //   state.dataForEventMoreInfo = {};
-    // },
-    // clearEventsUpdated: (state) => {
-    //   state.eventsUpdated = false;
-    // },
     setFullCalendarError: (state, action) => {
       state.hasError = true;
       state.error = action.payload;
@@ -133,7 +126,6 @@ const fullCalendarSlice = createSlice({
     clearFullCalendarError: (state) => {
       state.hasError = false;
       state.error = null;
-      // state.updateFailed = false;
       state.tempDataForEventCreation = {};
       state.tempDataForEventReschedule = {};
       state.dataForEventMoreInfo = {};
@@ -168,14 +160,12 @@ const fullCalendarSlice = createSlice({
       .addCase(updateCalendarEvent.rejected, (state, action) => {
         manageRejectedState(state, action);
         state.tempDataForEventReschedule = {};
-        // state.updateFailed = true;
       })
 
       .addCase(createCalendarEvent.pending, managePendingState)
       .addCase(createCalendarEvent.fulfilled, (state) => {
         manageFulfilledState(state);
         state.refetchNeeded = true;
-        // state.eventsUpdated = true;
       })
       .addCase(createCalendarEvent.rejected, (state, action) => {
         manageRejectedState(state, action);
@@ -200,8 +190,6 @@ export const {
   updateTempDataForEventCreation,
   setTempDataForEventReschedule,
   setDataForEventMoreInfo,
-  // clearDataForEventMoreInfo,
-  // clearEventsUpdated,
   setFullCalendarError,
   clearFullCalendarError,
   clearFullCalendarRefetchNeeded,
@@ -234,10 +222,6 @@ export const selectFullCalendarTempDataForReschedule = (state) =>
   state.fullCalendar.tempDataForEventReschedule;
 export const selectFullCalendarDataForMoreInfo = (state) =>
   state.fullCalendar.dataForEventMoreInfo;
-// export const selectFullCalendarUpdateSuccessStatus = (state) =>
-//   state.fullCalendar.eventsUpdated;
-// export const selectFullCalendarUpdateFailedStatus = (state) =>
-//   state.fullCalendar.updateFailed;
 
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////// TIME RELATED SELECTORS //////////////////////////////////////
@@ -245,11 +229,21 @@ export const selectFullCalendarDataForMoreInfo = (state) =>
 
 export const selectTodayDate = (state) => state.fullCalendar.today;
 export const selectEndDay = (state) => state.fullCalendar.endDay;
-export const selectFullCalendarWorkingHoursArray = (state) =>
-  state.fullCalendar.workingHours;
-export const selectFullCalendarWorkingHoursStart = (state) =>
-  getStartHourFromWorkingHoursArray(state.fullCalendar.workingHours);
-export const selectFullCalendarWorkingHoursEnd = (state) =>
-  getEndHourFromWorkingHoursArray(state.fullCalendar.workingHours);
+// export const selectFullCalendarWorkingHoursArray = (state) =>
+//   state.fullCalendar.workingHours;
+// export const selectFullCalendarWorkingHoursStart = (state) =>
+//   getStartHourFromWorkingHoursArray(state.fullCalendar.workingHours);
+// export const selectFullCalendarWorkingHoursEnd = (state) =>
+//   getEndHourFromWorkingHoursArray(state.fullCalendar.workingHours);
+
+// export const selectWokringHours2 = (state) => state.fullCalendar.workingHours2;
+export const selectAvailabilityHours = (state) =>
+  state.fullCalendar.availabilityHours.availableHoursArray;
+
+export const selectAvailabilityStartHour = (state) =>
+  state.fullCalendar.availabilityHours.startHour;
+
+export const selectAvailabilityEndHour = (state) =>
+  state.fullCalendar.availabilityHours.endHour;
 
 export default fullCalendarSlice.reducer;
