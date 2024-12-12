@@ -53,6 +53,7 @@ const authSlice = createSlice({
     isLoading: false,
     hasError: false,
     isAuthenticated: false,
+    tokenVerificationComplete: false,
     token: localStorage.getItem("access_token"),
   },
   reducers: {
@@ -80,15 +81,17 @@ const authSlice = createSlice({
       .addCase(verifyStoredToken.pending, (state) => {
         managePendingState(state);
       })
-      .addCase(verifyStoredToken.fulfilled, (state, action) => {
+      .addCase(verifyStoredToken.fulfilled, (state) => {
         manageFulfilledState(state);
-        state.user = action.payload.user;
+        // state.user = action.payload.user;
         state.isAuthenticated = true;
+        state.tokenVerificationComplete = true;
       })
       .addCase(verifyStoredToken.rejected, (state, action) => {
         manageRejectedState(state, action);
         state.isAuthenticated = false;
         state.token = null;
+        state.tokenVerificationComplete = true;
       })
       .addCase(logoutUser.pending, (state) => {
         managePendingState(state);
@@ -104,7 +107,9 @@ const authSlice = createSlice({
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectAuthLoadingState = (state) => state.auth.isLoading;
 export const selectToken = (state) => state.auth.token;
-export const selectUser = (state) => state.auth.user;
+export const selectTokenVerificationStatus = (state) =>
+  state.auth.tokenVerificationComplete;
+// export const selectUser = (state) => state.auth.user;
 
 export const { setToken, clearToken } = authSlice.actions;
 

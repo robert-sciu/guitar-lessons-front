@@ -8,6 +8,7 @@ import {
   loginUser,
   selectAuthLoadingState,
   selectIsAuthenticated,
+  selectTokenVerificationStatus,
 } from "../../../store/authSlice";
 
 import { useTranslation } from "react-i18next";
@@ -27,14 +28,16 @@ export default function LoginForm() {
 
   const loggedIn = useSelector(selectIsAuthenticated);
   const isLoading = useSelector(selectAuthLoadingState);
+  const tokenVerificationComplete = useSelector(selectTokenVerificationStatus);
 
   useEffect(() => {
+    if (!tokenVerificationComplete) return;
     if (loggedIn) {
       navigate("/dashboard/welcome");
     } else {
       setShowLogin(true);
     }
-  }, [loggedIn, navigate]);
+  }, [loggedIn, isLoading, navigate, tokenVerificationComplete]);
 
   function handleSubmit(e) {
     e.preventDefault();

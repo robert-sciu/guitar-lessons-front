@@ -1,6 +1,10 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser, selectIsAuthenticated } from "../../../store/authSlice";
+import {
+  logoutUser,
+  selectIsAuthenticated,
+  selectTokenVerificationStatus,
+} from "../../../store/authSlice";
 import { useEffect, useState } from "react";
 import styles from "./dashboardNav.module.scss";
 import {
@@ -29,13 +33,11 @@ export default function DashboardNav() {
   const userInfoFetchComplete = useSelector(selectUserInfoFetchStatus);
   const userRefetchNeeded = useSelector(selectUserRefetchNeeded);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-    }
-  });
+  const tokenVerificationComplete = useSelector(selectTokenVerificationStatus);
+
   useEffect(() => {
     if (
+      tokenVerificationComplete &&
       isAuthenticated &&
       !userInfoFetchComplete &&
       !userInfoIsLoading &&
@@ -44,6 +46,7 @@ export default function DashboardNav() {
       dispatch(fetchUserInfo());
     }
   }, [
+    tokenVerificationComplete,
     isAuthenticated,
     userInfoFetchComplete,
     userInfoIsLoading,
@@ -81,7 +84,7 @@ export default function DashboardNav() {
         <DashboardNavLinks onLogout={handleLogout} />
       </div>
       <div className={styles.dashboardContentContainer}>
-        <Outlet />
+        {fetchComplete && <Outlet />}
       </div>
     </div>
   );

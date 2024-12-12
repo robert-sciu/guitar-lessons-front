@@ -6,5 +6,8 @@
 
   .buttonsContainer {
     @extend .modalWindowButtonsContainer;
+    p {
+      display: flex;
+    }
   }
 }

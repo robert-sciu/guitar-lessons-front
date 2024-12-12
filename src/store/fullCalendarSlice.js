@@ -11,11 +11,9 @@ import apiClient from "../api/api";
 import {
   configureEvents,
   configWorkingHours,
-  // getEndHourFromWorkingHoursArray,
+  getAvailableDates,
   getReservationEndDate,
-  // getStartHourFromWorkingHoursArray,
   getTodayDate,
-  // getWorkingHoursArray,
 } from "../utilities/calendarUtilities";
 
 export const fetchCalendarEvents = createAsyncThunk(
@@ -23,7 +21,7 @@ export const fetchCalendarEvents = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       checkAuthenticated(getState);
-      const userId = getState().auth.user.id;
+      const userId = getState().userInfo.userInfo.id;
       const response = await apiClient.get("/lessonReservations");
       const extractedData = extractResponseData(response);
       return { response: extractedData, userId };
@@ -88,12 +86,16 @@ const fullCalendarSlice = createSlice({
 
     tempDataForEventCreation: {},
     tempDataForEventReschedule: {},
+    tempDataForEventDeletion: {},
+
     dataForEventMoreInfo: {},
+    dataForEventMoreInfoInitial: {},
+
     calendarEvents: [],
     availabilityHours: configWorkingHours(),
-    // workingHours2: getWorkingHoursArray(),
     today: getTodayDate(),
     endDay: getReservationEndDate(),
+    availableDates: getAvailableDates(),
   },
   reducers: {
     setTempDataForEventCreation: (state, action) => {
@@ -103,12 +105,13 @@ const fullCalendarSlice = createSlice({
       state.tempDataForEventCreation = {};
       state.tempDataForEventReschedule = {};
       state.dataForEventMoreInfo = {};
+      state.tempDataForEventDeletion = {};
+    },
+    clearTempDataForEventDeletion: (state) => {
+      state.tempDataForEventDeletion = {};
     },
     updateTempDataForEventCreation: (state, action) => {
-      state.tempDataForEventCreation = {
-        ...state.tempDataForEventCreation,
-        ...action.payload,
-      };
+      state.tempDataForEventCreation = action.payload;
     },
     clearFullCalendarRefetchNeeded: (state) => {
       state.refetchNeeded = false;
@@ -116,8 +119,16 @@ const fullCalendarSlice = createSlice({
     setTempDataForEventReschedule: (state, action) => {
       state.tempDataForEventReschedule = action.payload;
     },
+
     setDataForEventMoreInfo: (state, action) => {
       state.dataForEventMoreInfo = action.payload;
+      state.dataForEventMoreInfoInitial = action.payload;
+    },
+    updateDataForEventMoreInfo: (state, action) => {
+      state.dataForEventMoreInfo = action.payload;
+    },
+    setTempDataForEventDeletion: (state, action) => {
+      state.tempDataForEventDeletion = action.payload;
     },
     setFullCalendarError: (state, action) => {
       state.hasError = true;
@@ -129,6 +140,7 @@ const fullCalendarSlice = createSlice({
       state.tempDataForEventCreation = {};
       state.tempDataForEventReschedule = {};
       state.dataForEventMoreInfo = {};
+      state.tempDataForEventDeletion = {};
     },
   },
   extraReducers: (builder) => {
@@ -152,9 +164,9 @@ const fullCalendarSlice = createSlice({
       .addCase(updateCalendarEvent.pending, managePendingState)
       .addCase(updateCalendarEvent.fulfilled, (state) => {
         manageFulfilledState(state);
-        state.calendarEvents = state.calendarEvents.filter((event) => {
-          event.id !== state.tempDataForEventReschedule.id;
-        });
+        // state.calendarEvents = state.calendarEvents.filter((event) => {
+        //   event.id !== state.tempDataForEventReschedule.id;
+        // });
         state.refetchNeeded = true;
       })
       .addCase(updateCalendarEvent.rejected, (state, action) => {
@@ -175,11 +187,15 @@ const fullCalendarSlice = createSlice({
       .addCase(deleteCalendarEvent.pending, managePendingState)
       .addCase(deleteCalendarEvent.fulfilled, (state) => {
         manageFulfilledState(state);
+        state.dataForEventMoreInfo = {};
+        state.dataForEventMoreInfoInitial = {};
+        state.tempDataForEventDeletion = {};
         state.refetchNeeded = true;
       })
       .addCase(deleteCalendarEvent.rejected, (state, action) => {
         manageRejectedState(state, action);
         state.dataForEventMoreInfo = {};
+        state.tempDataForEventDeletion = {};
       });
   },
 });
@@ -193,6 +209,9 @@ export const {
   setFullCalendarError,
   clearFullCalendarError,
   clearFullCalendarRefetchNeeded,
+  updateDataForEventMoreInfo,
+  setTempDataForEventDeletion,
+  clearTempDataForEventDeletion,
 } = fullCalendarSlice.actions;
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -222,6 +241,10 @@ export const selectFullCalendarTempDataForReschedule = (state) =>
   state.fullCalendar.tempDataForEventReschedule;
 export const selectFullCalendarDataForMoreInfo = (state) =>
   state.fullCalendar.dataForEventMoreInfo;
+export const selectFullCalendarDataForMoreInfoInitial = (state) =>
+  state.fullCalendar.dataForEventMoreInfoInitial;
+export const selectFullCalendarEventToDeleteId = (state) =>
+  state.fullCalendar.tempDataForEventDeletion;
 
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////// TIME RELATED SELECTORS //////////////////////////////////////
@@ -229,14 +252,6 @@ export const selectFullCalendarDataForMoreInfo = (state) =>
 
 export const selectTodayDate = (state) => state.fullCalendar.today;
 export const selectEndDay = (state) => state.fullCalendar.endDay;
-// export const selectFullCalendarWorkingHoursArray = (state) =>
-//   state.fullCalendar.workingHours;
-// export const selectFullCalendarWorkingHoursStart = (state) =>
-//   getStartHourFromWorkingHoursArray(state.fullCalendar.workingHours);
-// export const selectFullCalendarWorkingHoursEnd = (state) =>
-//   getEndHourFromWorkingHoursArray(state.fullCalendar.workingHours);
-
-// export const selectWokringHours2 = (state) => state.fullCalendar.workingHours2;
 export const selectAvailabilityHours = (state) =>
   state.fullCalendar.availabilityHours.availableHoursArray;
 
@@ -245,5 +260,8 @@ export const selectAvailabilityStartHour = (state) =>
 
 export const selectAvailabilityEndHour = (state) =>
   state.fullCalendar.availabilityHours.endHour;
+
+export const selectAvailabilityDates = (state) =>
+  state.fullCalendar.availableDates;
 
 export default fullCalendarSlice.reducer;

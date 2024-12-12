@@ -1,4 +1,4 @@
-import { IoMove } from "react-icons/io5";
+import { IoMove, IoClose } from "react-icons/io5";
 import styles from "./modalWindowMain.module.scss";
 import Draggable from "react-draggable";
 import { useRef } from "react";
@@ -10,27 +10,49 @@ import RescheduleModal from "../RescheduleModal/rescheduleModal";
 import TaskDeleteModal from "../TaskDeleteModal/taskDeleteModal";
 import CodeRequiredModal from "../codeRequiredModal/codeRequiredModal";
 import ErrorWindow from "../errorWindow/errorWindow";
+import ReservationDeleteModal from "../reservationDeleteModal/reservationDeleteModal";
+import { clearTempData } from "../../../store/fullCalendarSlice";
+import { classNameFormatter } from "../../../utilities/utilities";
 export default function ModalWindowMain({
   modalType,
   onSubmit,
   onCancel,
   onDeleteSubmit,
   data,
+  disableBlur,
 }) {
   const dispatch = useDispatch();
   const nodeRef = useRef(null);
   function handleBgClick(e) {
-    if (e.target.className === styles.modalWindowBackground) {
+    if (
+      e.target.className.includes("modalWindowBackground") ||
+      e.target.className.includes("blur")
+    ) {
       if (onCancel) {
+        dispatch(clearTempData());
         dispatch(onCancel());
       }
     }
   }
+  function handleClose() {
+    if (onCancel) {
+      dispatch(onCancel());
+    }
+  }
   return (
-    <div className={styles.modalWindowBackground} onClick={handleBgClick}>
+    <div
+      className={classNameFormatter({
+        styles,
+        classNames: ["modalWindowBackground", !disableBlur && "blur"],
+      })}
+      onClick={handleBgClick}
+    >
       <Draggable nodeRef={nodeRef}>
         <div ref={nodeRef} className={styles.modalWindowContainer}>
           <div className={styles.dragArea}>
+            <div className={styles.closeBtn} onClick={handleClose}>
+              <IoClose />
+            </div>
             <IoMove />
           </div>
           {modalType === "reservation" && (
@@ -45,6 +67,16 @@ export default function ModalWindowMain({
             <MoreInfoModal
               event={data}
               onDeleteSubmit={onDeleteSubmit}
+              onSubmit={onSubmit}
+              dispatch={dispatch}
+              onCancel={onCancel}
+            />
+          )}
+          {modalType === "confirmDelete" && (
+            <ReservationDeleteModal
+              data={data}
+              onDeleteSubmit={onDeleteSubmit}
+              onCancel={onCancel}
               dispatch={dispatch}
             />
           )}
@@ -87,4 +119,5 @@ ModalWindowMain.propTypes = {
   onClose: PropTypes.func,
   onDeleteSubmit: PropTypes.func,
   data: PropTypes.any,
+  disableBlur: PropTypes.bool,
 };

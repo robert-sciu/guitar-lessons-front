@@ -3,66 +3,70 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./customDropdown.module.scss";
 
 import PropTypes from "prop-types";
-import { hourToLocaleStringHour } from "../../../utilities/calendarUtilities";
+import {
+  getLocalDateFromDateOnly,
+  hourToLocaleStringHour,
+} from "../../../utilities/calendarUtilities";
 
 export default function CustomDropdown({
   availableReservationHours,
-  reservationStartHour,
   availableDurationValues,
-  selectedDuration,
+  availableReservationDates,
+  selectedValue,
   onSelect,
   type,
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("");
 
   const dropdownRef = useRef(null);
 
   function toggleDropdown() {
     setIsOpen((prev) => !prev);
   }
-  function handleSelect(hour) {
+  function handleSelect(value) {
     if (type === "hour") {
-      setSelectedValue(hour);
-      onSelect(hour);
+      onSelect(value);
       setIsOpen(false);
     }
     if (type === "duration") {
-      setSelectedValue(hour);
-      onSelect(hour);
+      onSelect(value);
+      setIsOpen(false);
+    }
+    if (type === "date") {
+      onSelect(value);
       setIsOpen(false);
     }
   }
 
   useEffect(() => {
     if (type === "hour" && isOpen && dropdownRef.current) {
-      const selectedIndex = availableReservationHours.indexOf(
-        selectedValue || reservationStartHour
-      );
-
+      const selectedIndex = availableReservationHours.indexOf(selectedValue);
       if (selectedIndex !== -1) {
         const itemHeight = dropdownRef.current.firstChild.offsetHeight;
         dropdownRef.current.scrollTop =
-          selectedIndex * itemHeight - itemHeight / 2;
+          selectedIndex * itemHeight - itemHeight * 1.5;
       }
     }
-  }, [
-    isOpen,
-    availableReservationHours,
-    reservationStartHour,
-    selectedValue,
-    type,
-  ]);
+  }, [isOpen, availableReservationHours, selectedValue, type]);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    if (type === "date" && isOpen && dropdownRef.current) {
+      const selectedIndex = availableReservationDates.indexOf(selectedValue);
+      if (selectedIndex !== -1) {
+        const itemHeight = dropdownRef.current.firstChild.offsetHeight;
+        dropdownRef.current.scrollTop =
+          selectedIndex * itemHeight - itemHeight * 1.5;
+      }
+    }
+  }, [isOpen, availableReservationDates, selectedValue, type]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
-    };
-
+    }
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -71,9 +75,19 @@ export default function CustomDropdown({
   return (
     <div className={styles.customDropdown}>
       <div className={styles.selected} onClick={toggleDropdown}>
-        {type === "hour" && hourToLocaleStringHour(reservationStartHour)}
-        {type === "duration" && (selectedValue || selectedDuration)}
+        {type === "hour" && hourToLocaleStringHour(selectedValue)}
+        {type === "duration" && selectedValue}
+        {type === "date" && getLocalDateFromDateOnly(selectedValue)}
       </div>
+      {type === "date" && isOpen && (
+        <ul className={styles.dropdownList} ref={dropdownRef}>
+          {availableReservationDates.map((date) => (
+            <li key={date} onClick={() => handleSelect(date)}>
+              {getLocalDateFromDateOnly(date)}
+            </li>
+          ))}
+        </ul>
+      )}
       {type === "hour" && isOpen && (
         <ul className={styles.dropdownList} ref={dropdownRef}>
           {availableReservationHours.map((hour) => (
@@ -98,9 +112,9 @@ export default function CustomDropdown({
 
 CustomDropdown.propTypes = {
   availableReservationHours: PropTypes.array,
-  reservationStartHour: PropTypes.string,
+  availableDurationValues: PropTypes.array,
+  availableReservationDates: PropTypes.array,
+  selectedValue: PropTypes.any,
   onSelect: PropTypes.func,
   type: PropTypes.string,
-  availableDurationValues: PropTypes.array,
-  selectedDuration: PropTypes.number,
 };

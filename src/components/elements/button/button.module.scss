@@ -33,6 +33,13 @@
   }
 }
 
+.redBtn {
+  background-color: $delete-red;
+  &:hover {
+    background-color: $delete-red-hover;
+  }
+}
+
 .smallBtn {
   min-width: 0 !important;
 }

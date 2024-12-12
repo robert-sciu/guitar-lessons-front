@@ -96,6 +96,9 @@ i18n
             date: "Data",
             time: "Godzina",
             duration: "Długość",
+            editFreely: "Edytuj bez ograniczeń do godziny:",
+            confirmCancel: "Czy na pewno chcesz anulować rezerwację?",
+            editing: "Edytuję...",
           },
           daysOfTheWeek: {
             0: "Niedziela",
@@ -132,7 +135,7 @@ i18n
             close: "Zamknij",
             download: "Pobierz",
             wait: "Czekaj",
-            cancelReservation: "Odwołaj lekcję",
+            cancelReservation: "Odwołaj",
             nextWeek: "Następny",
             previousWeek: "Poprzedni",
           },
@@ -255,6 +258,9 @@ i18n
             date: "Date",
             time: "Time",
             duration: "Duration",
+            editFreely: "Edit reservation freely until:",
+            confirmCancel: "Are you sure you want to cancel this reservation?",
+            editing: "Editing...",
           },
 
           daysOfTheWeek: {

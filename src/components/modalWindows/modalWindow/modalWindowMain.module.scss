@@ -2,8 +2,6 @@
 @import "../../../../styles/classes.module.scss";
 
 .modalWindowBackground {
-  // @extend .modalBackground;
-  @extend .backdropBlur;
   position: fixed;
   top: 0;
   left: 0;
@@ -38,10 +36,23 @@
       left: 0;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       flex-direction: row-reverse;
-      padding-right: $size-s;
+      padding: 0 $size-s;
       font-size: $size-l;
       color: $main-gray;
+      .closeBtn {
+        cursor: pointer;
+        transition: $basic-transition;
+
+        &:hover {
+          color: $delete-red-hover;
+        }
+      }
     }
   }
+}
+
+.blur {
+  @extend .backdropBlur;
 }

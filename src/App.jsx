@@ -47,12 +47,16 @@ const LazyFullCalendarPage = React.lazy(() =>
 
 function App() {
   const dispatch = useDispatch();
+  //veryfing token here saves a lot of trouble
+  //and keeps the code dry
+  //leave it be
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (token) {
       dispatch(verifyStoredToken({ token }));
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <BrowserRouter>
       <Routes>

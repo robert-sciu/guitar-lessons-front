@@ -10,11 +10,25 @@ function getTodayDate() {
 }
 
 function getReservationEndDate() {
-  const oneDay = 24 * 60 * 60 * 1000;
-  // 13 days is actually 14 days because we count from 0
-  return new Date(
-    new Date(getTodayDate()).getTime() + oneDay * 13
-  ).toISOString();
+  const todayDate = new Date(getTodayDate());
+  return new Date(todayDate.setDate(todayDate.getDate() + 13))
+    .toISOString()
+    .split("T")[0];
+}
+
+function getAvailableDates() {
+  const todayDate = new Date(getTodayDate());
+  const start = todayDate.setDate(todayDate.getDate() + 1);
+  const end = getReservationEndDate();
+  const dates = [];
+  for (
+    let date = new Date(start);
+    date <= new Date(end);
+    date.setDate(date.getDate() + 1)
+  ) {
+    dates.push(date.toISOString().split("T")[0]);
+  }
+  return dates;
 }
 
 /**
@@ -33,6 +47,16 @@ function fullDateToISOString(date) {
  */
 function getDateOnlyFromISOString(date) {
   return new Date(date).toISOString().split("T")[0];
+}
+
+function getLocalDateTimeFromIsoString(isoString) {
+  const date = new Date(isoString);
+  return date.toLocaleString();
+}
+
+function getLocalDateFromDateOnly(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString();
 }
 
 /**
@@ -66,6 +90,16 @@ function changeISOStringHour(isoString, newHour) {
   return new Date(
     new Date(isoString).setHours(hour, minutes, 0, 0)
   ).toISOString();
+}
+
+function changeISOStringDate(isoString, newDate) {
+  const date = new Date(new Date(isoString));
+  date.setFullYear(
+    newDate.split("-")[0],
+    newDate.split("-")[1] - 1,
+    newDate.split("-")[2]
+  );
+  return date.toISOString();
 }
 
 function checkIfReservationDurationIsAllowed(isoStart, isoEnd) {
@@ -229,7 +263,6 @@ function configWorkingHours() {
  */
 function configureEvents(events, userId) {
   const today = getTodayDate();
-
   function getColor(event) {
     const startDate = getDateOnlyFromISOString(event.start);
     if (startDate < today) {
@@ -239,12 +272,14 @@ function configureEvents(events, userId) {
     const color = event.user_id === userId ? "#10a710" : "#a5a5a5";
     return color;
   }
+
   return events.map((event) => ({
     ...event,
     editable:
       event.user_id === userId && getDateOnlyFromISOString(event.start) > today,
     title: event.user_id === userId ? t("calendar.myReservation") : event.title,
     color: getColor(event),
+    duration_min: event.duration,
   }));
 }
 
@@ -291,4 +326,8 @@ export {
   configWorkingHours,
   getLocalHourFromIsoString,
   hourToLocaleStringHour,
+  getAvailableDates,
+  changeISOStringDate,
+  getLocalDateTimeFromIsoString,
+  getLocalDateFromDateOnly,
 };

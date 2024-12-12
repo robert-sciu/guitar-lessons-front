@@ -3,4 +3,17 @@
 
 .modalWindow {
   @extend .modalWindowContent;
+
+  .dateContainer {
+    padding: $size-xxs $size-xxxs;
+    border-radius: $size-xxxxs;
+    box-shadow: $soft-shadow-gray-light;
+    cursor: pointer;
+  }
+  .buttonsContainer {
+    @extend .modalWindowButtonsContainer;
+    p {
+      display: flex;
+    }
+  }
 }

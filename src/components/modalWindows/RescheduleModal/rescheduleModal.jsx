@@ -3,8 +3,8 @@ import styles from "./rescheduleModal.module.scss";
 import PropTypes from "prop-types";
 import {
   getDateOnlyFromISOString,
-  getHourFromISOString,
-  getMinutesFromISOString,
+  getLocalDateFromDateOnly,
+  getLocalHourFromIsoString,
 } from "../../../utilities/calendarUtilities";
 import Button from "../../elements/button/button";
 
@@ -29,15 +29,15 @@ export default function RescheduleModal({
         <div>
           <p>
             {t("calendar.date")}:{" "}
-            {getDateOnlyFromISOString(reservation.start_UTC)}
+            {getLocalDateFromDateOnly(
+              getDateOnlyFromISOString(reservation.start_UTC)
+            )}
           </p>
         </div>
         <div>
           <p>
-            {t("calendar.time")}: {getHourFromISOString(reservation.start_UTC)}:
-            {getMinutesFromISOString(reservation.start_UTC) === 0
-              ? "00"
-              : getMinutesFromISOString(reservation.start_UTC)}
+            {t("calendar.time")}:
+            {getLocalHourFromIsoString(reservation.start_UTC)}
           </p>
         </div>
         <div>
@@ -50,6 +50,7 @@ export default function RescheduleModal({
         <Button
           label={t("buttons.confirm")}
           onClick={() => handleClick(true)}
+          style={"greenBtn"}
         />
         <Button
           label={t("buttons.cancel")}

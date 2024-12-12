@@ -28,6 +28,13 @@
   color: red;
 }
 
+.modalWindowButtonsContainer {
+  display: flex;
+  gap: $size-xxs;
+  width: 100%;
+  justify-content: space-between;
+}
+
 .modalWindowContent {
   z-index: 21;
   display: flex;

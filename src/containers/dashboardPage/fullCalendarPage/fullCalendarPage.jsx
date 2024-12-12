@@ -13,6 +13,7 @@ import { selectUserId } from "../../../store/userInfoSlice";
 import {
   clearFullCalendarError,
   clearTempData,
+  clearTempDataForEventDeletion,
   createCalendarEvent,
   deleteCalendarEvent,
   fetchCalendarEvents,
@@ -23,18 +24,17 @@ import {
   selectFullCalendarErrorMessage,
   selectFullCalendarErrorStatus,
   selectFullCalendarEvents,
+  selectFullCalendarEventToDeleteId,
   selectFullCalendarFetchStatus,
   selectFullCalendarLoadingStatus,
   selectFullCalendarRefetchNeeded,
   selectFullCalendarTempDataForCreation,
   selectFullCalendarTempDataForReschedule,
-  // selectFullCalendarWorkingHoursEnd,
-  // selectFullCalendarWorkingHoursStart,
   selectTodayDate,
-  // selectWokringHours2,
   setDataForEventMoreInfo,
   setFullCalendarError,
   setTempDataForEventCreation,
+  setTempDataForEventDeletion,
   setTempDataForEventReschedule,
   updateCalendarEvent,
 } from "../../../store/fullCalendarSlice";
@@ -54,17 +54,17 @@ import {
   configureRescheduleDataFromEvent,
   getDateOnlyFromISOString,
   fullDateToISOString,
-  // getMinMaxSlots,
   objectHasData,
   checkIfReservationDateIsAllowed,
   checkIfReservationTimeIsAllowed,
-  // configWorkingHours,
 } from "../../../utilities/calendarUtilities";
 
 export default function FullCalendarPage() {
   // modal windows control
   const [fetchComplete, setFetchComplete] = useState(false);
-  const [calendarPage, setCalendarPage] = useState(0);
+  // const [calendarPage, setCalendarPage] = useState(0);
+  const [prevButtonDisabled, setPrevButtonDisabled] = useState(false);
+  const [nextButtonDisabled, setNextButtonDisabled] = useState(false);
 
   const calendarRef = useRef(null);
 
@@ -80,12 +80,15 @@ export default function FullCalendarPage() {
   const hasError = useSelector(selectFullCalendarErrorStatus);
   const errorMessage = useSelector(selectFullCalendarErrorMessage);
   const eventMoreInfo = useSelector(selectFullCalendarDataForMoreInfo);
+
   const dataForEventCreation = useSelector(
     selectFullCalendarTempDataForCreation
   );
   const dataForEventReschedule = useSelector(
     selectFullCalendarTempDataForReschedule
   );
+  const dataForEventDeletion = useSelector(selectFullCalendarEventToDeleteId);
+
   const calendarStartHour = useSelector(selectAvailabilityStartHour);
   const calendarEndHour = useSelector(selectAvailabilityEndHour);
   const todayDate = useSelector(selectTodayDate);
@@ -95,10 +98,10 @@ export default function FullCalendarPage() {
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (!isFetchComplete && !isLoading && !hasError) {
+    if (!isFetchComplete && !isLoading && !hasError && userId) {
       dispatch(fetchCalendarEvents());
     }
-  }, [dispatch, isFetchComplete, isLoading, hasError]);
+  }, [dispatch, isFetchComplete, isLoading, hasError, userId]);
 
   useEffect(() => {
     if (needsRefetch) {
@@ -106,10 +109,19 @@ export default function FullCalendarPage() {
     }
   }, [dispatch, needsRefetch]);
 
-  // const { minTime, maxTime } = getMinMaxSlots(
-  //   calendarStartHour,
-  //   calendarEndHour
-  // );
+  useEffect(() => {
+    if (objectHasData(eventMoreInfo)) {
+      const calendarApi = calendarRef.current.getApi();
+      calendarApi.gotoDate(eventMoreInfo.start);
+    }
+  }, [eventMoreInfo]);
+
+  useEffect(() => {
+    if (objectHasData(dataForEventCreation)) {
+      const calendarApi = calendarRef.current.getApi();
+      calendarApi.gotoDate(dataForEventCreation.start);
+    }
+  }, [dataForEventCreation, endDay, todayDate]);
 
   function handleCreateEvent(e) {
     dispatch(clearTempData());
@@ -131,6 +143,7 @@ export default function FullCalendarPage() {
       title: t("calendar.bookIt"),
       start: start_UTC,
       end: addMinutesToIsoString(start_UTC, config.defaultReservationLength),
+      duration: config.defaultReservationLength,
     };
     dispatch(setTempDataForEventCreation(event));
   }
@@ -151,15 +164,21 @@ export default function FullCalendarPage() {
       return;
     }
     const eventData = {
-      id: event.id,
-      title: event.title,
-      start: getDateOnlyFromISOString(event.start),
+      id: Number(event.id),
+      title: t("calendar.editing"),
+      color: "#10a710a1",
+      user_id: event.extendedProps.user_id,
+      start: fullDateToISOString(event.start),
+      end: fullDateToISOString(event.end),
+      duration: event.extendedProps.duration_min,
+      freeEditExpiry: event.extendedProps.free_edit_expiry,
     };
     dispatch(setDataForEventMoreInfo(eventData));
   }
 
-  function handleEventReschedule(e) {
-    const data = configureRescheduleDataFromEvent(e.event);
+  function handleEventReschedule(e, isFormatted = false) {
+    const data = isFormatted ? e : configureRescheduleDataFromEvent(e.event);
+
     const { start_UTC, end_UTC } = data;
     if (!checkIfReservationDurationIsAllowed(start_UTC, end_UTC)) {
       dispatch(setFullCalendarError(t("errors.invalidDuration")));
@@ -191,15 +210,30 @@ export default function FullCalendarPage() {
   }
 
   function handleGoNext() {
-    setCalendarPage((prev) => prev + 1);
+    setPrevButtonDisabled(false);
     const calendarApi = calendarRef.current.getApi();
     calendarApi.next();
   }
 
   function handleGoPrev() {
-    setCalendarPage((prev) => prev - 1);
+    setNextButtonDisabled(false);
     const calendarApi = calendarRef.current.getApi();
     calendarApi.prev();
+  }
+
+  function handleDatesSet(info) {
+    const firstVisibleDate = info.start; // First displayed date
+    const lastVisibleDate = info.end; // Last displayed date
+    if (new Date(firstVisibleDate) < new Date(todayDate)) {
+      setPrevButtonDisabled(true);
+    } else {
+      setPrevButtonDisabled(false);
+    }
+    if (new Date(lastVisibleDate) > new Date(endDay)) {
+      setNextButtonDisabled(true);
+    } else {
+      setNextButtonDisabled(false);
+    }
   }
 
   const handleDayCellClassNames = (info) => {
@@ -231,13 +265,13 @@ export default function FullCalendarPage() {
           <Button
             label={t("buttons.previousWeek")}
             onClick={handleGoPrev}
-            disabled={calendarPage === 0}
+            disabled={prevButtonDisabled}
           />
 
           <Button
             label={t("buttons.nextWeek")}
             onClick={handleGoNext}
-            disabled={calendarPage === 2}
+            disabled={nextButtonDisabled}
           />
         </div>
 
@@ -256,7 +290,11 @@ export default function FullCalendarPage() {
               center: "title",
               right: null,
             }}
-            events={[...fullCalendarEvents, dataForEventCreation]}
+            events={[
+              ...fullCalendarEvents,
+              dataForEventCreation,
+              eventMoreInfo,
+            ]}
             eventDragMinDistance={5}
             eventOverlap={false}
             eventDrop={handleEventDragStop}
@@ -266,33 +304,53 @@ export default function FullCalendarPage() {
             eventColor={"#10a710"}
             locale={"pl"}
             dayCellClassNames={handleDayCellClassNames}
+            // validRange={{
+            //   start: todayDate,
+            //   end: endDay,
+            // }}
             // firstDay={1}
+            datesSet={handleDatesSet}
           />
         )}
       </div>
 
-      {objectHasData(dataForEventCreation) && (
+      {!hasError && objectHasData(dataForEventCreation) && (
         <ModalWindowMain
           modalType={"reservation"}
           data={dataForEventCreation}
           onSubmit={createCalendarEvent}
           onCancel={clearTempData}
+          disableBlur={true}
         />
       )}
-      {objectHasData(dataForEventReschedule) && (
+      {!hasError && objectHasData(dataForEventReschedule) && (
         <ModalWindowMain
           modalType={"reschedule"}
           data={dataForEventReschedule}
           onSubmit={updateCalendarEvent}
           onCancel={clearTempData}
+          disableBlur={true}
         />
       )}
-      {objectHasData(eventMoreInfo) && (
+      {!hasError &&
+        !objectHasData(dataForEventReschedule) &&
+        !objectHasData(dataForEventDeletion) &&
+        objectHasData(eventMoreInfo) && (
+          <ModalWindowMain
+            modalType={"moreInfo"}
+            data={eventMoreInfo}
+            onSubmit={handleEventReschedule}
+            onDeleteSubmit={setTempDataForEventDeletion}
+            onCancel={clearTempData}
+            disableBlur={true}
+          />
+        )}
+      {!hasError && objectHasData(dataForEventDeletion) && (
         <ModalWindowMain
-          modalType={"moreInfo"}
-          data={eventMoreInfo}
+          modalType={"confirmDelete"}
+          data={dataForEventDeletion}
           onDeleteSubmit={deleteCalendarEvent}
-          onCancel={clearTempData}
+          onCancel={clearTempDataForEventDeletion}
         />
       )}
       {hasError && (
