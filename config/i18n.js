@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
+import config from "./config";
 
 i18n
   .use(LanguageDetector)
@@ -18,15 +19,25 @@ i18n
           mainNav: {
             home: "Start",
             login: "Zaloguj się",
+            register: "Zarejestruj się",
           },
-          loginForm: {
+          loginRegisterForm: {
+            register: "Zarejestruj się",
             login: "Zaloguj się",
-            username: "Nazwa użytkownika",
+            username: "Nazwa użytkownika",
+            usernameError: `Wprowadź poprawnie nazwę użytkownika (min. ${config.minUsernameLength} znaków, max. ${config.maxUsernameLength} znaków, duże i małe litery oraz cyfry)`,
             email: "E-mail",
             emailError: "Wprowadź poprawny adres e-mail",
             password: "Hasło",
-            passwordError: "Wprowadź poprawne hasło",
+            passwordError: `Wprowadź poprawne hasło (min. ${config.minPasswordLength} znaków, max. ${config.maxPasswordLength} znaków)`,
             submitBtn: "Zaloguj",
+            notMemberYet: "Nie masz jeszcze konta?",
+            registrationSuccess: "Rejestracja przebiegła pomyslnie",
+            goToLogin: "Przejdz do logowania",
+            contactUs: "Skontaktuj się z nami",
+            redirectToLogin: "Zostaniesz automatycznie przekierowany za",
+            finishRegistration:
+              "Sprawdź email i kliknij link, aby zakonczyc rejestracje",
           },
           dashboardNav: {
             welcome: "Witaj",
@@ -138,6 +149,7 @@ i18n
             cancelReservation: "Odwołaj",
             nextWeek: "Następny",
             previousWeek: "Poprzedni",
+            register: "Zarejestruj",
           },
           modals: {
             codeRequired: "Kod wymagany",
@@ -173,15 +185,25 @@ i18n
           mainNav: {
             home: "Home",
             login: "Login",
+            register: "Register",
           },
-          loginForm: {
+          loginRegisterForm: {
+            register: "Register",
             login: "Login",
             username: "Username",
+            usernameError: `Enter a valid username (min ${config.minUsernameLength} characters, max ${config.maxUsernameLength} characters, uppercase and lowercase letters and numbers)`,
             email: "Email",
             emailErro: "Enter a valid email",
             password: "Password",
-            passwordError: "Enter a valid password",
+            passwordError: `Enter a valid password (min ${config.minPasswordLength} characters, max ${config.maxPasswordLength} characters)`,
             submitBtn: "Login",
+            notMemberYet: "Not a member yet?",
+            registrationSuccess: "Registration completed successfully",
+            goToLogin: "Go to login",
+            contactUs: "Contact us",
+            redirectToLogin: "You will be automatically redirected in",
+            finishRegistration:
+              "Check your email and click the link to finish registration",
           },
 
           dashboardNav: {
@@ -298,6 +320,7 @@ i18n
             download: "Download",
             wait: "Wait",
             cancelReservation: "Cancel reservation",
+            register: "Register",
           },
           modals: {
             codeRequired: "Code required",

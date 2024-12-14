@@ -71,6 +71,16 @@ function addMinutesToIsoString(isoString, minutes) {
   ).toISOString();
 }
 
+function addDaysToIsoString(isoString, days) {
+  return new Date(
+    new Date(isoString).getTime() + days * 24 * 60 * 60 * 1000
+  ).toISOString();
+}
+
+function addDaysToLocalDate(date, days) {
+  return new Date(new Date(date).getTime() + days * 24 * 60 * 60 * 1000);
+}
+
 function getHourFromISOString(isoString) {
   return new Date(isoString).getHours();
 }
@@ -330,4 +340,6 @@ export {
   changeISOStringDate,
   getLocalDateTimeFromIsoString,
   getLocalDateFromDateOnly,
+  addDaysToIsoString,
+  addDaysToLocalDate,
 };

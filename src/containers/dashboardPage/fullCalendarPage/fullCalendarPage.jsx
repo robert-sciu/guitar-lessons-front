@@ -57,6 +57,7 @@ import {
   objectHasData,
   checkIfReservationDateIsAllowed,
   checkIfReservationTimeIsAllowed,
+  addDaysToLocalDate,
 } from "../../../utilities/calendarUtilities";
 
 export default function FullCalendarPage() {
@@ -65,6 +66,7 @@ export default function FullCalendarPage() {
   // const [calendarPage, setCalendarPage] = useState(0);
   const [prevButtonDisabled, setPrevButtonDisabled] = useState(false);
   const [nextButtonDisabled, setNextButtonDisabled] = useState(false);
+  const [endDate, setEndDate] = useState(null);
 
   const calendarRef = useRef(null);
 
@@ -93,6 +95,7 @@ export default function FullCalendarPage() {
   const calendarEndHour = useSelector(selectAvailabilityEndHour);
   const todayDate = useSelector(selectTodayDate);
   const endDay = useSelector(selectEndDay);
+  // console.log(endDay);
   const userId = useSelector(selectUserId);
 
   const { t } = useTranslation();
@@ -121,7 +124,7 @@ export default function FullCalendarPage() {
       const calendarApi = calendarRef.current.getApi();
       calendarApi.gotoDate(dataForEventCreation.start);
     }
-  }, [dataForEventCreation, endDay, todayDate]);
+  }, [dataForEventCreation, todayDate]);
 
   function handleCreateEvent(e) {
     dispatch(clearTempData());
@@ -237,15 +240,16 @@ export default function FullCalendarPage() {
   }
 
   const handleDayCellClassNames = (info) => {
-    const date = info.date.toISOString(); // Format date as YYYY-MM-DD
-
-    const dateOnly = getDateOnlyFromISOString(date);
-    const endDateOnly = getDateOnlyFromISOString(endDay);
-
-    if (dateOnly >= endDateOnly) {
+    if (info.isPast) {
       return ["unavailable"];
     }
-    if (dateOnly < todayDate) {
+    if (info.isToday) {
+      if (!endDate) {
+        setEndDate(addDaysToLocalDate(info.date, 14));
+      }
+      return ["today"];
+    }
+    if (info.isFuture && info.date >= endDate) {
       return ["unavailable"];
     }
     return ["available"];
@@ -304,11 +308,6 @@ export default function FullCalendarPage() {
             eventColor={"#10a710"}
             locale={"pl"}
             dayCellClassNames={handleDayCellClassNames}
-            // validRange={{
-            //   start: todayDate,
-            //   end: endDay,
-            // }}
-            // firstDay={1}
             datesSet={handleDatesSet}
           />
         )}

@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
  * @param {boolean} [spinnerOnly=false] - Spinner only for use inside small components like buttons.
  * @param {string} [size=undefined] - Size of the spinner, options are "sizeS" "sizeM" "sizeL" "sizeXL".
  * @param {boolean} [fadeOut=false] - Fades out the loading state and sets the display to none.
+ * @param {boolean} [inactive=false] - Doesn't show the loading state at all. Use if user already visited page and data is fetched
  * @note dont use fullscreen and spinnerOnly together
  *
  * @return {ReactElement}

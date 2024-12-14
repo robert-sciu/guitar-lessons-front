@@ -7,7 +7,12 @@ import { useSelector } from "react-redux";
 import { selectUserInfoLoadingStatus } from "../../../store/userInfoSlice";
 import Button from "../../elements/button/button";
 
-export default function CodeRequiredModal({ onSubmit, onCancel, dispatch }) {
+export default function CodeRequiredModal({
+  onSubmit,
+  onCancel,
+  dispatch,
+  additionalInfo,
+}) {
   const { t } = useTranslation();
   const [confirmationCode, setConfirmationCode] = useState("");
   const isLoading = useSelector(selectUserInfoLoadingStatus);
@@ -20,6 +25,7 @@ export default function CodeRequiredModal({ onSubmit, onCancel, dispatch }) {
   return (
     <div className={styles.modalWindow} onClick={(e) => e.stopPropagation()}>
       <h4>{t("modals.codeRequired")}</h4>
+      <p>{additionalInfo}</p>
       <input
         type="text"
         onChange={(e) => setConfirmationCode(e.target.value)}
@@ -42,4 +48,5 @@ CodeRequiredModal.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   dispatch: PropTypes.func.isRequired,
+  additionalInfo: PropTypes.any,
 };

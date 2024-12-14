@@ -13,13 +13,16 @@ import ErrorWindow from "../errorWindow/errorWindow";
 import ReservationDeleteModal from "../reservationDeleteModal/reservationDeleteModal";
 import { clearTempData } from "../../../store/fullCalendarSlice";
 import { classNameFormatter } from "../../../utilities/utilities";
+import InfoModal from "../infoModal/infoModal";
 export default function ModalWindowMain({
   modalType,
   onSubmit,
+  OnConfirm,
   onCancel,
   onDeleteSubmit,
   data,
   disableBlur,
+  additionalInfo,
 }) {
   const dispatch = useDispatch();
   const nodeRef = useRef(null);
@@ -101,7 +104,11 @@ export default function ModalWindowMain({
               onSubmit={onSubmit}
               onCancel={onCancel}
               dispatch={dispatch}
+              additionalInfo={additionalInfo}
             />
+          )}
+          {modalType === "info" && (
+            <InfoModal info={data} onConfirm={OnConfirm} />
           )}
           {modalType === "error" && (
             <ErrorWindow error={data} onCancel={onCancel} dispatch={dispatch} />
@@ -120,4 +127,6 @@ ModalWindowMain.propTypes = {
   onDeleteSubmit: PropTypes.func,
   data: PropTypes.any,
   disableBlur: PropTypes.bool,
+  OnConfirm: PropTypes.func,
+  additionalInfo: PropTypes.any,
 };

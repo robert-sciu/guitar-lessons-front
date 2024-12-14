@@ -9,6 +9,8 @@ export const loadStateSlice = createSlice({
       completedUserTasksPage: false,
       userTasksPage: false,
       fullCalendarPage: false,
+      registerPage: false,
+      loginPage: false,
     },
   },
   reducers: {
@@ -27,6 +29,12 @@ export const loadStateSlice = createSlice({
     setFullCalendarPageLoaded: (state) => {
       state.loadState.fullCalendarPage = true;
     },
+    setRegisterPageLoaded: (state) => {
+      state.loadState.registerPage = true;
+    },
+    setLoginPageLoaded: (state) => {
+      state.loadState.loginPage = true;
+    },
   },
 });
 
@@ -36,6 +44,8 @@ export const {
   setCompletedUserTasksPageLoaded,
   setUserTasksPageLoaded,
   setFullCalendarPageLoaded,
+  setRegisterPageLoaded,
+  setLoginPageLoaded,
 } = loadStateSlice.actions;
 
 export const selectDashboardHomePageLoaded = (state) =>
@@ -52,5 +62,11 @@ export const selectUserTasksPageLoaded = (state) =>
 
 export const selectFullCalendarPageLoaded = (state) =>
   state.loadState.loadState.fullCalendarPage;
+
+export const selectRegisterPageLoaded = (state) =>
+  state.loadState.loadState.registerPage;
+
+export const selectLoginPageLoaded = (state) =>
+  state.loadState.loadState.loginPage;
 
 export default loadStateSlice.reducer;

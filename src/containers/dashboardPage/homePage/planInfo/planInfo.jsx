@@ -26,9 +26,9 @@ export default function PlanInfo({ planInfo }) {
   const { t } = useTranslation();
 
   const date = t(`daysOfTheWeek.${planInfo.permanent_reservation_weekday}`);
-  const time = utcTimeToLocalTimeString(
-    planInfo.permanent_reservation_start_hour_UTC
-  );
+  const time =
+    planInfo.permanent_reservation_start_hour_UTC &&
+    utcTimeToLocalTimeString(planInfo.permanent_reservation_start_hour_UTC);
   const hasPermanentReservation = planInfo.has_permanent_reservation;
 
   return (

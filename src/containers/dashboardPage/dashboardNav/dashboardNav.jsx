@@ -52,7 +52,14 @@ export default function DashboardNav() {
     userInfoIsLoading,
     userInfoHasError,
     dispatch,
+    navigate,
   ]);
+
+  useEffect(() => {
+    if (tokenVerificationComplete && !isAuthenticated) {
+      navigate("/login");
+    }
+  });
 
   useEffect(() => {
     if (userRefetchNeeded) {

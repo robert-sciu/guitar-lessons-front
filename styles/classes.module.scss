@@ -8,6 +8,38 @@
   // transition: $reveal-transition;
 }
 
+.fullscreenCardContainer {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  // height: 50%;
+  padding: $size-xxxl;
+  background: $card-background-gradient;
+
+  border-radius: $size-xxxxs;
+  justify-content: center;
+  align-items: center;
+}
+
+.formContainer {
+  // position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: $size-m;
+  align-items: center;
+  width: 60%;
+
+  justify-content: center;
+}
+.inputsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $size-m;
+  align-items: center;
+  // justify-content: center;
+  width: 100%;
+}
+
 .backdropBlur {
   content: "";
   position: absolute;

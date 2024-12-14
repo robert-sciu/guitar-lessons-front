@@ -22,3 +22,11 @@
 .available {
   cursor: pointer;
 }
+
+/* .fc-day-today .fc-timegrid-now-indicator-container {
+  background-color: #c0c0c0 !important;
+} */
+
+.today {
+  background-color: #99999980 !important;
+}

@@ -3,10 +3,15 @@
 
 .mainContainer {
   @extend .fullscreenCardContainer;
+
   .formContainer {
     @extend .formContainer;
     .inputsContainer {
       @extend .inputsContainer;
+    }
+    .finishRegistrationContainer {
+      text-align: center;
+      padding: $size-xxxxl 0;
     }
   }
 }

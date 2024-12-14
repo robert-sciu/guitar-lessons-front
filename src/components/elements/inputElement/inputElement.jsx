@@ -14,17 +14,30 @@ import PropTypes from "prop-types";
  *
  * @return {ReactElement} - The rendered input element.
  */
-export default function InputElement({ type, value, onChange, width }) {
+export default function InputElement({
+  type,
+  value,
+  label = false,
+  inputError = false,
+  onChange,
+  width,
+}) {
   return (
-    <input
+    <div
       className={classNameFormatter({
         styles,
-        classNames: ["inputElement", width && `width-${width}`],
+        classNames: ["inputElementContainer", width && `width-${width}`],
       })}
-      type={type}
-      value={value}
-      onChange={onChange}
-    />
+    >
+      {label && <label className={styles.label}>{label}:</label>}
+      <input
+        className={styles.inputElement}
+        type={type}
+        value={value}
+        onChange={onChange}
+      />
+      {inputError && <p className={styles.inputError}>{inputError}</p>}
+    </div>
   );
 }
 
@@ -33,4 +46,6 @@ InputElement.propTypes = {
   value: PropTypes.any,
   onChange: PropTypes.func,
   width: PropTypes.any,
+  inputError: PropTypes.string,
+  label: PropTypes.string,
 };

@@ -3,13 +3,25 @@ import { Suspense } from "react";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.scss";
-import { useDispatch } from "react-redux";
-import { verifyStoredToken } from "./store/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectToken,
+  setTokenVerificationComplete,
+  verifyStoredToken,
+} from "./store/authSlice";
 
 import LoadingState from "./components/loadingState/loadingState";
 
 const LazyMainNav = React.lazy(() =>
   import("./containers/mainPage/mainNav/mainNav")
+);
+
+const LazyRegisterForm = React.lazy(() =>
+  import("./containers/mainPage/registerForm/registerForm")
+);
+
+const LazyVerificationPage = React.lazy(() =>
+  import("./containers/mainPage/verificationPage/verificationPage")
 );
 
 const LazyLoginForm = React.lazy(() =>
@@ -37,9 +49,6 @@ const LazyCompletedUserTasksPage = React.lazy(() =>
     "./containers/dashboardPage/completedUserTasksPage/completedUserTasksMain/completedUserTasksMain"
   )
 );
-// const LazyCalendarPage = React.lazy(() =>
-//   import("./containers/dashboardPage/calendar/calendarMain/calendarMain")
-// );
 
 const LazyFullCalendarPage = React.lazy(() =>
   import("./containers/dashboardPage/fullCalendarPage/fullCalendarPage")
@@ -50,11 +59,12 @@ function App() {
   //veryfing token here saves a lot of trouble
   //and keeps the code dry
   //leave it be
+  const token = useSelector(selectToken);
+
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
     if (token) {
       dispatch(verifyStoredToken({ token }));
-    }
+    } else dispatch(setTokenVerificationComplete());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -68,6 +78,22 @@ function App() {
             </Suspense>
           }
         >
+          <Route
+            path="/register"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <LazyRegisterForm />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/verifyUser"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <LazyVerificationPage />
+              </Suspense>
+            }
+          />
           <Route
             path="/login"
             element={

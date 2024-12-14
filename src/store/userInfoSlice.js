@@ -10,6 +10,30 @@ import {
 
 import apiClient from "../api/api";
 
+export const registerUser = createAsyncThunk(
+  "userInfo/createUser",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post("/users", data);
+      return extractResponseData(response);
+    } catch (error) {
+      return rejectWithValue(extractErrorResponse(error));
+    }
+  }
+);
+
+export const verifyUser = createAsyncThunk(
+  "userInfo/verifyUser",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post("/users/verifyUser", data);
+      return extractResponseData(response);
+    } catch (error) {
+      return rejectWithValue(extractErrorResponse(error));
+    }
+  }
+);
+
 export const fetchUserInfo = createAsyncThunk(
   "userInfo/fetchUserInfo",
   async (_, { getState, rejectWithValue }) => {
@@ -73,8 +97,9 @@ export const userInfoSlice = createSlice({
     hasError: false,
     error: null,
     refetchNeeded: false,
-
     fetchComplete: false,
+    userCreated: false,
+    userVerified: false,
 
     emailChangeConfirmationCodeRequired: false,
     // emailChangeResponse: "",
@@ -92,6 +117,7 @@ export const userInfoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
       .addCase(fetchUserInfo.pending, managePendingState)
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
         manageFulfilledState(state);
@@ -125,7 +151,20 @@ export const userInfoSlice = createSlice({
       .addCase(updateEmail.rejected, (state, action) => {
         manageRejectedState(state, action);
         state.emailChangeConfirmationCodeRequired = false;
-      });
+      })
+      .addCase(registerUser.pending, managePendingState)
+      .addCase(registerUser.fulfilled, (state) => {
+        manageFulfilledState(state);
+        state.userCreated = true;
+      })
+      .addCase(registerUser.rejected, manageRejectedState)
+
+      .addCase(verifyUser.pending, managePendingState)
+      .addCase(verifyUser.fulfilled, (state) => {
+        manageFulfilledState(state);
+        state.userVerified = true;
+      })
+      .addCase(verifyUser.rejected, manageRejectedState);
   },
 });
 
@@ -136,6 +175,10 @@ export const selectUserId = (state) => state.userInfo.userInfo.id;
 export const selectUserInfoMinimumDifficultyLevel = (state) =>
   state.userInfo.userInfo.minimum_task_level_to_display;
 export const selectUserInfoLoadingStatus = (state) => state.userInfo.isLoading;
+export const selectUserInfoCreationStatus = (state) =>
+  state.userInfo.userCreated;
+export const selectUserInfoVerificationStatus = (state) =>
+  state.userInfo.userVerified;
 //prettier-ignore
 export const selectUserInfoFetchStatus = (state) => state.userInfo.fetchComplete;
 export const selectUserInfoErrorStatus = (state) => state.userInfo.hasError;

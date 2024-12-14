@@ -14,6 +14,9 @@ export default function MainNav() {
           <li>
             <NavLink to="/login">{t("mainNav.login")}</NavLink>
           </li>
+          <li>
+            <NavLink to="/register">{t("mainNav.register")}</NavLink>
+          </li>
         </ul>
       </div>
       <div className={styles.outletContainer}>
