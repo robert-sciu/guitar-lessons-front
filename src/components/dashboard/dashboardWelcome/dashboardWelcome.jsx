@@ -19,5 +19,5 @@ export default function DashboardWelcome({ username }) {
 }
 
 DashboardWelcome.propTypes = {
-  username: PropTypes.string.isRequired,
+  username: PropTypes.string,
 };

@@ -62,10 +62,9 @@ export const fetchUserInfo = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "userInfo/updateUser",
   async (data, { getState, rejectWithValue }) => {
-    const { id, ...updateData } = data;
     try {
       checkAuthenticated(getState);
-      await apiClient.patch(`/users/${id}`, updateData);
+      await apiClient.patch(`/users`, data);
       return true;
     } catch (error) {
       return rejectWithValue(extractErrorResponse(error));
@@ -209,5 +208,7 @@ export const selectUserRefetchNeeded = (state) => state.userInfo.refetchNeeded;
 
 export const selectEmailChangeConfirmationCodeRequired = (state) =>
   state.userInfo.emailChangeConfirmationCodeRequired;
+
+// export const selectUserInfoUserRole = (state) => state.userInfo.userInfo.role;
 
 export default userInfoSlice.reducer;

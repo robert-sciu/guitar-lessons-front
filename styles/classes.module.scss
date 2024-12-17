@@ -105,3 +105,19 @@
   gap: $size-xs;
   font-weight: 500;
 }
+
+.navLinksContainer {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: $size-xxxl;
+  list-style: none;
+}
+
+.navLink {
+  display: flex;
+  gap: $size-xxxxs;
+  flex-direction: column;
+  list-style: none;
+}

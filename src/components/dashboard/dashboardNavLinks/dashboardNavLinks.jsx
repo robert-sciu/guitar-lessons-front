@@ -10,11 +10,12 @@ import {
   HiCalendarDays,
   HiOutlineCurrencyDollar,
   HiOutlinePower,
+  HiMiniWrenchScrewdriver,
 } from "react-icons/hi2";
 import styles from "./dashboardNavLinks.module.scss";
 import PropTypes from "prop-types";
 
-export default function DashboardNavLinks({ onLogout }) {
+export default function DashboardNavLinks({ onLogout, showAdminLink = false }) {
   const { t } = useTranslation();
   return (
     <div className={styles.dashboardNavLinksContainer}>
@@ -49,6 +50,13 @@ export default function DashboardNavLinks({ onLogout }) {
           label={t("dashboardNav.payments")}
           icon={<HiOutlineCurrencyDollar />}
         />
+        {showAdminLink && (
+          <NavLinkBtn
+            to="/admin"
+            label={t("dashboardNav.admin")}
+            icon={<HiMiniWrenchScrewdriver />}
+          />
+        )}
       </ul>
       <NavLinkBtn
         to="/"
@@ -62,4 +70,5 @@ export default function DashboardNavLinks({ onLogout }) {
 
 DashboardNavLinks.propTypes = {
   onLogout: PropTypes.func.isRequired,
+  showAdminLink: PropTypes.bool,
 };

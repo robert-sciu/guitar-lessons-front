@@ -49,6 +49,11 @@ i18n
             calendar: "kalendarz",
             payments: "płatności",
             dashboard: "Centrum Dowodzenia",
+            admin: "Panel Admina",
+          },
+          adminNav: {
+            dashboard: "Panel standardowy",
+            users: "Użytkownicy",
           },
           userInfo: {
             basicInfo: "Podstawowe Informacje",
@@ -222,6 +227,7 @@ i18n
             profileStatus: "Profile status",
             active: "active",
             inactive: "inactive",
+            admin: "Admin",
           },
 
           userInfo: {

@@ -15,10 +15,10 @@ import {
   selectUserRefetchNeeded,
 } from "../../../store/userInfoSlice";
 import DashboardWelcome from "../../../components/dashboard/dashboardWelcome/dashboardWelcome";
-import DashboardNavLinks from "../../../components/dashboard/dashboardNavLinks/dashboardNavLinks";
+import AdminNavLinks from "../../../components/admin/adminNavLinks/adminNavLinks";
 import DashboardNavContainer from "../../../components/dashboardNavContainer/dashboardNavContainer";
 
-export default function DashboardNav() {
+export default function AdminNav() {
   const [fetchComplete, setFetchComplete] = useState(false);
 
   const dispatch = useDispatch();
@@ -60,7 +60,7 @@ export default function DashboardNav() {
     if (tokenVerificationComplete && !isAuthenticated) {
       navigate("/login");
     }
-  });
+  }, [tokenVerificationComplete, isAuthenticated, navigate, userInfo]);
 
   useEffect(() => {
     if (userRefetchNeeded) {
@@ -70,9 +70,12 @@ export default function DashboardNav() {
 
   useEffect(() => {
     if (userInfoFetchComplete) {
+      if (userInfo.role !== "admin") {
+        navigate("/");
+      }
       setFetchComplete(true);
     }
-  }, [userInfoFetchComplete]);
+  }, [userInfoFetchComplete, userInfo, navigate]);
 
   function handleLogout(e) {
     e.preventDefault();
@@ -81,14 +84,23 @@ export default function DashboardNav() {
   }
 
   return (
+    // <div className={styles.dashboardContainer}>
+    //   <div
+    //     className={classNameFormatter({
+    //       styles,
+    //       classNames: ["dashboardNav", fetchComplete ? "show" : "hide"],
+    //     })}
+    //   >
+    //     {fetchComplete && <DashboardWelcome username={userInfo.username} />}
+    //     <AdminNavLinks onLogout={handleLogout} />
+    //   </div>
+    //   <div className={styles.dashboardContentContainer}>
+    //     {fetchComplete && <Outlet />}
+    //   </div>
+    // </div>
     <DashboardNavContainer
-      dashboardWelcome={<DashboardWelcome username={userInfo.username} />}
-      navLinks={
-        <DashboardNavLinks
-          onLogout={handleLogout}
-          showAdminLink={userInfo?.role === "admin"}
-        />
-      }
+      dashboardWelcome={<DashboardWelcome username={`Ekscelencjo`} />}
+      navLinks={<AdminNavLinks onLogout={handleLogout} />}
       fetchComplete={fetchComplete}
     />
   );

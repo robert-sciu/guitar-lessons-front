@@ -58,6 +58,12 @@ const LazyFullCalendarPage = React.lazy(() =>
   import("./containers/dashboardPage/fullCalendarPage/fullCalendarPage")
 );
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+const LazyAdminNav = React.lazy(() =>
+  import("./containers/adminPage/adminNav/adminNav")
+);
+
 function App() {
   const dispatch = useDispatch();
   //veryfing token here saves a lot of trouble
@@ -165,6 +171,14 @@ function App() {
             }
           />
         </Route>
+        <Route
+          path="/admin"
+          element={
+            <Suspense fallback={<LoadingState />}>
+              <LazyAdminNav />
+            </Suspense>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
