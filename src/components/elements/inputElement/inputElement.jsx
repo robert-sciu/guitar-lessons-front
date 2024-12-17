@@ -21,6 +21,8 @@ export default function InputElement({
   inputError = false,
   onChange,
   width,
+  name = "",
+  autoComplete = "off",
 }) {
   return (
     <div
@@ -33,6 +35,8 @@ export default function InputElement({
       <input
         className={styles.inputElement}
         type={type}
+        name={name}
+        autoComplete={autoComplete}
         value={value}
         onChange={onChange}
       />
@@ -48,4 +52,6 @@ InputElement.propTypes = {
   width: PropTypes.any,
   inputError: PropTypes.string,
   label: PropTypes.string,
+  name: PropTypes.string,
+  autoComplete: PropTypes.string,
 };

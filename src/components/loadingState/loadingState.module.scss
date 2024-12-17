@@ -9,12 +9,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: $main-gray-lightest;
 
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: $main-gray-lightest;
   z-index: 100;
   .spinner {
     animation: spin 1.5s linear infinite;

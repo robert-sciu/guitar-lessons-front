@@ -1,0 +1,51 @@
+@import "../../../../styles/variables.module.scss";
+@import "../../../../styles/classes.module.scss";
+
+.mainContainer {
+  @extend .fullscreenCardContainer;
+  .successContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $size-m;
+    padding: $size-xl 0;
+
+    .successIcon {
+      font-size: $size-xxxxl;
+      color: $main-green;
+      // clip-path: polygon(
+      //   100% 100%,
+      //   100% 100%,
+      //   100% 100%,
+      //   100% 100%
+      // ); // Hidden state
+      animation: diagonalReveal 1.4s ease-out forwards; // Play reveal animation
+    }
+    .goToLogin {
+      color: $main-gray-dark;
+      text-decoration: none;
+      cursor: pointer;
+      &:hover,
+      &:active {
+        color: $main-gray-darkest;
+      }
+    }
+  }
+}
+
+@keyframes diagonalReveal {
+  0% {
+    clip-path: circle(0%);
+    opacity: 0;
+  }
+
+  90% {
+    clip-path: circle(100%);
+    opacity: 1;
+  }
+  100% {
+    clip-path: circle(60%);
+    opacity: 1;
+  }
+}

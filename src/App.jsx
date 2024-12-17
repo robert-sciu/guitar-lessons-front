@@ -5,7 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.scss";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectToken,
+  selectAuthToken,
   setTokenVerificationComplete,
   verifyStoredToken,
 } from "./store/authSlice";
@@ -22,6 +22,10 @@ const LazyRegisterForm = React.lazy(() =>
 
 const LazyVerificationPage = React.lazy(() =>
   import("./containers/mainPage/verificationPage/verificationPage")
+);
+
+const LazyActivationPage = React.lazy(() =>
+  import("./containers/mainPage/activationPage/activationPage")
 );
 
 const LazyLoginForm = React.lazy(() =>
@@ -59,7 +63,7 @@ function App() {
   //veryfing token here saves a lot of trouble
   //and keeps the code dry
   //leave it be
-  const token = useSelector(selectToken);
+  const token = useSelector(selectAuthToken);
 
   useEffect(() => {
     if (token) {
@@ -91,6 +95,14 @@ function App() {
             element={
               <Suspense fallback={<LoadingState />}>
                 <LazyVerificationPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/activateUser"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <LazyActivationPage />
               </Suspense>
             }
           />

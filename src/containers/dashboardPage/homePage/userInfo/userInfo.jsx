@@ -79,13 +79,9 @@ export default function UserInfo({ userInfo }) {
         <InfoTile
           label={t("userInfo.profileStatus")}
           content={
-            userInfo.is_confirmed_by_admin
-              ? t("userInfo.active")
-              : t("userInfo.inactive")
+            userInfo.is_active ? t("userInfo.active") : t("userInfo.inactive")
           }
-          contentClassNames={
-            userInfo.is_confirmed_by_admin ? ["active"] : ["inactive"]
-          }
+          contentClassNames={userInfo.is_active ? ["active"] : ["inactive"]}
         />
         <div className={styles.userData}>
           <p>{t("userInfo.level")}:</p>

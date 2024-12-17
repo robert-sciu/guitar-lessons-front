@@ -10,6 +10,9 @@ import { Link, useNavigate } from "react-router-dom";
 import LoadingState from "../../../components/loadingState/loadingState";
 import { useTranslation } from "react-i18next";
 import ModalWindowMain from "../../../components/modalWindows/modalWindow/modalWindowMain";
+import { IoCheckmarkCircle } from "react-icons/io5";
+
+import styles from "./verificationPage.module.scss";
 
 export default function VerificationPage() {
   const [secondsToRedirection, setSecondsToRedirection] = useState(5);
@@ -40,7 +43,7 @@ export default function VerificationPage() {
     if (userIsVerified) {
       setTimeout(() => {
         navigate("/login");
-      }, 5000);
+      }, 6500);
     }
   }, [userIsVerified, navigate]);
 
@@ -56,14 +59,23 @@ export default function VerificationPage() {
   }, [secondsToRedirection]);
 
   return (
-    <div>
+    <div className={styles.mainContainer}>
       {userIsVerified && (
-        <div>
+        <div className={styles.successContainer}>
+          <div className={styles.successIcon}>
+            {secondsToRedirection === 0 ? (
+              <LoadingState spinnerOnly={true} />
+            ) : (
+              <IoCheckmarkCircle />
+            )}
+          </div>
           <p>{t("loginRegisterForm.verificationSuccess")}</p>
           <p>
-            {t("loginRegisterForm.redirectToLogin")}: {secondsToRedirection}
+            {t("loginRegisterForm.redirectToLogin")}: {secondsToRedirection}s
           </p>
-          <Link to="/login">{t("loginRegisterForm.goToLogin")}</Link>
+          <Link className={styles.goToLogin} to="/login">
+            {t("loginRegisterForm.goToLogin")}
+          </Link>
         </div>
       )}
       {hasError && (

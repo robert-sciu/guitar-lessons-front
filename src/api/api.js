@@ -1,7 +1,7 @@
 import axios from "axios";
 const api_url = import.meta.env.VITE_API_BASE_URL;
 import store from "../store";
-import { logoutUser, selectToken, setToken } from "../store/authSlice";
+import { logoutUser, selectAuthToken, setToken } from "../store/authSlice";
 import i18n from "../../config/i18n";
 const currentLanguage = i18n.language;
 
@@ -17,7 +17,7 @@ const apiClient = axios.create({
 // Request interceptor to add access token to headers
 apiClient.interceptors.request.use(
   (config) => {
-    const token = selectToken(store.getState());
+    const token = selectAuthToken(store.getState());
     if (token) {
       config.headers["x-auth-token"] = token;
     }

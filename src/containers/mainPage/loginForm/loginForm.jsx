@@ -5,12 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 import {
+  clearAuthError,
   loginUser,
+  selectAuthAuthenticationStatus,
+  selectAuthErrorMessage,
+  selectAuthErrorStatus,
   selectAuthLoadingState,
-  selectIsAuthenticated,
-  selectIsVerified,
-  selectToken,
-  selectTokenVerificationStatus,
+  selectAuthToken,
+  selectAuthTokenVerificationStatus,
 } from "../../../store/authSlice";
 
 import { useTranslation } from "react-i18next";
@@ -26,6 +28,7 @@ import {
   isEmailValid,
   isPasswordValid,
 } from "../../../utilities/regexUtilities";
+import ModalWindowMain from "../../../components/modalWindows/modalWindow/modalWindowMain";
 
 export default function LoginForm() {
   const [showLogin, setShowLogin] = useState(false);
@@ -38,21 +41,20 @@ export default function LoginForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const loggedIn = useSelector(selectIsAuthenticated);
+  const loggedIn = useSelector(selectAuthAuthenticationStatus);
   const isLoading = useSelector(selectAuthLoadingState);
-  const tokenVerificationComplete = useSelector(selectTokenVerificationStatus);
+  const tokenVerificationComplete = useSelector(
+    selectAuthTokenVerificationStatus
+  );
   const dataLoaded = useSelector(selectLoginPageLoaded);
-  const userVerified = useSelector(selectIsVerified);
+  const hasError = useSelector(selectAuthErrorStatus);
+  const errorMessage = useSelector(selectAuthErrorMessage);
 
-  const token = useSelector(selectToken);
+  const token = useSelector(selectAuthToken);
 
   useEffect(() => {
     if (!tokenVerificationComplete && token) return;
     if (loggedIn) {
-      if (!userVerified) {
-        navigate("/register");
-        return;
-      }
       navigate("/dashboard/welcome");
     } else {
       setTimeout(() => {
@@ -60,16 +62,7 @@ export default function LoginForm() {
         dispatch(setLoginPageLoaded());
       }, 300);
     }
-  }, [
-    loggedIn,
-    isLoading,
-    navigate,
-    tokenVerificationComplete,
-    dataLoaded,
-    dispatch,
-    token,
-    userVerified,
-  ]);
+  }, [loggedIn, tokenVerificationComplete, token, navigate, dispatch]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -83,6 +76,7 @@ export default function LoginForm() {
     }
     dispatch(loginUser({ email, password }));
   }
+
   return (
     <div className={styles.mainContainer}>
       <form className={styles.formContainer} onSubmit={handleSubmit}>
@@ -92,6 +86,8 @@ export default function LoginForm() {
             label={t("loginRegisterForm.email")}
             inputError={emailError}
             type="email"
+            name="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             width={100}
@@ -100,6 +96,8 @@ export default function LoginForm() {
             label={t("loginRegisterForm.password")}
             inputError={passwordError}
             type="password"
+            name="password"
+            autoComplete="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             width={100}
@@ -112,6 +110,14 @@ export default function LoginForm() {
           </p>
         </div>
       </form>
+      {hasError && (
+        <ModalWindowMain
+          modalType={"error"}
+          data={errorMessage}
+          onCancel={clearAuthError}
+        />
+      )}
+
       <LoadingState fadeOut={showLogin} inactive={dataLoaded} />
     </div>
   );

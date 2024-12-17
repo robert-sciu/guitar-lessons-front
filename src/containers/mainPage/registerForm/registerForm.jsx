@@ -10,6 +10,7 @@ import {
   setRegisterPageLoaded,
 } from "../../../store/loadStateSlice";
 import {
+  clearUserInfoError,
   registerUser,
   selectUserInfoCreationStatus,
   selectUserInfoErrorMessage,
@@ -42,7 +43,11 @@ export default function RegisterForm() {
 
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  // const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(clearUserInfoError());
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (dataLoaded) return;
@@ -81,7 +86,7 @@ export default function RegisterForm() {
       return;
     }
 
-    dispatch(registerUser({ username, email, password, role: "user" }));
+    dispatch(registerUser({ username, email, password }));
   }
 
   return (
@@ -92,25 +97,31 @@ export default function RegisterForm() {
           <div className={styles.inputsContainer}>
             {hasError && <p className={styles.errorMessage}>{errorMessage}</p>}
             <InputElement
-              label={t("loginRegisterForm.username")}
-              inputError={usernameError}
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              width={100}
-            />
-            <InputElement
               label={t("loginRegisterForm.email")}
               inputError={emailError}
               type="email"
+              name="email"
+              autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              width={100}
+            />
+            <InputElement
+              label={t("loginRegisterForm.username")}
+              inputError={usernameError}
+              type="text"
+              name="nickname"
+              autoComplete="off"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               width={100}
             />
             <InputElement
               label={t("loginRegisterForm.password")}
               inputError={passwordError}
               type="password"
+              name="password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               width={100}

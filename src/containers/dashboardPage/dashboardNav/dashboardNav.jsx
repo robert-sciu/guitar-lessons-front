@@ -2,8 +2,8 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   logoutUser,
-  selectIsAuthenticated,
-  selectTokenVerificationStatus,
+  selectAuthAuthenticationStatus,
+  selectAuthTokenVerificationStatus,
 } from "../../../store/authSlice";
 import { useEffect, useState } from "react";
 import styles from "./dashboardNav.module.scss";
@@ -25,7 +25,7 @@ export default function DashboardNav() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isAuthenticated = useSelector(selectAuthAuthenticationStatus);
 
   const userInfo = useSelector(selectUserInfo);
   const userInfoIsLoading = useSelector(selectUserInfoLoadingStatus);
@@ -33,7 +33,9 @@ export default function DashboardNav() {
   const userInfoFetchComplete = useSelector(selectUserInfoFetchStatus);
   const userRefetchNeeded = useSelector(selectUserRefetchNeeded);
 
-  const tokenVerificationComplete = useSelector(selectTokenVerificationStatus);
+  const tokenVerificationComplete = useSelector(
+    selectAuthTokenVerificationStatus
+  );
 
   useEffect(() => {
     if (

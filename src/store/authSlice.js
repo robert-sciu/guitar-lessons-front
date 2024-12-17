@@ -52,6 +52,7 @@ const authSlice = createSlice({
   initialState: {
     isLoading: false,
     hasError: false,
+    error: null,
     isAuthenticated: false,
     tokenVerificationComplete: false,
     token: localStorage.getItem("access_token"),
@@ -66,6 +67,12 @@ const authSlice = createSlice({
     setTokenVerificationComplete: (state) => {
       state.tokenVerificationComplete = true;
     },
+    clearAuthError: (state) => {
+      state.hasError = false;
+      state.error = null;
+      state.tokenVerificationComplete = false;
+      localStorage.removeItem("access_token");
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -74,7 +81,6 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         manageFulfilledState(state);
-        state.isVerified = action.payload.isVerified;
         state.token = action.payload.token;
         state.isAuthenticated = true;
         state.tokenVerificationComplete = true;
@@ -109,15 +115,20 @@ const authSlice = createSlice({
   },
 });
 
-export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
+export const selectAuthAuthenticationStatus = (state) =>
+  state.auth.isAuthenticated;
 export const selectAuthLoadingState = (state) => state.auth.isLoading;
-export const selectToken = (state) => state.auth.token;
-export const selectIsVerified = (state) => state.auth.isVerified;
-export const selectTokenVerificationStatus = (state) =>
+export const selectAuthToken = (state) => state.auth.token;
+export const selectAuthTokenVerificationStatus = (state) =>
   state.auth.tokenVerificationComplete;
-// export const selectUser = (state) => state.auth.user;
+export const selectAuthErrorStatus = (state) => state.auth.hasError;
+export const selectAuthErrorMessage = (state) => state.auth.error;
 
-export const { setToken, clearToken, setTokenVerificationComplete } =
-  authSlice.actions;
+export const {
+  setToken,
+  clearToken,
+  setTokenVerificationComplete,
+  clearAuthError,
+} = authSlice.actions;
 
 export default authSlice.reducer;

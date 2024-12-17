@@ -24,7 +24,7 @@ i18n
           loginRegisterForm: {
             register: "Zarejestruj się",
             login: "Zaloguj się",
-            username: "Nazwa użytkownika",
+            username: "Imię (widoczne dla innych)",
             usernameError: `Wprowadź poprawnie nazwę użytkownika (min. ${config.minUsernameLength} znaków, max. ${config.maxUsernameLength} znaków, duże i małe litery oraz cyfry)`,
             email: "E-mail",
             emailError: "Wprowadź poprawny adres e-mail",
@@ -35,6 +35,7 @@ i18n
             registrationSuccess: "Rejestracja przebiegła pomyslnie",
             goToLogin: "Przejdz do logowania",
             contactUs: "Skontaktuj się z nami",
+            verificationSuccess: "Weryfikacja przebiegła pomyslnie",
             redirectToLogin: "Zostaniesz automatycznie przekierowany za",
             finishRegistration:
               "Sprawdź email i kliknij link, aby zakonczyc rejestracje",
@@ -190,7 +191,7 @@ i18n
           loginRegisterForm: {
             register: "Register",
             login: "Login",
-            username: "Username",
+            username: "Nickname (visible to others)",
             usernameError: `Enter a valid username (min ${config.minUsernameLength} characters, max ${config.maxUsernameLength} characters, uppercase and lowercase letters and numbers)`,
             email: "Email",
             emailErro: "Enter a valid email",
@@ -201,6 +202,7 @@ i18n
             registrationSuccess: "Registration completed successfully",
             goToLogin: "Go to login",
             contactUs: "Contact us",
+            verificationSuccess: "Verification completed successfully",
             redirectToLogin: "You will be automatically redirected in",
             finishRegistration:
               "Check your email and click the link to finish registration",

@@ -26,7 +26,19 @@ export const verifyUser = createAsyncThunk(
   "userInfo/verifyUser",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post("/users/verifyUser", data);
+      const response = await apiClient.post("/users/verify_user", data);
+      return extractResponseData(response);
+    } catch (error) {
+      return rejectWithValue(extractErrorResponse(error));
+    }
+  }
+);
+
+export const activateUserWithToken = createAsyncThunk(
+  "userInfo/activateUserWithToken",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post("/users/activate_user", data);
       return extractResponseData(response);
     } catch (error) {
       return rejectWithValue(extractErrorResponse(error));
@@ -99,7 +111,8 @@ export const userInfoSlice = createSlice({
     refetchNeeded: false,
     fetchComplete: false,
     userCreated: false,
-    userVerified: false,
+    userVerified: true,
+    userActivated: false,
 
     emailChangeConfirmationCodeRequired: false,
     // emailChangeResponse: "",
@@ -164,7 +177,14 @@ export const userInfoSlice = createSlice({
         manageFulfilledState(state);
         state.userVerified = true;
       })
-      .addCase(verifyUser.rejected, manageRejectedState);
+      .addCase(verifyUser.rejected, manageRejectedState)
+
+      .addCase(activateUserWithToken.pending, managePendingState)
+      .addCase(activateUserWithToken.fulfilled, (state) => {
+        manageFulfilledState(state);
+        state.userActivated = true;
+      })
+      .addCase(activateUserWithToken.rejected, manageRejectedState);
   },
 });
 
@@ -179,6 +199,8 @@ export const selectUserInfoCreationStatus = (state) =>
   state.userInfo.userCreated;
 export const selectUserInfoVerificationStatus = (state) =>
   state.userInfo.userVerified;
+export const selectUserInfoActivationStatus = (state) =>
+  state.userInfo.userActivated;
 //prettier-ignore
 export const selectUserInfoFetchStatus = (state) => state.userInfo.fetchComplete;
 export const selectUserInfoErrorStatus = (state) => state.userInfo.hasError;
