@@ -10,6 +10,9 @@ import userInfoReducer from "./userInfoSlice";
 import planInfoReducer from "./planInfoSlice";
 import loadStateReducer from "./loadStateSlice";
 
+import adminUserInfoReducer from "./admin/adminUserInfoSlice";
+import adminPlanInfoReducer from "./admin/adminPlanInfoSlice";
+
 // export default configureStore({
 //   reducer: {
 //     auth: authReducer,
@@ -36,6 +39,9 @@ const appReducer = combineReducers({
   fullCalendar: fullCalendarReducer,
   userInfo: userInfoReducer,
   planInfo: planInfoReducer,
+
+  adminUserInfo: adminUserInfoReducer,
+  adminPlanInfo: adminPlanInfoReducer,
 });
 
 const rootReducer = (state, action) => {

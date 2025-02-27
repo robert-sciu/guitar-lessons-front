@@ -10,7 +10,7 @@ import {
   selectAuthAuthenticationStatus,
   selectAuthErrorMessage,
   selectAuthErrorStatus,
-  selectAuthLoadingState,
+  // selectAuthLoadingState,
   selectAuthToken,
   selectAuthTokenVerificationStatus,
 } from "../../../store/authSlice";
@@ -42,7 +42,7 @@ export default function LoginForm() {
   const navigate = useNavigate();
 
   const loggedIn = useSelector(selectAuthAuthenticationStatus);
-  const isLoading = useSelector(selectAuthLoadingState);
+  // const isLoading = useSelector(selectAuthLoadingState);
   const tokenVerificationComplete = useSelector(
     selectAuthTokenVerificationStatus
   );

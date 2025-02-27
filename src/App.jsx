@@ -1,16 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Suspense } from "react";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.scss";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  selectAuthToken,
-  setTokenVerificationComplete,
-  verifyStoredToken,
-} from "./store/authSlice";
 
 import LoadingState from "./components/loadingState/loadingState";
+
+const LazyProtectedRoute = React.lazy(() =>
+  import("./containers/protectedRoute/ProtectedRoute")
+);
 
 const LazyMainNav = React.lazy(() =>
   import("./containers/mainPage/mainNav/mainNav")
@@ -64,19 +62,13 @@ const LazyAdminNav = React.lazy(() =>
   import("./containers/adminPage/adminNav/adminNav")
 );
 
-function App() {
-  const dispatch = useDispatch();
-  //veryfing token here saves a lot of trouble
-  //and keeps the code dry
-  //leave it be
-  const token = useSelector(selectAuthToken);
+const LazyAdminUserManagementPage = React.lazy(() =>
+  import(
+    "./containers/adminPage/userManagementPage/userManagementPageMain/userManagementPageMain"
+  )
+);
 
-  useEffect(() => {
-    if (token) {
-      dispatch(verifyStoredToken({ token }));
-    } else dispatch(setTokenVerificationComplete());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+function App() {
   return (
     <BrowserRouter>
       <Routes>
@@ -125,7 +117,9 @@ function App() {
           path="/dashboard"
           element={
             <Suspense fallback={<LoadingState fullscreen={true} />}>
-              <LazyDashboardNav />
+              <LazyProtectedRoute>
+                <LazyDashboardNav />
+              </LazyProtectedRoute>
             </Suspense>
           }
         >
@@ -178,7 +172,16 @@ function App() {
               <LazyAdminNav />
             </Suspense>
           }
-        />
+        >
+          <Route
+            path="/admin/user_management"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <LazyAdminUserManagementPage />
+              </Suspense>
+            }
+          />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

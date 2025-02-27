@@ -1,0 +1,11 @@
+@import "../../../../../styles/variables.module.scss";
+@import "../../../../../styles/classes.module.scss";
+
+.mainContainer {
+  grid-column-start: 1;
+  grid-column-end: -1;
+  margin: $size-xs 0;
+  display: flex;
+  border: 1px solid $main-gray-transparent;
+  border-radius: $size-xxxxs;
+}

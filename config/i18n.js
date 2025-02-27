@@ -54,6 +54,8 @@ i18n
           adminNav: {
             dashboard: "Panel standardowy",
             users: "Użytkownicy",
+            tasks: "Zadania",
+            tags: "Tagi",
           },
           userInfo: {
             basicInfo: "Podstawowe Informacje",

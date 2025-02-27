@@ -13,7 +13,10 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post("/auth/login", { email, password });
+      const response = await apiClient.post("/open/auth/login", {
+        email,
+        password,
+      });
       const { token } = extractResponseData(response);
       localStorage.setItem("access_token", token);
       return extractResponseData(response);
@@ -28,7 +31,9 @@ export const verifyStoredToken = createAsyncThunk(
   async ({ token }, { rejectWithValue }) => {
     try {
       if (token) {
-        const response = await apiClient.post("/auth/verifyToken", { token });
+        const response = await apiClient.post("/auth/verifyToken", {
+          token,
+        });
         if (response.status === 200) {
           return extractResponseData(response);
         }
@@ -40,12 +45,15 @@ export const verifyStoredToken = createAsyncThunk(
 );
 
 // Async thunk for user logout
-export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
-  localStorage.removeItem("access_token");
-  await apiClient.post("/auth/logout");
-  store.dispatch(clearToken());
-  return null;
-});
+export const logoutUser = createAsyncThunk(
+  "/open/auth/logoutUser",
+  async () => {
+    localStorage.removeItem("access_token");
+    await apiClient.post("/open/auth/logout");
+    store.dispatch(clearToken());
+    return null;
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",

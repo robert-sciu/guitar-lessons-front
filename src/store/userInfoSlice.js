@@ -11,7 +11,7 @@ import {
 import apiClient from "../api/api";
 
 export const registerUser = createAsyncThunk(
-  "userInfo/createUser",
+  "open/userInfo/createUser",
   async (data, { rejectWithValue }) => {
     try {
       const response = await apiClient.post("/users", data);
@@ -23,7 +23,7 @@ export const registerUser = createAsyncThunk(
 );
 
 export const verifyUser = createAsyncThunk(
-  "userInfo/verifyUser",
+  "open/userInfo/verifyUser",
   async (data, { rejectWithValue }) => {
     try {
       const response = await apiClient.post("/users/verify_user", data);
@@ -35,7 +35,7 @@ export const verifyUser = createAsyncThunk(
 );
 
 export const activateUserWithToken = createAsyncThunk(
-  "userInfo/activateUserWithToken",
+  "open/userInfo/activateUserWithToken",
   async (data, { rejectWithValue }) => {
     try {
       const response = await apiClient.post("/users/activate_user", data);

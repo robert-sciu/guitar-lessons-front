@@ -121,3 +121,14 @@
   flex-direction: column;
   list-style: none;
 }
+
+.horizontalTileContainer {
+  display: grid;
+
+  width: 100%;
+  height: 100%;
+  border-radius: $size-xxxxs;
+  box-shadow: $soft-shadow-gray;
+  background-color: $main-white-lightest;
+  padding: $size-xxxxs $size-xs;
+}

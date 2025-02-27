@@ -1,0 +1,18 @@
+@import "../../../../../styles/variables.module.scss";
+
+.activationStatusLightActive,
+.activationStatusLightNotActive {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.activationStatusLightActive {
+  background-color: $main-green;
+  box-shadow: $soft-shadow-green;
+}
+
+.activationStatusLightNotActive {
+  background-color: $main-red;
+  box-shadow: $soft-shadow-red;
+}

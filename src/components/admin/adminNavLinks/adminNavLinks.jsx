@@ -3,14 +3,16 @@ import { useTranslation } from "react-i18next";
 import NavLinkBtn from "../../elements/navLinkBtn/navLinkBtn";
 
 import {
-  HiOutlineHome,
+  // HiOutlineHome,
   HiOutlineInboxStack,
-  HiMagnifyingGlassPlus,
-  HiCheck,
-  HiCalendarDays,
+  // HiMagnifyingGlassPlus,
+  // HiCheck,
+  // HiCalendarDays,
   HiOutlineCurrencyDollar,
+  HiOutlineTag,
   HiOutlinePower,
-  HiMiniWrenchScrewdriver,
+
+  // HiMiniWrenchScrewdriver,
   HiMiniUserGroup,
 } from "react-icons/hi2";
 import styles from "./adminNavLinks.module.scss";
@@ -22,14 +24,24 @@ export default function AdminNavLinks({ onLogout }) {
     <div className={styles.dashboardNavLinksContainer}>
       <ul className={styles.dashboardNavLinks}>
         <NavLinkBtn
-          to="/admin/users"
+          to="/admin/user_management"
           label={t("adminNav.users")}
           icon={<HiMiniUserGroup />}
         />
         <NavLinkBtn
+          to="/admin/task_management"
+          label={t("adminNav.tasks")}
+          icon={<HiOutlineInboxStack />}
+        />
+        <NavLinkBtn
+          to="/admin/tags"
+          label={t("adminNav.tags")}
+          icon={<HiOutlineTag />}
+        />
+        <NavLinkBtn
           to="/dashboard/welcome"
           label={t("adminNav.dashboard")}
-          icon={<HiOutlineCurrencyDollar />}
+          icon={<HiMiniUserGroup />}
         />
       </ul>
       <NavLinkBtn
