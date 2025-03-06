@@ -95,6 +95,7 @@ function getLocalHourFromIsoString(isoString) {
 }
 
 function changeISOStringHour(isoString, newHour) {
+  console.log(isoString, newHour);
   const hour = newHour.split(":")[0];
   const minutes = newHour.split(":")[1];
   return new Date(
@@ -317,6 +318,12 @@ function utcTimeToLocalTimeString(utcHour) {
   return localTime;
 }
 
+function localHourToIsoHour(hour) {
+  const date = new Date();
+  date.setHours(hour.split(":")[0], hour.split(":")[1], 0, 0);
+  return new Date(date).toISOString().split("T")[1].split(".")[0];
+}
+
 export {
   getTodayDate,
   fullDateToISOString,
@@ -342,4 +349,5 @@ export {
   getLocalDateFromDateOnly,
   addDaysToIsoString,
   addDaysToLocalDate,
+  localHourToIsoHour,
 };

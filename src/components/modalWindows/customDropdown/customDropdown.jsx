@@ -12,6 +12,7 @@ export default function CustomDropdown({
   availableReservationHours,
   availableDurationValues,
   availableReservationDates,
+  availableWeekdays,
   selectedValue,
   onSelect,
   type,
@@ -24,18 +25,20 @@ export default function CustomDropdown({
     setIsOpen((prev) => !prev);
   }
   function handleSelect(value) {
-    if (type === "hour") {
-      onSelect(value);
-      setIsOpen(false);
-    }
-    if (type === "duration") {
-      onSelect(value);
-      setIsOpen(false);
-    }
-    if (type === "date") {
-      onSelect(value);
-      setIsOpen(false);
-    }
+    // if (type === "hour") {
+    //   onSelect(value);
+    //   setIsOpen(false);
+    // }
+    // if (type === "duration") {
+    //   onSelect(value);
+    //   setIsOpen(false);
+    // }
+    // if (type === "date") {
+    //   onSelect(value);
+    //   setIsOpen(false);
+    // }
+    onSelect(value);
+    setIsOpen(false);
   }
 
   useEffect(() => {
@@ -75,9 +78,11 @@ export default function CustomDropdown({
   return (
     <div className={styles.customDropdown}>
       <div className={styles.selected} onClick={toggleDropdown}>
-        {type === "hour" && hourToLocaleStringHour(selectedValue)}
-        {type === "duration" && selectedValue}
+        {type === "hour" &&
+          ((selectedValue && hourToLocaleStringHour(selectedValue)) || "---")}
+        {type === "duration" && (selectedValue || "---")}
         {type === "date" && getLocalDateFromDateOnly(selectedValue)}
+        {type === "weekday" && (selectedValue[1] || "---")}
       </div>
       {type === "date" && isOpen && (
         <ul className={styles.dropdownList} ref={dropdownRef}>
@@ -106,6 +111,15 @@ export default function CustomDropdown({
           ))}
         </ul>
       )}
+      {type === "weekday" && isOpen && (
+        <ul className={styles.dropdownList} ref={dropdownRef}>
+          {availableWeekdays.map((weekday) => (
+            <li key={weekday} onClick={() => handleSelect(weekday)}>
+              {weekday[1]}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -117,4 +131,5 @@ CustomDropdown.propTypes = {
   selectedValue: PropTypes.any,
   onSelect: PropTypes.func,
   type: PropTypes.string,
+  availableWeekdays: PropTypes.array,
 };

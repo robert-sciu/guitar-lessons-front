@@ -1,0 +1,27 @@
+@import "../../../../styles//variables.module.scss";
+@import "../../../../styles/classes.module.scss";
+
+.mainContainer {
+  display: flex;
+  flex: 1;
+  // background-color: $main-white-lightest;
+  // gap: $size-xxxxl;
+  box-shadow: $inset-soft-shadow;
+  border-radius: $size-xxxxs;
+  padding: $size-xxxxs $size-xxxxs $size-xxxxs $size-s;
+  justify-content: space-between;
+  input {
+    @extend .input;
+    text-align: left;
+    font-size: $size-s;
+  }
+  .labelContainer {
+    display: flex;
+    align-items: center;
+    gap: $size-xxxs;
+  }
+  .adjustButtonsContainer {
+    display: flex;
+    gap: $size-xxxs;
+  }
+}

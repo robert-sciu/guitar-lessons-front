@@ -3,19 +3,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
 import InputToggler from "../../../../components/elements/inputToggler/inputToggler";
-import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
+// import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
 import Button from "../../../../components/elements/button/button";
 import { HiOutlinePencilSquare } from "react-icons/hi2";
 
 import {
   selectEmailChangeConfirmationCodeRequired,
-  updateEmail,
+  // updateEmail,
   updateUserMailCodeRequest,
   updateUser,
-  cancelEmailChange,
-  clearUserInfoError,
+  // cancelEmailChange,
+  // clearUserInfoError,
   selectUserInfoErrorStatus,
-  selectUserInfoErrorMessage,
+  // selectUserInfoErrorMessage,
   selectUserInfoLoadingStatus,
 } from "../../../../store/userInfoSlice";
 
@@ -31,7 +31,7 @@ export default function UserInfo({ userInfo }) {
 
   const userInfoHasError = useSelector(selectUserInfoErrorStatus);
 
-  const userInfoError = useSelector(selectUserInfoErrorMessage);
+  // const userInfoError = useSelector(selectUserInfoErrorMessage);
   const emailChangeConfirmationCodeRequired = useSelector(
     selectEmailChangeConfirmationCodeRequired
   );
@@ -133,20 +133,6 @@ export default function UserInfo({ userInfo }) {
           </div>
         </div>
       </div>
-      {emailChangeConfirmationCodeRequired && (
-        <ModalWindowMain
-          modalType={"codeRequired"}
-          onSubmit={updateEmail}
-          onCancel={cancelEmailChange}
-        />
-      )}
-      {userInfoHasError && (
-        <ModalWindowMain
-          modalType="error"
-          data={userInfoError}
-          onCancel={clearUserInfoError}
-        />
-      )}
     </div>
   );
 }

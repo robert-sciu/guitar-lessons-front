@@ -34,9 +34,9 @@ export const updateUser = createAsyncThunk(
 
 export const deleteUser = createAsyncThunk(
   "adminUserInfo/deleteUser",
-  async (id, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      const response = await apiClient.delete(`/admin/users/${id}`);
+      const response = await apiClient.delete(`/admin/users/${data.id}`);
       return extractResponseData(response);
     } catch (error) {
       return rejectWithValue(extractErrorResponse(error));
@@ -52,12 +52,23 @@ const adminUserInfoSlice = createSlice({
     error: null,
     refetchNeeded: false,
     fetchComplete: false,
-    userInfo: {},
+    userInfo: [],
+    showMoreId: null,
   },
   reducers: {
     clearError: (state) => {
       state.hasError = false;
       state.error = null;
+    },
+    clearAdminUserInfoError: (state) => {
+      state.hasError = false;
+      state.error = null;
+    },
+    setShowMoreId: (state, action) => {
+      state.showMoreId = action.payload;
+    },
+    clearShowMoreId: (state) => {
+      state.showMoreId = null;
     },
   },
   extraReducers: (builder) => {
@@ -89,7 +100,8 @@ const adminUserInfoSlice = createSlice({
   },
 });
 
-export const { clearAdminUserInfoError } = adminUserInfoSlice.actions;
+export const { clearAdminUserInfoError, setShowMoreId, clearShowMoreId } =
+  adminUserInfoSlice.actions;
 
 export const selectAdminUserInfo = (state) => state.adminUserInfo.userInfo;
 export const selectAdminUserInfoLoadingStatus = (state) =>
@@ -102,5 +114,7 @@ export const selectAdminUserInfoFetchStatus = (state) =>
   state.adminUserInfo.fetchComplete;
 export const selectAdminUserInfoRefetchNeeded = (state) =>
   state.adminUserInfo.refetchNeeded;
+export const selectAdminUserShowMoreId = (state) =>
+  state.adminUserInfo.showMoreId;
 
 export default adminUserInfoSlice.reducer;

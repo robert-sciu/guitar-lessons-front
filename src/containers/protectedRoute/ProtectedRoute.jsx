@@ -12,7 +12,7 @@ import {
 } from "../../store/authSlice";
 import { useNavigate } from "react-router";
 
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ adminRoute = false, children }) {
   const [showChildren, setShowChildren] = useState(false);
 
   const userIsAuthenticated = useSelector(selectAuthAuthenticationStatus);
@@ -26,7 +26,7 @@ export default function ProtectedRoute({ children }) {
 
   useEffect(() => {
     if (token) {
-      dispatch(verifyStoredToken({ token }));
+      dispatch(verifyStoredToken({ token, isAdmin: adminRoute }));
     } else dispatch(setTokenVerificationComplete());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -47,4 +47,5 @@ export default function ProtectedRoute({ children }) {
 
 ProtectedRoute.propTypes = {
   children: PropTypes.node.isRequired,
+  adminRoute: PropTypes.bool,
 };

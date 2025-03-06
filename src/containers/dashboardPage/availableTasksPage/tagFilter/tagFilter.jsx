@@ -1,22 +1,28 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
 import TagDisplay from "../../../../components/tagDisplay/tagDisplay";
 
-import { selectTags } from "../../../../store/tagsSlice";
+import {
+  selectSelectedTags,
+  selectTags,
+  setSelectedTags,
+} from "../../../../store/tagsSlice";
 
 import styles from "./tagFilter.module.scss";
 
 import PropTypes from "prop-types";
 
-export default function TagFilter({ selectedTags, onSetSelectedTags }) {
+export default function TagFilter() {
   const tags = useSelector(selectTags);
+  const dispatch = useDispatch();
+  const selectedTags = useSelector(selectSelectedTags);
 
   function handleTagClick(tag, selected) {
     if (selected) {
-      onSetSelectedTags(selectedTags.filter((t) => t.id !== tag.id));
+      dispatch(setSelectedTags(selectedTags.filter((t) => t.id !== tag.id)));
     } else {
-      onSetSelectedTags([...selectedTags, tag]);
+      dispatch(setSelectedTags([...selectedTags, tag]));
     }
   }
   const { t } = useTranslation();

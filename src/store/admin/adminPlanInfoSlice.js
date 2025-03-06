@@ -20,6 +20,21 @@ export const fetchAllPlanInfo = createAsyncThunk(
   }
 );
 
+export const updatePlanInfo = createAsyncThunk(
+  "adminPlanInfo/updatePlanInfo",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.patch(
+        `/admin/planInfo/${data.id}`,
+        data
+      );
+      return extractResponseData(response);
+    } catch (error) {
+      return rejectWithValue(extractErrorResponse(error));
+    }
+  }
+);
+
 const adminPlanInfoSlice = createSlice({
   name: "adminPlanInfo",
   initialState: {
@@ -30,7 +45,12 @@ const adminPlanInfoSlice = createSlice({
     fetchComplete: false,
     planInfo: {},
   },
-  reducers: {},
+  reducers: {
+    clearAdminPlayInfoError: (state) => {
+      state.hasError = false;
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllPlanInfo.pending, managePendingState)
@@ -43,10 +63,29 @@ const adminPlanInfoSlice = createSlice({
         state.fetchComplete = true;
         state.refetchNeeded = false;
       })
-      .addCase(fetchAllPlanInfo.rejected, manageRejectedState);
+      .addCase(fetchAllPlanInfo.rejected, manageRejectedState)
+
+      .addCase(updatePlanInfo.pending, managePendingState)
+      .addCase(updatePlanInfo.fulfilled, (state) => {
+        manageFulfilledState(state);
+        state.refetchNeeded = true;
+      })
+      .addCase(updatePlanInfo.rejected, manageRejectedState);
   },
 });
 
+export const { clearAdminPlayInfoError } = adminPlanInfoSlice.actions;
+
 export const selectAdminPlanInfo = (state) => state.adminPlanInfo.planInfo;
+export const selectAdminPlanInfoLoadingStatus = (state) =>
+  state.adminPlanInfo.isLoading;
+export const selectAdminPlanInfoErrorStatus = (state) =>
+  state.adminPlanInfo.hasError;
+export const selectAdminPlanInfoErrorMessage = (state) =>
+  state.adminPlanInfo.error;
+export const selectAdminPlanInfoFetchStatus = (state) =>
+  state.adminPlanInfo.fetchComplete;
+export const selectAdminPlanInfoRefetchNeeded = (state) =>
+  state.adminPlanInfo.refetchNeeded;
 
 export default adminPlanInfoSlice.reducer;

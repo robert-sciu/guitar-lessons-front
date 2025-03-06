@@ -9,6 +9,7 @@ import fullCalendarReducer from "./fullCalendarSlice";
 import userInfoReducer from "./userInfoSlice";
 import planInfoReducer from "./planInfoSlice";
 import loadStateReducer from "./loadStateSlice";
+import pricingInfoReducer from "./pricingInfoSlice";
 
 import adminUserInfoReducer from "./admin/adminUserInfoSlice";
 import adminPlanInfoReducer from "./admin/adminPlanInfoSlice";
@@ -39,6 +40,8 @@ const appReducer = combineReducers({
   fullCalendar: fullCalendarReducer,
   userInfo: userInfoReducer,
   planInfo: planInfoReducer,
+
+  pricingInfo: pricingInfoReducer,
 
   adminUserInfo: adminUserInfoReducer,
   adminPlanInfo: adminPlanInfoReducer,

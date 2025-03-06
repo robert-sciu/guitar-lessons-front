@@ -1,14 +1,14 @@
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
-import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
+// import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
 import InfoTile from "../infoTile/infoTile";
 
 import {
-  clearPlanInfoError,
+  // clearPlanInfoError,
   selectPlanInfoDiscount,
-  selectPlanInfoErrorMessage,
-  selectPlanInfoErrorStatus,
+  // selectPlanInfoErrorMessage,
+  // selectPlanInfoErrorStatus,
 } from "../../../../store/planInfoSlice";
 
 import styles from "./planInfo.module.scss";
@@ -17,13 +17,15 @@ import { utcTimeToLocalTimeString } from "../../../../utilities/calendarUtilitie
 
 import PropTypes from "prop-types";
 
-export default function PlanInfo({ planInfo }) {
+export default function PlanInfo({ planInfo, pricingInfo }) {
   //the discount is calculated at planInfoSlice
   const discount = useSelector(selectPlanInfoDiscount);
-  const planInfoHasError = useSelector(selectPlanInfoErrorStatus);
-  const planInfoError = useSelector(selectPlanInfoErrorMessage);
+  // const planInfoHasError = useSelector(selectPlanInfoErrorStatus);
+  // const planInfoError = useSelector(selectPlanInfoErrorMessage);
 
   const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const language = ["en", "pl"].includes(i18n.language) ? i18n.language : "en";
 
   const date = t(`daysOfTheWeek.${planInfo.permanent_reservation_weekday}`);
   const time =
@@ -68,13 +70,6 @@ export default function PlanInfo({ planInfo }) {
           </>
         )}
       </div>
-      {planInfoHasError && (
-        <ModalWindowMain
-          modalType="error"
-          data={planInfoError}
-          onCancel={clearPlanInfoError}
-        />
-      )}
     </div>
   );
 }

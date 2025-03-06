@@ -13,17 +13,48 @@ import { useEffect } from "react";
 
 import UserDisplayMain from "../../../../components/admin/userDisplay/userDisplayMain/userDisplayMain";
 
-import styles from "./userManagementPageMain.module.scss";
-import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
-import { fetchAllPlanInfo } from "../../../../store/admin/adminPlanInfoSlice";
+// import styles from "./userManagementPageMain.module.scss";
+// import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
+import {
+  clearAdminPlayInfoError,
+  fetchAllPlanInfo,
+  selectAdminPlanInfo,
+  selectAdminPlanInfoErrorMessage,
+  selectAdminPlanInfoErrorStatus,
+  selectAdminPlanInfoFetchStatus,
+  selectAdminPlanInfoLoadingStatus,
+  selectAdminPlanInfoRefetchNeeded,
+} from "../../../../store/admin/adminPlanInfoSlice";
+import DashboardContentContainer from "../../../dashboardContentContainer/DashboardContentContainer";
+import {
+  selectAdminUserInfoPageLoaded,
+  setAdminUserInfoPageLoaded,
+} from "../../../../store/loadStateSlice";
 
 export default function UserManagementPageMain() {
   const dispatch = useDispatch();
 
+  const dataLoaded = useSelector(selectAdminUserInfoPageLoaded);
+
+  const adminPlanInfo = useSelector(selectAdminPlanInfo);
+  const adminPlanInfoIsLoading = useSelector(selectAdminPlanInfoLoadingStatus);
+  const adminPlanInfoHasError = useSelector(selectAdminPlanInfoErrorStatus);
+  const adminPlanInfoErrorMessage = useSelector(
+    selectAdminPlanInfoErrorMessage
+  );
+  const adminPlanInfoFetchComplete = useSelector(
+    selectAdminPlanInfoFetchStatus
+  );
+  const adminPlanInfoRefetchNeeded = useSelector(
+    selectAdminPlanInfoRefetchNeeded
+  );
+
   const adminUserInfo = useSelector(selectAdminUserInfo);
-  const isLoading = useSelector(selectAdminUserInfoLoadingStatus);
-  const hasError = useSelector(selectAdminUserInfoErrorStatus);
-  const errorMessage = useSelector(selectAdminUserInfoErrorMessage);
+  const adminUserInfoIsLoading = useSelector(selectAdminUserInfoLoadingStatus);
+  const adminUserInfoHasError = useSelector(selectAdminUserInfoErrorStatus);
+  const adminUserInfoErrorMessage = useSelector(
+    selectAdminUserInfoErrorMessage
+  );
   const adminUserInfoFetchComplete = useSelector(
     selectAdminUserInfoFetchStatus
   );
@@ -32,11 +63,40 @@ export default function UserManagementPageMain() {
   );
 
   useEffect(() => {
-    if (!adminUserInfoFetchComplete && !isLoading && !hasError) {
+    if (
+      !adminUserInfoFetchComplete &&
+      !adminUserInfoIsLoading &&
+      !adminUserInfoHasError
+    ) {
       dispatch(fetchAllUsers());
+    }
+  }, [
+    adminUserInfoFetchComplete,
+    adminUserInfoIsLoading,
+    adminUserInfoHasError,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    if (
+      !adminPlanInfoFetchComplete &&
+      !adminPlanInfoIsLoading &&
+      !adminPlanInfoHasError
+    ) {
       dispatch(fetchAllPlanInfo());
     }
-  }, [adminUserInfoFetchComplete, isLoading, hasError, dispatch]);
+  }, [
+    adminPlanInfoFetchComplete,
+    adminPlanInfoIsLoading,
+    adminPlanInfoHasError,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    if (adminUserInfoFetchComplete && adminPlanInfoFetchComplete) {
+      dispatch(setAdminUserInfoPageLoaded());
+    }
+  });
 
   useEffect(() => {
     if (adminUserInfoRefetchNeeded) {
@@ -44,19 +104,43 @@ export default function UserManagementPageMain() {
     }
   }, [adminUserInfoRefetchNeeded, dispatch]);
 
+  useEffect(() => {
+    if (adminPlanInfoRefetchNeeded) {
+      dispatch(fetchAllPlanInfo());
+    }
+  }, [adminPlanInfoRefetchNeeded, dispatch]);
+
   return (
-    <div className={styles.mainContainer}>
-      {adminUserInfoFetchComplete &&
+    <DashboardContentContainer
+      showContent={
+        (adminUserInfoFetchComplete && adminPlanInfoFetchComplete) || dataLoaded
+      }
+      contentCol={
+        adminUserInfo &&
+        adminPlanInfo &&
         adminUserInfo.map((user) => (
-          <UserDisplayMain key={user.id} user={user} />
-        ))}
-      {hasError && (
-        <ModalWindowMain
-          modalType="error"
-          data={errorMessage}
-          onClose={clearAdminUserInfoError}
-        />
-      )}
-    </div>
+          <UserDisplayMain
+            key={user.id}
+            user={user}
+            planInfo={adminPlanInfo[user.id]}
+          />
+        ))
+      }
+      disableLoadingState={dataLoaded}
+      modals={[
+        {
+          showModal: adminUserInfoHasError,
+          modalType: "error",
+          data: adminUserInfoErrorMessage,
+          onCancel: clearAdminUserInfoError,
+        },
+        {
+          showModal: adminPlanInfoHasError,
+          modalType: "error",
+          data: adminPlanInfoErrorMessage,
+          onCancel: clearAdminPlayInfoError,
+        },
+      ]}
+    />
   );
 }

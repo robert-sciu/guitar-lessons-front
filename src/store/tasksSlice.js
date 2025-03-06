@@ -57,9 +57,6 @@ const tasksSlice = createSlice({
     tasks: [],
   },
   reducers: {
-    setTasksRefetchNeeded: (state) => {
-      state.refetchNeeded = true;
-    },
     clearTasksError: (state) => {
       state.hasError = false;
       state.error = null;
@@ -75,6 +72,7 @@ const tasksSlice = createSlice({
     builder.addCase(fetchAvailableTasks.fulfilled, (state, action) => {
       manageFulfilledState(state);
       state.tasks = action.payload;
+
       state.fetchComplete = true;
       state.refetchNeeded = false;
     });
@@ -85,17 +83,12 @@ const tasksSlice = createSlice({
   },
 });
 
-export const {
-  clearTasksError,
-  setTasksRefetchNeeded,
-  setTasksMinimumDifficultyLevel,
-} = tasksSlice.actions;
+export const { clearTasksError, setTasksMinimumDifficultyLevel } =
+  tasksSlice.actions;
 
 export const selectTasks = (state) => state.tasks.tasks;
 export const selectTasksLoadingStatus = (state) => state.tasks.isLoading;
 export const selectTasksFetchStatus = (state) => state.tasks.fetchComplete;
-export const selectTasksRefetchNeeded = (state) => state.tasks.refetchNeeded;
-
 export const selectTasksErrorStatus = (state) => state.tasks.hasError;
 export const selectTasksErrorMessage = (state) => state.tasks.error;
 

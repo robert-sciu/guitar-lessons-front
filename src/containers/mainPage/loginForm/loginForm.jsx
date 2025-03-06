@@ -13,6 +13,7 @@ import {
   // selectAuthLoadingState,
   selectAuthToken,
   selectAuthTokenVerificationStatus,
+  verifyStoredToken,
 } from "../../../store/authSlice";
 
 import { useTranslation } from "react-i18next";
@@ -51,6 +52,11 @@ export default function LoginForm() {
   const errorMessage = useSelector(selectAuthErrorMessage);
 
   const token = useSelector(selectAuthToken);
+
+  useEffect(() => {
+    if (!token) return;
+    dispatch(verifyStoredToken(token));
+  });
 
   useEffect(() => {
     if (!tokenVerificationComplete && token) return;

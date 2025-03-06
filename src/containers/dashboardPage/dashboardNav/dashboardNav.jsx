@@ -1,10 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  logoutUser,
-  selectAuthAuthenticationStatus,
-  selectAuthTokenVerificationStatus,
-} from "../../../store/authSlice";
+import { logoutUser } from "../../../store/authSlice";
 import { useEffect, useState } from "react";
 import {
   fetchUserInfo,
@@ -14,17 +10,20 @@ import {
   selectUserInfoLoadingStatus,
   selectUserRefetchNeeded,
 } from "../../../store/userInfoSlice";
-import DashboardWelcome from "../../../components/dashboard/dashboardWelcome/dashboardWelcome";
 import DashboardNavLinks from "../../../components/dashboard/dashboardNavLinks/dashboardNavLinks";
-import DashboardNavContainer from "../../../components/dashboardNavContainer/dashboardNavContainer";
+import { classNameFormatter } from "../../../utilities/utilities";
+import styles from "./dashboardNav.module.scss";
+import { useTranslation } from "react-i18next";
 
-export default function DashboardNav() {
+import PropTypes from "prop-types";
+
+export default function DashboardNav({ showAdminNav = false }) {
   const [fetchComplete, setFetchComplete] = useState(false);
+
+  const { t } = useTranslation();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const isAuthenticated = useSelector(selectAuthAuthenticationStatus);
 
   const userInfo = useSelector(selectUserInfo);
   const userInfoIsLoading = useSelector(selectUserInfoLoadingStatus);
@@ -32,35 +31,17 @@ export default function DashboardNav() {
   const userInfoFetchComplete = useSelector(selectUserInfoFetchStatus);
   const userRefetchNeeded = useSelector(selectUserRefetchNeeded);
 
-  const tokenVerificationComplete = useSelector(
-    selectAuthTokenVerificationStatus
-  );
-
   useEffect(() => {
-    if (
-      tokenVerificationComplete &&
-      isAuthenticated &&
-      !userInfoFetchComplete &&
-      !userInfoIsLoading &&
-      !userInfoHasError
-    ) {
+    if (!userInfoFetchComplete && !userInfoIsLoading && !userInfoHasError) {
       dispatch(fetchUserInfo());
     }
   }, [
-    tokenVerificationComplete,
-    isAuthenticated,
     userInfoFetchComplete,
     userInfoIsLoading,
     userInfoHasError,
     dispatch,
     navigate,
   ]);
-
-  useEffect(() => {
-    if (tokenVerificationComplete && !isAuthenticated) {
-      navigate("/login");
-    }
-  });
 
   useEffect(() => {
     if (userRefetchNeeded) {
@@ -81,15 +62,37 @@ export default function DashboardNav() {
   }
 
   return (
-    <DashboardNavContainer
-      dashboardWelcome={<DashboardWelcome username={userInfo.username} />}
-      navLinks={
+    <div className={styles.dashboardContainer}>
+      <div
+        className={classNameFormatter({
+          styles,
+          classNames: ["dashboardNav", fetchComplete ? "show" : "hide"],
+        })}
+      >
+        {fetchComplete && (
+          <div className={styles.dashboardWelcomeContainer}>
+            <div className={styles.dashboardUserIcon}>
+              <h3>{userInfo.username[0].toUpperCase()}</h3>
+            </div>
+            <h4>{t("dashboardNav.dashboard")}</h4>
+            <h6>
+              {t("dashboardNav.welcome")} {userInfo.username}
+            </h6>
+          </div>
+        )}
         <DashboardNavLinks
           onLogout={handleLogout}
           showAdminLink={userInfo?.role === "admin"}
+          showAdminNav={showAdminNav}
         />
-      }
-      fetchComplete={fetchComplete}
-    />
+      </div>
+      <div className={styles.dashboardContentContainer}>
+        {fetchComplete && <Outlet />}
+      </div>
+    </div>
   );
 }
+
+DashboardNav.propTypes = {
+  showAdminNav: PropTypes.bool,
+};

@@ -58,10 +58,6 @@ const LazyFullCalendarPage = React.lazy(() =>
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-const LazyAdminNav = React.lazy(() =>
-  import("./containers/adminPage/adminNav/adminNav")
-);
-
 const LazyAdminUserManagementPage = React.lazy(() =>
   import(
     "./containers/adminPage/userManagementPage/userManagementPageMain/userManagementPageMain"
@@ -169,12 +165,22 @@ function App() {
           path="/admin"
           element={
             <Suspense fallback={<LoadingState />}>
-              <LazyAdminNav />
+              <LazyProtectedRoute adminRoute={true}>
+                <LazyDashboardNav showAdminNav={true} />
+              </LazyProtectedRoute>
             </Suspense>
           }
         >
           <Route
-            path="/admin/user_management"
+            path="/admin/welcome"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <LazyDashboardHomePage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/admin/userManagement"
             element={
               <Suspense fallback={<LoadingState />}>
                 <LazyAdminUserManagementPage />

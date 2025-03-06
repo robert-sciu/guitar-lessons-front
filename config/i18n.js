@@ -188,7 +188,7 @@ i18n
       en: {
         translation: {
           common: {
-            nothingHere: "Nothing here yet",
+            nothingHere: "Nothing here... 🌵",
           },
           mainNav: {
             home: "Home",
@@ -229,7 +229,13 @@ i18n
             profileStatus: "Profile status",
             active: "active",
             inactive: "inactive",
-            admin: "Admin",
+            admin: "admin",
+          },
+          adminNav: {
+            dashboard: "standard dashboard",
+            users: "users",
+            tasks: "tasks",
+            tags: "tags",
           },
 
           userInfo: {

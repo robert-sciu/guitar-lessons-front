@@ -28,12 +28,15 @@ export const loginUser = createAsyncThunk(
 
 export const verifyStoredToken = createAsyncThunk(
   "auth/verifyStoredToken",
-  async ({ token }, { rejectWithValue }) => {
+  async ({ token, isAdmin = false }, { rejectWithValue }) => {
     try {
       if (token) {
-        const response = await apiClient.post("/auth/verifyToken", {
-          token,
-        });
+        const response = await apiClient.post(
+          `${isAdmin ? "/admin" : ""}/auth/verifyToken`,
+          {
+            token,
+          }
+        );
         if (response.status === 200) {
           return extractResponseData(response);
         }

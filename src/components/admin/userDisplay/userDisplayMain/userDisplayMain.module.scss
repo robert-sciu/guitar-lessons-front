@@ -4,10 +4,22 @@
 .userDisplayContainer {
   @extend .horizontalTileContainer;
   grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr;
+  // grid-template-rows: 1fr 1fr;
   align-items: center;
   .statusContainer {
     display: flex;
     align-items: center;
     gap: $size-xxxs;
   }
+}
+.userManagementPanel {
+  width: 100%;
+  height: 100%;
+  border-radius: $size-xxxxs;
+  box-shadow: $soft-shadow-gray;
+  background-color: $main-white-lightest;
+  padding: $size-xxxxs $size-xs;
+  margin-top: $size-xs;
+  display: flex;
+  flex-direction: column;
 }

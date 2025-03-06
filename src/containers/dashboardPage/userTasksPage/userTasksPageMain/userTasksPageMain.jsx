@@ -14,14 +14,15 @@ import {
   selectUserTaskToDeleteId,
 } from "../../../../store/userTasksSlice";
 import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/taskDisplayMain";
-import styles from "./userTasksPageMain.module.scss";
+// import styles from "./userTasksPageMain.module.scss";
 import { useTranslation } from "react-i18next";
-import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
+// import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
 import {
   selectUserTasksPageLoaded,
   setUserTasksPageLoaded,
 } from "../../../../store/loadStateSlice";
-import LoadingState from "../../../../components/loadingState/loadingState";
+// import LoadingState from "../../../../components/loadingState/loadingState";
+import DashboardContentContainer from "../../../dashboardContentContainer/DashboardContentContainer";
 
 export default function UserTasksPageMain() {
   const [fetchComplete, setFetchComplete] = useState(false);
@@ -60,39 +61,35 @@ export default function UserTasksPageMain() {
   }, [isFetchComplete, dispatch]);
 
   return (
-    <div className={styles.mainContainer}>
-      {(fetchComplete || dataLoaded) && (
-        <>
-          <h3>{t("myTasks.title")}</h3>
-          {userTasks?.length === 0 && <p>{t("common.nothingHere")}</p>}
-          {userTasks?.length > 0 &&
-            userTasks.map((task) => (
-              <TaskDisplay
-                key={task.id}
-                task={task}
-                enableDelete={true}
-                showTags={true}
-                enableShowMore={true}
-              />
-            ))}
-        </>
-      )}
-      {taskToDeleteId && (
-        <ModalWindowMain
-          modalType={"taskDelete"}
-          onSubmit={deleteUserTask}
-          onCancel={clearTaskToDeleteId}
-          data={taskToDeleteId}
+    <DashboardContentContainer
+      showContent={fetchComplete || dataLoaded}
+      contentHeader={t("myTasks.title")}
+      contentSubHeader={userTasks?.length === 0 && t("common.nothingHere")}
+      contentCol={userTasks?.map((task) => (
+        <TaskDisplay
+          key={task.id}
+          task={task}
+          enableDelete={true}
+          showTags={true}
+          enableShowMore={true}
         />
-      )}
-      {hasError && (
-        <ModalWindowMain
-          modalType={"error"}
-          data={errorMessage}
-          onCancel={clearUserTasksError}
-        />
-      )}
-      <LoadingState fadeOut={fetchComplete} inactive={dataLoaded} />
-    </div>
+      ))}
+      disableLoadingState={dataLoaded}
+      modals={[
+        {
+          showModal: taskToDeleteId,
+          modalType: "taskDelete",
+          onSubmit: deleteUserTask,
+          onCancel: clearTaskToDeleteId,
+          data: taskToDeleteId,
+        },
+        {
+          showModal: hasError,
+          modalType: "error",
+          onCancel: clearUserTasksError,
+          data: errorMessage,
+        },
+      ]}
+    />
   );
 }

@@ -32,11 +32,15 @@ const tagsSlice = createSlice({
 
     fetchComplete: false,
     tags: [],
+    selectedTags: [],
   },
   reducers: {
     clearTagsError: (state) => {
       state.hasError = false;
       state.error = null;
+    },
+    setSelectedTags: (state, action) => {
+      state.selectedTags = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -51,9 +55,10 @@ const tagsSlice = createSlice({
   },
 });
 
-export const { clearTagsError } = tagsSlice.actions;
+export const { clearTagsError, setSelectedTags } = tagsSlice.actions;
 
 export const selectTags = (state) => state.tags.tags;
+export const selectSelectedTags = (state) => state.tags.selectedTags;
 export const selectTagsLoadingStatus = (state) => state.tags.isLoading;
 export const selectTagsFetchStatus = (state) => state.tags.fetchComplete;
 export const selectTagsErrorStatus = (state) => state.tags.hasError;
