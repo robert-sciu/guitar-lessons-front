@@ -7,12 +7,15 @@ import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { debounce } from "lodash";
 import LoadingState from "../../loadingState/loadingState";
-import CustomDropdown from "../../modalWindows/customDropdown/customDropdown";
+import { classNameFormatter } from "../../../utilities/utilities";
 
 export default function ConfigurableUserInput({
   controllerType,
   label,
   userId,
+  isFlexColumn = false,
+
+  labelOnlyValue,
 
   showStatusLight = false,
   statusLightIsActive,
@@ -30,11 +33,6 @@ export default function ConfigurableUserInput({
 
   adjustableValueCurrent,
   showAdjustableValue = false,
-
-  dropdownType,
-  dropdownData,
-  dropdownSelectedValue,
-  dropdownSelectHandler,
 }) {
   const [unlockRedBtn, setUnlockRedBtn] = useState(false);
   const [unlockRedBtnInput, setUnlockRedBtnInput] = useState("");
@@ -43,7 +41,7 @@ export default function ConfigurableUserInput({
     adjustableValueCurrent
   );
   const [savingValue, setSavingValue] = useState(false);
-
+  console.log(savingValue);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -55,6 +53,8 @@ export default function ConfigurableUserInput({
   function clearInputs() {
     setUnlockRedBtn(false);
     setUnlockRedBtnInput("");
+    // setSavingValue(false);
+    setAdjustableValue(0);
   }
 
   function handleButtonClick(status) {
@@ -63,28 +63,31 @@ export default function ConfigurableUserInput({
   }
 
   const debauncedSaveAdjustableValue = useRef(
-    debounce((level) => {
-      dispatch(statusChangeHandler({ id: userId, [valueToUpdate]: level }));
+    debounce((value) => {
+      dispatch(statusChangeHandler({ id: userId, [valueToUpdate]: value }));
       setSavingValue(false);
     }, 1000)
   ).current;
 
   function handleValueAdjustment(value) {
-    if (value < 1) return;
+    if (Number(value) && value < 1) return;
     setSavingValue(true);
     clearInputs();
     setAdjustableValue(value);
     debauncedSaveAdjustableValue(value);
   }
 
-  // function handleDropdownSelect(value) {
-  // clearInputs();
-  // dispatch(statusChangeHandler({ id: userId, [valueToUpdate]: value }));
-  // console.log(value);
-  // }
+  function handleValueAdjustmentWithoutSaving(value) {
+    setAdjustableValue(value);
+  }
 
   return (
-    <div className={styles.mainContainer}>
+    <div
+      className={classNameFormatter({
+        styles,
+        classNames: ["mainContainer", isFlexColumn && "flexColumn"],
+      })}
+    >
       <div className={styles.labelContainer}>
         {<p>{label}</p>}
         {showStatusLight && <StatusLight isActive={statusLightIsActive} />}
@@ -93,7 +96,13 @@ export default function ConfigurableUserInput({
           <LoadingState spinnerOnly={true} inactive={!savingValue} />
         )}
       </div>
-      <div className={styles.controllerContainer}>
+
+      <div
+        className={classNameFormatter({
+          styles,
+          classNames: [controllerType === "textarea" && "textareaContainer"],
+        })}
+      >
         {controllerType === "enable-disable" && (
           <>
             {showGreenBtn && (
@@ -135,14 +144,30 @@ export default function ConfigurableUserInput({
             />
           </div>
         )}
-        {controllerType === "dropdown" && (
-          <CustomDropdown
-            availableReservationHours={dropdownData}
-            availableDurationValues={dropdownData}
-            availableWeekdays={dropdownData}
-            selectedValue={dropdownSelectedValue}
-            onSelect={dropdownSelectHandler}
-            type={dropdownType}
+        {controllerType === "only-label" && <p>{labelOnlyValue}</p>}
+        {controllerType === "number-input" && (
+          <div className={styles.numberInputContainer}>
+            <input
+              type="number"
+              value={adjustableValue}
+              onChange={(e) =>
+                handleValueAdjustmentWithoutSaving(e.target.value)
+              }
+            />
+
+            <Button
+              label={greenBtnLabel}
+              style="greenBtn"
+              // disabled={!showGreenBtn || disableGreenBtn}
+              onClick={() => handleButtonClick(adjustableValue)}
+            />
+          </div>
+        )}
+        {controllerType === "textarea" && (
+          <textarea
+            className={styles.textarea}
+            value={adjustableValue || ""}
+            onChange={(e) => handleValueAdjustment(e.target.value)}
           />
         )}
       </div>
@@ -164,7 +189,14 @@ ConfigurableUserInput.propTypes = {
   statusChangeHandler: PropTypes.func,
   valueToUpdate: PropTypes.string,
   userId: PropTypes.number,
+  hideLabel: PropTypes.bool,
   showAdjustableValue: PropTypes.bool,
-  adjustableValueCurrent: PropTypes.number,
   showSpinner: PropTypes.bool,
+  savingValue: PropTypes.bool,
+  disableGreenBtn: PropTypes.bool,
+  adjustableValue: PropTypes.number,
+  labelOnlyValue: PropTypes.any,
+  showAdminLink: PropTypes.bool,
+  adjustableValueCurrent: PropTypes.any,
+  isFlexColumn: PropTypes.bool,
 };

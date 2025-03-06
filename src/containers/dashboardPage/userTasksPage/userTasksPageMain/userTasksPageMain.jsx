@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   clearTaskToDeleteId,
   clearUserTasksError,
@@ -14,55 +13,27 @@ import {
   selectUserTaskToDeleteId,
 } from "../../../../store/userTasksSlice";
 import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/taskDisplayMain";
-// import styles from "./userTasksPageMain.module.scss";
 import { useTranslation } from "react-i18next";
-// import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
-import {
-  selectUserTasksPageLoaded,
-  setUserTasksPageLoaded,
-} from "../../../../store/loadStateSlice";
-// import LoadingState from "../../../../components/loadingState/loadingState";
 import DashboardContentContainer from "../../../dashboardContentContainer/DashboardContentContainer";
+import useReduxFetch from "../../../../hooks/useReduxFetch";
 
 export default function UserTasksPageMain() {
-  const [fetchComplete, setFetchComplete] = useState(false);
-
-  const dispatch = useDispatch();
   const { t } = useTranslation();
 
-  const dataLoaded = useSelector(selectUserTasksPageLoaded);
-
   const userTasks = useSelector(selectUserTasks);
-  const isLoading = useSelector(selectUserTasksLoadingStatus);
   const isFetchComplete = useSelector(selectUserTasksFetchStatus);
-  const hasError = useSelector(selectUserTasksErrorStatus);
-  const errorMessage = useSelector(selectUserTasksErrorMessage);
-  const taskToDeleteId = useSelector(selectUserTaskToDeleteId);
-  // const userTasksFetchComplete = useSelector(selectUserTasksFetchComplete);
-  const userTasksRefetchNeeded = useSelector(selectUserTasksRefetchNeeded);
 
-  useEffect(() => {
-    if (!isFetchComplete && !isLoading && !hasError) {
-      dispatch(fetchUserTasks());
-    }
-  }, [isFetchComplete, isLoading, hasError, dispatch]);
-
-  useEffect(() => {
-    if (userTasksRefetchNeeded) {
-      dispatch(fetchUserTasks());
-    }
+  useReduxFetch({
+    fetchAction: fetchUserTasks,
+    fetchCompleteSelector: selectUserTasksFetchStatus,
+    loadingSelector: selectUserTasksLoadingStatus,
+    errorSelector: selectUserTasksErrorStatus,
+    refetchSelector: selectUserTasksRefetchNeeded,
   });
-
-  useEffect(() => {
-    if (isFetchComplete) {
-      setFetchComplete(true);
-      dispatch(setUserTasksPageLoaded());
-    }
-  }, [isFetchComplete, dispatch]);
 
   return (
     <DashboardContentContainer
-      showContent={fetchComplete || dataLoaded}
+      showContent={isFetchComplete}
       contentHeader={t("myTasks.title")}
       contentSubHeader={userTasks?.length === 0 && t("common.nothingHere")}
       contentCol={userTasks?.map((task) => (
@@ -70,24 +41,24 @@ export default function UserTasksPageMain() {
           key={task.id}
           task={task}
           enableDelete={true}
-          showTags={true}
+          showTags={false}
           enableShowMore={true}
         />
       ))}
-      disableLoadingState={dataLoaded}
+      disableLoadingState={isFetchComplete}
       modals={[
         {
-          showModal: taskToDeleteId,
+          showModal: useSelector(selectUserTaskToDeleteId),
           modalType: "taskDelete",
           onSubmit: deleteUserTask,
           onCancel: clearTaskToDeleteId,
-          data: taskToDeleteId,
+          data: useSelector(selectUserTaskToDeleteId),
         },
         {
-          showModal: hasError,
+          showModal: useSelector(selectUserTasksErrorStatus),
           modalType: "error",
           onCancel: clearUserTasksError,
-          data: errorMessage,
+          data: useSelector(selectUserTasksErrorMessage),
         },
       ]}
     />

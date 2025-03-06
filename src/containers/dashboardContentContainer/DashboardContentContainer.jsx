@@ -16,6 +16,7 @@ export default function DashboardContentContainer({
   disableLoadingState,
   modals,
 }) {
+  if (!showContent) return;
   return (
     <div
       className={classNameFormatter({
@@ -33,7 +34,7 @@ export default function DashboardContentContainer({
         })}
       >
         <div className={styles.headerContainer}>
-          <div>
+          <div className={styles.header}>
             {contentHeader && <h3>{contentHeader}</h3>}
             {tagFilter && tagFilter}
             {contentSubHeader && <h6>{contentSubHeader}</h6>}
@@ -75,4 +76,6 @@ DashboardContentContainer.propTypes = {
   isStretchedVertically: PropTypes.bool,
   contentHeader: PropTypes.string,
   contentSubHeader: PropTypes.string,
+  contentFilter: PropTypes.element,
+  tagFilter: PropTypes.element,
 };

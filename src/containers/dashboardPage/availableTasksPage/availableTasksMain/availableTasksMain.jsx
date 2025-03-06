@@ -11,10 +11,6 @@ import {
 } from "../../../../store/userTasksSlice";
 import { selectUserInfoMinimumDifficultyLevel } from "../../../../store/userInfoSlice";
 import {
-  selectAvailableTasksPageLoaded,
-  setAvailableTasksPageLoaded,
-} from "../../../../store/loadStateSlice";
-import {
   clearTasksError,
   fetchAvailableTasks,
   selectTasks,
@@ -23,7 +19,9 @@ import {
   selectTasksFetchStatus,
   selectTasksLoadingStatus,
   selectTasksMinimumDifficultyLevel,
+  selectTasksRefetchNeeded,
   setTasksMinimumDifficultyLevel,
+  setTasksRefetchNeeded,
 } from "../../../../store/tasksSlice";
 import {
   clearTagsError,
@@ -33,66 +31,57 @@ import {
   selectTagsErrorStatus,
   selectTagsFetchStatus,
   selectTagsLoadingStatus,
+  selectTagsRefetchNeeded,
 } from "../../../../store/tagsSlice";
 
 // import styles from "./availableTasksMain.module.scss";
 
 import TasksLevelFilter from "../tasksLevelFilter/tasksLevelFilter";
 import TagFilter from "../tagFilter/tagFilter";
+import useReduxFetch from "../../../../hooks/useReduxFetch";
 
 export default function AvailableTasksMain() {
-  const [fetchComplete, setFetchComplete] = useState(false);
   const [filteredTasks, setFilteredTasks] = useState([]);
 
   const dispatch = useDispatch();
 
-  const dataLoaded = useSelector(selectAvailableTasksPageLoaded);
-
   const tasks = useSelector(selectTasks);
-  const isLoadingTasks = useSelector(selectTasksLoadingStatus);
   const isFetchCompleteTasks = useSelector(selectTasksFetchStatus);
-  const hasErrorTasks = useSelector(selectTasksErrorStatus);
-  const errorMessageTasks = useSelector(selectTasksErrorMessage);
-  //prettier-ignore
-  const minimumDifficultyLevelTasks = useSelector(selectTasksMinimumDifficultyLevel);
 
-  const isFetchCompleteTags = useSelector(selectTagsFetchStatus);
   const selectedTags = useSelector(selectSelectedTags);
-  const isLoadingTags = useSelector(selectTagsLoadingStatus);
-  const hasErrorTags = useSelector(selectTagsErrorStatus);
-  const errorMessageTags = useSelector(selectTagsErrorMessage);
+  const isFetchCompleteTags = useSelector(selectTagsFetchStatus);
   //prettier-ignore
-  const userInfoMinimumDifficultyLevel = useSelector(selectUserInfoMinimumDifficultyLevel);
+
+  const minimumDifficultyLevelTasks = useSelector(selectTasksMinimumDifficultyLevel);
+  const userInfoMinimumDifficultyLevel = useSelector(
+    selectUserInfoMinimumDifficultyLevel
+  );
   // if task is added to userTasks we use this state to refetch tasks excluding the added task
   const userTaskUpdated = useSelector(selectUserTaskUpdated);
 
-  const { t } = useTranslation();
+  useReduxFetch({
+    fetchAction: fetchAvailableTasks,
+    fetchCompleteSelector: selectTasksFetchStatus,
+    loadingSelector: selectTasksLoadingStatus,
+    errorSelector: selectTasksErrorStatus,
+    refetchSelector: selectTasksRefetchNeeded,
+  });
 
-  // fetch tasks on mount
-  useEffect(() => {
-    if (!isFetchCompleteTasks && !isLoadingTasks && !hasErrorTasks) {
-      dispatch(fetchAvailableTasks());
-      dispatch(setTasksMinimumDifficultyLevel(userInfoMinimumDifficultyLevel));
-    }
-  }, [
-    dispatch,
-    isFetchCompleteTasks,
-    isLoadingTasks,
-    hasErrorTasks,
-    userInfoMinimumDifficultyLevel,
-  ]);
-  // fetch tags on mount
-  useEffect(() => {
-    if (!isFetchCompleteTags && !isLoadingTags && !hasErrorTags) {
-      dispatch(fetchTags());
-    }
-  }, [dispatch, isFetchCompleteTags, isLoadingTags, hasErrorTags]);
+  useReduxFetch({
+    fetchAction: fetchTags,
+    fetchCompleteSelector: selectTagsFetchStatus,
+    loadingSelector: selectTagsLoadingStatus,
+    errorSelector: selectTagsErrorStatus,
+    refetchSelector: selectTagsRefetchNeeded,
+  });
+
+  const { t } = useTranslation();
 
   // if minimum difficulty level changed we need to refetch tasks
   useEffect(() => {
     if (minimumDifficultyLevelTasks !== userInfoMinimumDifficultyLevel) {
       dispatch(setTasksMinimumDifficultyLevel(userInfoMinimumDifficultyLevel));
-      dispatch(fetchAvailableTasks());
+      dispatch(setTasksRefetchNeeded());
     }
   });
 
@@ -100,7 +89,7 @@ export default function AvailableTasksMain() {
   useEffect(() => {
     if (userTaskUpdated) {
       dispatch(clearUserTaskUpdated());
-      dispatch(fetchAvailableTasks());
+      dispatch(setTasksRefetchNeeded());
     }
   }, [dispatch, userTaskUpdated]);
 
@@ -116,16 +105,9 @@ export default function AvailableTasksMain() {
     }
   }, [selectedTags, tasks]);
 
-  useEffect(() => {
-    if (isFetchCompleteTasks && isFetchCompleteTags) {
-      setFetchComplete(true);
-      dispatch(setAvailableTasksPageLoaded());
-    }
-  }, [isFetchCompleteTasks, isFetchCompleteTags, setFetchComplete, dispatch]);
-
   return (
     <DashboardContentContainer
-      showContent={fetchComplete || dataLoaded}
+      showContent={isFetchCompleteTags && isFetchCompleteTasks}
       contentHeader={t("availableTasks.title")}
       contentSubHeader={filteredTasks?.length === 0 && t("common.nothingHere")}
       contentFilter={<TasksLevelFilter />}
@@ -138,19 +120,19 @@ export default function AvailableTasksMain() {
           showTags={true}
         />
       ))}
-      disableLoadingState={dataLoaded}
+      disableLoadingState={isFetchCompleteTags && isFetchCompleteTasks}
       modals={[
         {
-          showModal: hasErrorTasks,
+          showModal: useSelector(selectTasksErrorStatus),
           modalType: "error",
           onCancel: clearTasksError,
-          data: errorMessageTasks,
+          data: useSelector(selectTasksErrorMessage),
         },
         {
-          showModal: hasErrorTags,
+          showModal: useSelector(selectTagsErrorStatus),
           modalType: "error",
           onCancel: clearTagsError,
-          data: errorMessageTags,
+          data: useSelector(selectTagsErrorMessage),
         },
       ]}
     />

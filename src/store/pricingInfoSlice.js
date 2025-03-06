@@ -27,20 +27,7 @@ const pricingInfoSlice = createSlice({
     hasError: false,
     error: null,
     fetchComplete: false,
-    pricingData: {
-      pricingPl: {
-        regular: null,
-        permanent60: null,
-        permanent90: null,
-        permanent120: null,
-      },
-      pricingEn: {
-        regular: null,
-        permanent60: null,
-        permanent90: null,
-        permanent120: null,
-      },
-    },
+    pricingData: [],
   },
   reducers: {
     clearPricingInfoError: (state) => {

@@ -8,11 +8,11 @@ import {
   HiMagnifyingGlassPlus,
   HiCheck,
   HiCalendarDays,
-  HiOutlineCurrencyDollar,
   HiOutlinePower,
   HiMiniWrenchScrewdriver,
   HiMiniUserGroup,
   HiOutlineTag,
+  HiOutlineBookOpen,
 } from "react-icons/hi2";
 import styles from "./dashboardNavLinks.module.scss";
 import PropTypes from "prop-types";
@@ -54,9 +54,9 @@ export default function DashboardNavLinks({
               icon={<HiCalendarDays />}
             />
             <NavLinkBtn
-              to="/dashboard/payments"
-              label={t("dashboardNav.payments")}
-              icon={<HiOutlineCurrencyDollar />}
+              to="/dashboard/notes"
+              label={t("dashboardNav.notes")}
+              icon={<HiOutlineBookOpen />}
             />
           </>
         )}

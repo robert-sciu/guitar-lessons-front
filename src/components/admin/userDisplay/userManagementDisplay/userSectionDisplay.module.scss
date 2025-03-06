@@ -1,14 +1,21 @@
 @import "../../../../../styles/variables.module.scss";
 
 .mainContainer {
-  margin: $size-xxxs 0;
+  // margin: $size-xxxxs 0;
   width: 100%;
   display: grid;
-  gap: $size-xxxs;
+  gap: $size-xxs;
   padding: $size-l;
-  border-radius: $size-xxxxs;
+  // border-bottom: 1px dotted $main-gray;
+
+  // border-top: 1px dotted $main-gray;
+  // box-shadow: $inset-soft-shadow;
   // justify-items: stretch;
 }
+
+// .mainContainer:last-child {
+//   border-bottom: none;
+// }
 
 .columns-2 {
   grid-template-columns: repeat(2, 1fr);

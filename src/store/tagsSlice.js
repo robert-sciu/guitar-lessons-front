@@ -61,6 +61,7 @@ export const selectTags = (state) => state.tags.tags;
 export const selectSelectedTags = (state) => state.tags.selectedTags;
 export const selectTagsLoadingStatus = (state) => state.tags.isLoading;
 export const selectTagsFetchStatus = (state) => state.tags.fetchComplete;
+export const selectTagsRefetchNeeded = (state) => state.tags.refetchNeeded;
 export const selectTagsErrorStatus = (state) => state.tags.hasError;
 export const selectTagsErrorMessage = (state) => state.tags.error;
 

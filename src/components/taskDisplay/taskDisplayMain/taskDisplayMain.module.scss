@@ -3,7 +3,7 @@
 
 .taskDisplayContainer {
   @extend .horizontalTileContainer;
-  grid-template-columns: 5fr 2fr 1fr 1fr;
+  grid-template-columns: 4fr 3fr 1fr 1fr;
   .title {
     display: flex;
     align-items: center;
@@ -23,9 +23,11 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: $size-xxxs;
     align-content: center;
+    justify-content: center;
   }
   .taskDifficulty {
     display: flex;
     align-items: center;
+    justify-content: center;
   }
 }

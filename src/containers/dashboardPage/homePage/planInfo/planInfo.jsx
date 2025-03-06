@@ -1,74 +1,67 @@
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
 // import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
 import InfoTile from "../infoTile/infoTile";
 
-import {
-  // clearPlanInfoError,
-  selectPlanInfoDiscount,
-  // selectPlanInfoErrorMessage,
-  // selectPlanInfoErrorStatus,
-} from "../../../../store/planInfoSlice";
+import // clearPlanInfoError,
+// selectPlanInfoDiscount,
+// selectPlanInfoErrorMessage,
+// selectPlanInfoErrorStatus,
+"../../../../store/planInfoSlice";
 
 import styles from "./planInfo.module.scss";
 
-import { utcTimeToLocalTimeString } from "../../../../utilities/calendarUtilities";
+// import { utcTimeToLocalTimeString } from "../../../../utilities/calendarUtilities";
 
 import PropTypes from "prop-types";
+import {
+  calculatePayment,
+  calculateSingleLessonPrice,
+} from "../../../../utilities/utilities";
+// import { constrainPoint } from "@fullcalendar/core/internal";
 
 export default function PlanInfo({ planInfo, pricingInfo }) {
-  //the discount is calculated at planInfoSlice
-  const discount = useSelector(selectPlanInfoDiscount);
-  // const planInfoHasError = useSelector(selectPlanInfoErrorStatus);
-  // const planInfoError = useSelector(selectPlanInfoErrorMessage);
-
   const { t } = useTranslation();
-  const { i18n } = useTranslation();
-  const language = ["en", "pl"].includes(i18n.language) ? i18n.language : "en";
-
-  const date = t(`daysOfTheWeek.${planInfo.permanent_reservation_weekday}`);
-  const time =
-    planInfo.permanent_reservation_start_hour_UTC &&
-    utcTimeToLocalTimeString(planInfo.permanent_reservation_start_hour_UTC);
-  const hasPermanentReservation = planInfo.has_permanent_reservation;
+  // const { i18n } = useTranslation();
+  // const language = ["en", "pl"].includes(i18n.language) ? i18n.language : "en";
 
   return (
     <div className={styles.planInfoContainer}>
       <h4>{t("planInfo.basicInfo")}</h4>
       <div className={styles.detailsContainer}>
         <InfoTile
-          label={t("planInfo.hasPermanentReservation")}
+          label={t("planInfo.discount")}
+          content={`${planInfo.discount}%`}
+        />
+        <InfoTile
+          label={t("planInfo.lessonPrice")}
+          content={calculateSingleLessonPrice({ planInfo, pricingInfo })}
+        />
+
+        <InfoTile
+          label={t("planInfo.Balance")}
           content={
-            hasPermanentReservation
-              ? t("planInfo.active")
-              : t("planInfo.inactive")
+            planInfo &&
+            pricingInfo[0] &&
+            calculatePayment({ planInfo, pricingInfo })
           }
           contentClassNames={
-            hasPermanentReservation ? ["active"] : ["inactive"]
+            planInfo.lesson_balance >= 0 ? ["active"] : ["inactive"]
           }
         />
         <InfoTile
-          label={t("planInfo.reschedulesLeftCount")}
-          content={planInfo.reschedules_left_count}
+          label={t("planInfo.completedLessonsCount")}
+          content={planInfo.lesson_count}
+        />
+        <InfoTile
+          label={t("planInfo.reschedulesCount")}
+          content={planInfo.rescheduled_lesson_count}
         />
         <InfoTile
           label={t("planInfo.cancelledLessonsCount")}
           content={planInfo.cancelled_lesson_count}
         />
-        <InfoTile label={t("planInfo.discount")} content={`${discount}%`} />
-        {hasPermanentReservation && (
-          <>
-            <InfoTile
-              label={t("planInfo.permanentReservationDate")}
-              content={`${date}, ${time}`}
-            />
-            <InfoTile
-              label={t("planInfo.lessonDuration")}
-              content={`${planInfo.permanent_reservation_lesson_duration} min`}
-            />
-          </>
-        )}
       </div>
     </div>
   );
@@ -76,4 +69,5 @@ export default function PlanInfo({ planInfo, pricingInfo }) {
 
 PlanInfo.propTypes = {
   planInfo: PropTypes.object.isRequired,
+  pricingInfo: PropTypes.array.isRequired,
 };

@@ -2,7 +2,6 @@ import Button from "../../../elements/button/button";
 import styles from "./userDisplayMain.module.scss";
 
 import propTypes from "prop-types";
-// import UserManagementPanel from "../userManagementPanel/userManagementPanel";
 import StatusLight from "../../../elements/statusLight/statusLight";
 import BasicUserStatusManager from "../basicUserStatusManager/basicUserStatusManager";
 import PlanInfoManager from "../planInfoManager/planInfoManager";
@@ -11,8 +10,9 @@ import {
   selectAdminUserShowMoreId,
   setShowMoreId,
 } from "../../../../store/admin/adminUserInfoSlice";
+import NotesManager from "../notesManager/notesManager";
 
-export default function UserDisplayMain({ user, planInfo }) {
+export default function UserDisplayMain({ user, planInfo, pricingInfo }) {
   const dispatch = useDispatch();
 
   const showMoreId = useSelector(selectAdminUserShowMoreId);
@@ -45,13 +45,13 @@ export default function UserDisplayMain({ user, planInfo }) {
             onClick={handleShowMore}
             disabled={user.role === "admin"}
           />
-          {/* {showMore && <UserManagementPanel user={user} planInfo={planInfo} />} */}
         </div>
       )}
       {showMoreId === user.id && (
         <div className={styles.userManagementPanel}>
           <BasicUserStatusManager user={user} />
-          <PlanInfoManager planInfo={planInfo} />
+          <PlanInfoManager planInfo={planInfo} pricingInfo={pricingInfo} />
+          <NotesManager user={user} />
         </div>
       )}
     </>
@@ -61,4 +61,5 @@ export default function UserDisplayMain({ user, planInfo }) {
 UserDisplayMain.propTypes = {
   user: propTypes.object,
   planInfo: propTypes.object,
+  pricingInfo: propTypes.array,
 };

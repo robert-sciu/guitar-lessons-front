@@ -64,6 +64,9 @@ const tasksSlice = createSlice({
     setTasksMinimumDifficultyLevel: (state, action) => {
       state.tasksMinimumDifficulty = action.payload;
     },
+    setTasksRefetchNeeded: (state) => {
+      state.refetchNeeded = true;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchAvailableTasks.pending, (state) => {
@@ -83,14 +86,18 @@ const tasksSlice = createSlice({
   },
 });
 
-export const { clearTasksError, setTasksMinimumDifficultyLevel } =
-  tasksSlice.actions;
+export const {
+  clearTasksError,
+  setTasksMinimumDifficultyLevel,
+  setTasksRefetchNeeded,
+} = tasksSlice.actions;
 
 export const selectTasks = (state) => state.tasks.tasks;
 export const selectTasksLoadingStatus = (state) => state.tasks.isLoading;
 export const selectTasksFetchStatus = (state) => state.tasks.fetchComplete;
 export const selectTasksErrorStatus = (state) => state.tasks.hasError;
 export const selectTasksErrorMessage = (state) => state.tasks.error;
+export const selectTasksRefetchNeeded = (state) => state.tasks.refetchNeeded;
 
 export const selectTasksMinimumDifficultyLevel = (state) =>
   state.tasks.tasksMinimumDifficulty;

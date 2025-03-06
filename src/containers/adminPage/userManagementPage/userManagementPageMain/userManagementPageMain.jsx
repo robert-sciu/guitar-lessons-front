@@ -30,6 +30,15 @@ import {
   selectAdminUserInfoPageLoaded,
   setAdminUserInfoPageLoaded,
 } from "../../../../store/loadStateSlice";
+import {
+  clearPricingInfoError,
+  fetchPricingInfo,
+  selectPricingInfo,
+  selectPricingInfoErrorMessage,
+  selectPricingInfoErrorStatus,
+  selectPricingInfoFetchStatus,
+  selectPricingInfoLoadingStatus,
+} from "../../../../store/pricingInfoSlice";
 
 export default function UserManagementPageMain() {
   const dispatch = useDispatch();
@@ -62,6 +71,12 @@ export default function UserManagementPageMain() {
     selectAdminUserInfoRefetchNeeded
   );
 
+  const pricingInfo = useSelector(selectPricingInfo);
+  const pricingInfoIsLoading = useSelector(selectPricingInfoLoadingStatus);
+  const pricingInfoHasError = useSelector(selectPricingInfoErrorStatus);
+  const pricingInfoErrorMessage = useSelector(selectPricingInfoErrorMessage);
+  const pricingInfoFetchComplete = useSelector(selectPricingInfoFetchStatus);
+
   useEffect(() => {
     if (
       !adminUserInfoFetchComplete &&
@@ -93,7 +108,26 @@ export default function UserManagementPageMain() {
   ]);
 
   useEffect(() => {
-    if (adminUserInfoFetchComplete && adminPlanInfoFetchComplete) {
+    if (
+      !pricingInfoFetchComplete &&
+      !pricingInfoIsLoading &&
+      !pricingInfoHasError
+    ) {
+      dispatch(fetchPricingInfo());
+    }
+  }, [
+    pricingInfoFetchComplete,
+    pricingInfoIsLoading,
+    pricingInfoHasError,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    if (
+      adminUserInfoFetchComplete &&
+      adminPlanInfoFetchComplete &&
+      pricingInfoFetchComplete
+    ) {
       dispatch(setAdminUserInfoPageLoaded());
     }
   });
@@ -123,6 +157,7 @@ export default function UserManagementPageMain() {
             key={user.id}
             user={user}
             planInfo={adminPlanInfo[user.id]}
+            pricingInfo={pricingInfo}
           />
         ))
       }
@@ -139,6 +174,12 @@ export default function UserManagementPageMain() {
           modalType: "error",
           data: adminPlanInfoErrorMessage,
           onCancel: clearAdminPlayInfoError,
+        },
+        {
+          showModal: pricingInfoHasError,
+          modalType: "error",
+          data: pricingInfoErrorMessage,
+          onCancel: clearPricingInfoError,
         },
       ]}
     />

@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
 import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/taskDisplayMain";
-import LoadingState from "../../../../components/loadingState/loadingState";
-import ModalWindowMain from "../../../../components/modalWindows/modalWindow/modalWindowMain";
 
 import {
   clearCompletedUserTasksError,
@@ -21,7 +19,7 @@ import {
   setCompletedUserTasksPageLoaded,
 } from "../../../../store/loadStateSlice";
 
-import styles from "./completedUserTasksMain.module.scss";
+import DashboardContentContainer from "../../../dashboardContentContainer/DashboardContentContainer";
 
 export default function UserTasksPageMain() {
   const [fetchComplete, setFetchComplete] = useState(false);
@@ -58,31 +56,30 @@ export default function UserTasksPageMain() {
   }, [isFetchComplete, dispatch]);
 
   return (
-    <div className={styles.mainContainer}>
-      {(fetchComplete || dataLoaded) && (
-        <>
-          <h3>{t("completedTasks.title")}</h3>
-          {completedUserTasks.length === 0 && <p>{t("common.nothingHere")}</p>}
-          {completedUserTasks.length > 0 &&
-            completedUserTasks.map((task) => (
-              <TaskDisplay
-                key={task.id}
-                task={task}
-                enableDelete={false}
-                showTags={false}
-                enableShowMore={true}
-              />
-            ))}
-        </>
-      )}
-      {hasError && (
-        <ModalWindowMain
-          modalType={"error"}
-          data={errorMessage}
-          onCancel={clearCompletedUserTasksError}
+    <DashboardContentContainer
+      showContent={fetchComplete || dataLoaded}
+      contentHeader={t("completedTasks.title")}
+      contentSubHeader={
+        completedUserTasks?.length === 0 && t("common.nothingHere")
+      }
+      contentCol={completedUserTasks?.map((task) => (
+        <TaskDisplay
+          key={task.id}
+          task={task}
+          enableDelete={false}
+          showTags={false}
+          enableShowMore={true}
         />
-      )}
-      <LoadingState fadeOut={fetchComplete} inactive={dataLoaded} />
-    </div>
+      ))}
+      disableLoadingState={dataLoaded}
+      modals={[
+        {
+          showModal: hasError,
+          modalType: "error",
+          onCancel: clearCompletedUserTasksError,
+          data: errorMessage,
+        },
+      ]}
+    />
   );
 }

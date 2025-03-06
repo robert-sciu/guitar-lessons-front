@@ -56,6 +56,10 @@ const LazyFullCalendarPage = React.lazy(() =>
   import("./containers/dashboardPage/fullCalendarPage/fullCalendarPage")
 );
 
+const LazyNotesPage = React.lazy(() =>
+  import("./containers/dashboardPage/notesPage/notesPage")
+);
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 const LazyAdminUserManagementPage = React.lazy(() =>
@@ -157,6 +161,14 @@ function App() {
             element={
               <Suspense fallback={<LoadingState />}>
                 <LazyFullCalendarPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/dashboard/notes"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <LazyNotesPage />
               </Suspense>
             }
           />

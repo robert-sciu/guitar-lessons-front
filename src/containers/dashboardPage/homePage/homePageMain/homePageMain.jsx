@@ -1,10 +1,6 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
+import { useSelector } from "react-redux";
 import UserInfo from "../userInfo/userInfo";
 import PlanInfo from "../planInfo/planInfo";
-// import LoadingState from "../../../../components/loadingState/loadingState";
-
 import {
   cancelEmailChange,
   clearUserInfoError,
@@ -25,12 +21,7 @@ import {
   selectPlanInfoFetchStatus,
   selectPlanInfoLoadingStatus,
 } from "../../../../store/planInfoSlice";
-import {
-  selectDashboardHomePageLoaded,
-  setDashboardHomePageLoaded,
-} from "../../../../store/loadStateSlice";
 
-// import styles from "./homePageMain.module.scss";
 import DashboardContentContainer from "../../../dashboardContentContainer/DashboardContentContainer";
 import {
   clearPricingInfoError,
@@ -41,17 +32,10 @@ import {
   selectPricingInfoFetchStatus,
   selectPricingInfoLoadingStatus,
 } from "../../../../store/pricingInfoSlice";
+import useReduxFetch from "../../../../hooks/useReduxFetch";
+import { selectAdminPlanInfoRefetchNeeded } from "../../../../store/admin/adminPlanInfoSlice";
 
 export default function HomePageMain() {
-  const [fetchComplete, setFetchComplete] = useState(false);
-
-  const dispatch = useDispatch();
-
-  const dataLoaded = useSelector(selectDashboardHomePageLoaded);
-
-  const planInfoIsLoading = useSelector(selectPlanInfoLoadingStatus);
-  const pricingInfoIsLoading = useSelector(selectPricingInfoLoadingStatus);
-
   const planInfoFetchComplete = useSelector(selectPlanInfoFetchStatus);
   const userInfoFetchComplete = useSelector(selectUserInfoFetchStatus);
   const pricingInfoFetchComplete = useSelector(selectPricingInfoFetchStatus);
@@ -60,75 +44,61 @@ export default function HomePageMain() {
   const userInfo = useSelector(selectUserInfo);
   const pricingInfo = useSelector(selectPricingInfo);
 
-  const emailChangeConfirmationCodeRequired = useSelector(
-    selectEmailChangeConfirmationCodeRequired
-  );
-  const userInfoHasError = useSelector(selectUserInfoErrorStatus);
-  const userInfoError = useSelector(selectUserInfoErrorMessage);
-  const planInfoHasError = useSelector(selectPlanInfoErrorStatus);
-  const planInfoError = useSelector(selectPlanInfoErrorMessage);
-
-  const pricingInfoHasError = useSelector(selectPricingInfoErrorStatus);
-  const pricingInfoError = useSelector(selectPricingInfoErrorMessage);
-
-  //user info is fetched at dashboard nav as it's needed in multiple places
-  //plan info is fetched here before displaying the main dashboard page
-
-  useEffect(() => {
-    if (!planInfoFetchComplete && !planInfoIsLoading && !planInfoHasError) {
-      dispatch(fetchPlanInfo());
-    }
-  }, [planInfoFetchComplete, planInfoIsLoading, planInfoHasError, dispatch]);
-
-  useEffect(() => {
-    if (
-      !pricingInfoFetchComplete &&
-      !pricingInfoIsLoading &&
-      !pricingInfoHasError
-    ) {
-      dispatch(fetchPricingInfo());
-    }
+  useReduxFetch({
+    fetchAction: fetchPlanInfo,
+    fetchCompleteSelector: selectPlanInfoFetchStatus,
+    loadingSelector: selectPlanInfoLoadingStatus,
+    errorSelector: selectPlanInfoErrorStatus,
+    refetchSelector: selectAdminPlanInfoRefetchNeeded,
   });
 
-  useEffect(() => {
-    if (userInfoFetchComplete && planInfoFetchComplete) {
-      setFetchComplete(true);
-      dispatch(setDashboardHomePageLoaded());
-    }
-  }, [userInfoFetchComplete, planInfoFetchComplete, dispatch]);
+  useReduxFetch({
+    fetchAction: fetchPricingInfo,
+    fetchCompleteSelector: selectPricingInfoFetchStatus,
+    loadingSelector: selectPricingInfoLoadingStatus,
+    errorSelector: selectPricingInfoErrorStatus,
+  });
 
   return (
     <DashboardContentContainer
-      showContent={fetchComplete || dataLoaded}
+      showContent={
+        planInfoFetchComplete &&
+        userInfoFetchComplete &&
+        pricingInfoFetchComplete
+      }
       isStretchedVertically={true}
       contentCol={<UserInfo userInfo={userInfo} />}
       additionalContentCol={
         <PlanInfo planInfo={planInfo} pricingInfo={pricingInfo} />
       }
-      disableLoadingState={dataLoaded}
+      disableLoadingState={
+        planInfoFetchComplete &&
+        userInfoFetchComplete &&
+        pricingInfoFetchComplete
+      }
       modals={[
         {
-          showModal: emailChangeConfirmationCodeRequired,
+          showModal: useSelector(selectEmailChangeConfirmationCodeRequired),
           modalType: "codeRequired",
           onSubmit: updateEmail,
           onCancel: cancelEmailChange,
         },
         {
-          showModal: userInfoHasError,
+          showModal: useSelector(selectUserInfoErrorStatus),
           modalType: "error",
-          data: userInfoError,
+          data: useSelector(selectUserInfoErrorMessage),
           onCancel: clearUserInfoError,
         },
         {
-          showModal: planInfoHasError,
+          showModal: useSelector(selectPlanInfoErrorStatus),
           modalType: "error",
-          data: planInfoError,
+          data: useSelector(selectPlanInfoErrorMessage),
           onCancel: clearPlanInfoError,
         },
         {
-          showModal: pricingInfoHasError,
+          showModal: useSelector(selectPricingInfoErrorStatus),
           modalType: "error",
-          data: pricingInfoError,
+          data: useSelector(selectPricingInfoErrorMessage),
           onCancel: clearPricingInfoError,
         },
       ]}
