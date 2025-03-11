@@ -7,18 +7,49 @@ import BasicUserStatusManager from "../basicUserStatusManager/basicUserStatusMan
 import PlanInfoManager from "../planInfoManager/planInfoManager";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  selectAdminUserInfoRefetchNeeded,
+  selectAdminUserSelectedUserId,
   selectAdminUserShowMoreId,
+  setSelectedUser,
   setShowMoreId,
 } from "../../../../store/admin/adminUserInfoSlice";
-import NotesManager from "../notesManager/notesManager";
+// import NotesManager from "../notesManager/notesManager";
+import { setTasksRefetchNeeded } from "../../../../store/tasksSlice";
+import { useEffect } from "react";
+import { setUserTasksRefetchNeeded } from "../../../../store/userTasksSlice";
 
 export default function UserDisplayMain({ user, planInfo, pricingInfo }) {
   const dispatch = useDispatch();
 
   const showMoreId = useSelector(selectAdminUserShowMoreId);
 
+  const selectedUserId = useSelector(selectAdminUserSelectedUserId);
+  const userIsSelected = selectedUserId === user.id;
+
+  const userIsFullyActivated = user.is_active && user.is_verified;
+
+  const userRefetchNeeded = useSelector(selectAdminUserInfoRefetchNeeded);
+
+  useEffect(() => {
+    //if user was updated we need to refetch the tasks. not too pretty but it works
+    if (userRefetchNeeded) {
+      dispatch(setTasksRefetchNeeded());
+    }
+  });
+
   function handleShowMore() {
     dispatch(setShowMoreId(showMoreId === user.id ? null : user.id));
+  }
+
+  function handleSelectUser() {
+    if (userIsSelected) {
+      dispatch(setSelectedUser(null));
+
+      return;
+    }
+    dispatch(setSelectedUser(user.id));
+    dispatch(setTasksRefetchNeeded());
+    dispatch(setUserTasksRefetchNeeded());
   }
 
   return (
@@ -29,17 +60,36 @@ export default function UserDisplayMain({ user, planInfo, pricingInfo }) {
           <p>{user.email}</p>
           <p>{user.role}</p>
           <p>lvl: {user.difficulty_clearance_level}</p>
-          <div className={styles.statusContainer}>
-            <p>verification</p>
-            <StatusLight isActive={user.is_verified} />
-          </div>
-          <div className={styles.statusContainer}>
-            <p>activation</p>
-            <StatusLight isActive={user.is_active} />
-          </div>
+
+          {!userIsFullyActivated && (
+            <div className={styles.statusContainer}>
+              <p>Verification</p>
+              <StatusLight isActive={user.is_verified} />
+            </div>
+          )}
+          {userIsFullyActivated && (
+            <div className={styles.statusContainer}>
+              <p>Selected</p>
+              <StatusLight isActive={userIsSelected} />
+            </div>
+          )}
+
+          {userIsFullyActivated ? (
+            <Button
+              label={"select"}
+              isActive={userIsSelected}
+              activeLabel={"deselect"}
+              onClick={handleSelectUser}
+            />
+          ) : (
+            <div className={styles.statusContainer}>
+              <p>Activation</p>
+              <StatusLight isActive={user.is_active} />
+            </div>
+          )}
 
           <Button
-            label={"Pokaż więcej"}
+            label={"details"}
             isActive={showMoreId === user.id}
             activeLabel={"Pokaż mniej"}
             onClick={handleShowMore}
@@ -49,9 +99,9 @@ export default function UserDisplayMain({ user, planInfo, pricingInfo }) {
       )}
       {showMoreId === user.id && (
         <div className={styles.userManagementPanel}>
-          <BasicUserStatusManager user={user} />
           <PlanInfoManager planInfo={planInfo} pricingInfo={pricingInfo} />
-          <NotesManager user={user} />
+          <BasicUserStatusManager user={user} />
+          {/* <NotesManager user={user} /> */}
         </div>
       )}
     </>

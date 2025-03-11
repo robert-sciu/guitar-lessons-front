@@ -3,6 +3,7 @@ import {
   clearTaskToDeleteId,
   clearUserTasksError,
   deleteUserTask,
+  deleteUserTaskAdmin,
   fetchUserTasks,
   selectUserTasks,
   selectUserTasksErrorMessage,
@@ -16,20 +17,37 @@ import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/task
 import { useTranslation } from "react-i18next";
 import DashboardContentContainer from "../../../dashboardContentContainer/DashboardContentContainer";
 import useReduxFetch from "../../../../hooks/useReduxFetch";
+import { selectAdminUserSelectedUserId } from "../../../../store/admin/adminUserInfoSlice";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function UserTasksPageMain() {
+import PropTypes from "prop-types";
+
+export default function UserTasksPageMain({ isAdmin = false }) {
   const { t } = useTranslation();
+
+  const navigate = useNavigate();
 
   const userTasks = useSelector(selectUserTasks);
   const isFetchComplete = useSelector(selectUserTasksFetchStatus);
 
+  const selectedUserId = useSelector(selectAdminUserSelectedUserId);
+
   useReduxFetch({
-    fetchAction: fetchUserTasks,
+    fetchAction: !selectedUserId && isAdmin ? undefined : fetchUserTasks,
+    fetchData:
+      selectedUserId && isAdmin ? { isAdmin, userId: selectedUserId } : {},
     fetchCompleteSelector: selectUserTasksFetchStatus,
     loadingSelector: selectUserTasksLoadingStatus,
     errorSelector: selectUserTasksErrorStatus,
     refetchSelector: selectUserTasksRefetchNeeded,
   });
+
+  useEffect(() => {
+    if (isAdmin && !selectedUserId) {
+      navigate("/admin/userManagement");
+    }
+  }, [isAdmin, selectedUserId, navigate]);
 
   return (
     <DashboardContentContainer
@@ -50,7 +68,7 @@ export default function UserTasksPageMain() {
         {
           showModal: useSelector(selectUserTaskToDeleteId),
           modalType: "taskDelete",
-          onSubmit: deleteUserTask,
+          onSubmit: isAdmin ? deleteUserTaskAdmin : deleteUserTask,
           onCancel: clearTaskToDeleteId,
           data: useSelector(selectUserTaskToDeleteId),
         },
@@ -64,3 +82,7 @@ export default function UserTasksPageMain() {
     />
   );
 }
+
+UserTasksPageMain.propTypes = {
+  isAdmin: PropTypes.bool,
+};

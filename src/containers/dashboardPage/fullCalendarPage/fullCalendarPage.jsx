@@ -5,9 +5,6 @@ import { useTranslation } from "react-i18next";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import LoadingState from "../../../components/loadingState/loadingState";
-import Button from "../../../components/elements/button/button";
-import ModalWindowMain from "../../../components/modalWindows/modalWindow/modalWindowMain";
 
 import { selectUserId } from "../../../store/userInfoSlice";
 import {
@@ -38,12 +35,7 @@ import {
   setTempDataForEventReschedule,
   updateCalendarEvent,
 } from "../../../store/fullCalendarSlice";
-import {
-  selectFullCalendarPageLoaded,
-  setFullCalendarPageLoaded,
-} from "../../../store/loadStateSlice";
 
-import styles from "./fullCalendarPage.module.scss";
 import "./fullCalendarPage.css";
 
 import config from "../../../../config/config";
@@ -59,11 +51,10 @@ import {
   checkIfReservationTimeIsAllowed,
   addDaysToLocalDate,
 } from "../../../utilities/calendarUtilities";
+import DashboardContentContainer from "../../dashboardContentContainer/DashboardContentContainer";
+import useReduxFetch from "../../../hooks/useReduxFetch";
 
 export default function FullCalendarPage() {
-  // modal windows control
-  const [fetchComplete, setFetchComplete] = useState(false);
-  // const [calendarPage, setCalendarPage] = useState(0);
   const [prevButtonDisabled, setPrevButtonDisabled] = useState(false);
   const [nextButtonDisabled, setNextButtonDisabled] = useState(false);
   const [endDate, setEndDate] = useState(null);
@@ -72,45 +63,30 @@ export default function FullCalendarPage() {
 
   const dispatch = useDispatch();
 
-  const dataLoaded = useSelector(selectFullCalendarPageLoaded);
-
   const fullCalendarEvents = useSelector(selectFullCalendarEvents);
   //prettier-ignore
   const isFetchComplete = useSelector(selectFullCalendarFetchStatus);
-  const isLoading = useSelector(selectFullCalendarLoadingStatus);
-  const needsRefetch = useSelector(selectFullCalendarRefetchNeeded);
-  const hasError = useSelector(selectFullCalendarErrorStatus);
-  const errorMessage = useSelector(selectFullCalendarErrorMessage);
   const eventMoreInfo = useSelector(selectFullCalendarDataForMoreInfo);
 
   const dataForEventCreation = useSelector(
     selectFullCalendarTempDataForCreation
   );
-  const dataForEventReschedule = useSelector(
-    selectFullCalendarTempDataForReschedule
-  );
-  const dataForEventDeletion = useSelector(selectFullCalendarEventToDeleteId);
+
+  useReduxFetch({
+    fetchAction: fetchCalendarEvents,
+    fetchCompleteSelector: selectFullCalendarFetchStatus,
+    loadingSelector: selectFullCalendarLoadingStatus,
+    errorSelector: selectFullCalendarErrorStatus,
+    refetchSelector: selectFullCalendarRefetchNeeded,
+  });
 
   const calendarStartHour = useSelector(selectAvailabilityStartHour);
   const calendarEndHour = useSelector(selectAvailabilityEndHour);
   const todayDate = useSelector(selectTodayDate);
   const endDay = useSelector(selectEndDay);
-  // console.log(endDay);
   const userId = useSelector(selectUserId);
 
   const { t } = useTranslation();
-
-  useEffect(() => {
-    if (!isFetchComplete && !isLoading && !hasError && userId) {
-      dispatch(fetchCalendarEvents());
-    }
-  }, [dispatch, isFetchComplete, isLoading, hasError, userId]);
-
-  useEffect(() => {
-    if (needsRefetch) {
-      dispatch(fetchCalendarEvents());
-    }
-  }, [dispatch, needsRefetch]);
 
   useEffect(() => {
     if (objectHasData(eventMoreInfo)) {
@@ -255,111 +231,91 @@ export default function FullCalendarPage() {
     return ["available"];
   };
 
-  useEffect(() => {
-    if (isFetchComplete) {
-      setFetchComplete(true);
-      dispatch(setFullCalendarPageLoaded());
-    }
-  }, [dispatch, isFetchComplete]);
-
   return (
-    <div className={styles.mainContainer}>
-      <div className={styles.calendarContainer}>
-        <div className={styles.buttonsContainer}>
-          <Button
-            label={t("buttons.previousWeek")}
-            onClick={handleGoPrev}
-            disabled={prevButtonDisabled}
-          />
-
-          <Button
-            label={t("buttons.nextWeek")}
-            onClick={handleGoNext}
-            disabled={nextButtonDisabled}
-          />
-        </div>
-
-        {(fetchComplete || dataLoaded) && (
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[timeGridPlugin, interactionPlugin]}
-            slotDuration={"00:30:00"}
-            slotMinTime={calendarStartHour}
-            slotMaxTime={calendarEndHour}
-            allDaySlot={false}
-            expandRows={true}
-            height={"100%"}
-            headerToolbar={{
-              left: null,
-              center: "title",
-              right: null,
-            }}
-            events={[
-              ...fullCalendarEvents,
-              dataForEventCreation,
-              eventMoreInfo,
-            ]}
-            eventDragMinDistance={5}
-            eventOverlap={false}
-            eventDrop={handleEventDragStop}
-            eventResize={handleEventResize}
-            eventClick={handleShowEventInfo}
-            dateClick={handleCreateEvent}
-            eventColor={"#10a710"}
-            locale={"pl"}
-            dayCellClassNames={handleDayCellClassNames}
-            datesSet={handleDatesSet}
-          />
-        )}
-      </div>
-
-      {!hasError && objectHasData(dataForEventCreation) && (
-        <ModalWindowMain
-          modalType={"reservation"}
-          data={dataForEventCreation}
-          onSubmit={createCalendarEvent}
-          onCancel={clearTempData}
-          disableBlur={true}
+    <DashboardContentContainer
+      showContent={isFetchComplete}
+      isStretchedVertically={true}
+      showCalendarNavigation={true}
+      calendarBtnNextHandler={handleGoNext}
+      calendarBtnPrevHandler={handleGoPrev}
+      nextButtonDisabled={nextButtonDisabled}
+      prevButtonDisabled={prevButtonDisabled}
+      contentCol={
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[timeGridPlugin, interactionPlugin]}
+          slotDuration={"00:30:00"}
+          slotMinTime={calendarStartHour}
+          slotMaxTime={calendarEndHour}
+          allDaySlot={false}
+          expandRows={true}
+          height={"100%"}
+          headerToolbar={{
+            left: null,
+            center: "title",
+            right: null,
+          }}
+          events={[...fullCalendarEvents, dataForEventCreation, eventMoreInfo]}
+          eventDragMinDistance={5}
+          eventOverlap={false}
+          eventDrop={handleEventDragStop}
+          eventResize={handleEventResize}
+          eventClick={handleShowEventInfo}
+          dateClick={handleCreateEvent}
+          eventColor={"#10a710"}
+          locale={"pl"}
+          dayCellClassNames={handleDayCellClassNames}
+          datesSet={handleDatesSet}
         />
-      )}
-      {!hasError && objectHasData(dataForEventReschedule) && (
-        <ModalWindowMain
-          modalType={"reschedule"}
-          data={dataForEventReschedule}
-          onSubmit={updateCalendarEvent}
-          onCancel={clearTempData}
-          disableBlur={true}
-        />
-      )}
-      {!hasError &&
-        !objectHasData(dataForEventReschedule) &&
-        !objectHasData(dataForEventDeletion) &&
-        objectHasData(eventMoreInfo) && (
-          <ModalWindowMain
-            modalType={"moreInfo"}
-            data={eventMoreInfo}
-            onSubmit={handleEventReschedule}
-            onDeleteSubmit={setTempDataForEventDeletion}
-            onCancel={clearTempData}
-            disableBlur={true}
-          />
-        )}
-      {!hasError && objectHasData(dataForEventDeletion) && (
-        <ModalWindowMain
-          modalType={"confirmDelete"}
-          data={dataForEventDeletion}
-          onDeleteSubmit={deleteCalendarEvent}
-          onCancel={clearTempDataForEventDeletion}
-        />
-      )}
-      {hasError && (
-        <ModalWindowMain
-          modalType={"error"}
-          data={errorMessage}
-          onCancel={clearFullCalendarError}
-        />
-      )}
-      <LoadingState fadeOut={fetchComplete} inactive={dataLoaded} />
-    </div>
+      }
+      modals={[
+        {
+          modalType: "reservation",
+          showModal: objectHasData(
+            useSelector(selectFullCalendarTempDataForCreation)
+          ),
+          data: useSelector(selectFullCalendarTempDataForCreation),
+          onSubmit: createCalendarEvent,
+          onCancel: clearTempData,
+          disableBlur: true,
+        },
+        {
+          modalType: "reschedule",
+          showModal: objectHasData(
+            useSelector(selectFullCalendarTempDataForReschedule)
+          ),
+          data: useSelector(selectFullCalendarTempDataForReschedule),
+          onSubmit: updateCalendarEvent,
+          onCancel: clearTempData,
+          disableBlur: true,
+        },
+        {
+          modalType: "moreInfo",
+          showModal: objectHasData(
+            useSelector(selectFullCalendarDataForMoreInfo)
+          ),
+          data: useSelector(selectFullCalendarDataForMoreInfo),
+          onSubmit: handleEventReschedule,
+          onDeleteSubmit: setTempDataForEventDeletion,
+          onCancel: clearTempData,
+          disableBlur: true,
+        },
+        {
+          modalType: "confirmDelete",
+          showModal: objectHasData(
+            useSelector(selectFullCalendarEventToDeleteId)
+          ),
+          data: useSelector(selectFullCalendarEventToDeleteId),
+          onDeleteSubmit: deleteCalendarEvent,
+          onCancel: clearTempDataForEventDeletion,
+        },
+        {
+          modalType: "error",
+          showModal: useSelector(selectFullCalendarErrorStatus),
+          data: useSelector(selectFullCalendarErrorMessage),
+          onCancel: clearFullCalendarError,
+        },
+      ]}
+    />
   );
 }

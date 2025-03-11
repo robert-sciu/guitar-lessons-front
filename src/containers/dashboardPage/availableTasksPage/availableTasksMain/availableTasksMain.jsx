@@ -40,10 +40,15 @@ import TasksLevelFilter from "../tasksLevelFilter/tasksLevelFilter";
 import TagFilter from "../tagFilter/tagFilter";
 import useReduxFetch from "../../../../hooks/useReduxFetch";
 
-export default function AvailableTasksMain() {
+import PropTypes from "prop-types";
+import { selectAdminUserSelectedUserId } from "../../../../store/admin/adminUserInfoSlice";
+import { useNavigate } from "react-router-dom";
+
+export default function AvailableTasksMain({ isAdmin = false }) {
   const [filteredTasks, setFilteredTasks] = useState([]);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const tasks = useSelector(selectTasks);
   const isFetchCompleteTasks = useSelector(selectTasksFetchStatus);
@@ -59,8 +64,12 @@ export default function AvailableTasksMain() {
   // if task is added to userTasks we use this state to refetch tasks excluding the added task
   const userTaskUpdated = useSelector(selectUserTaskUpdated);
 
+  const selectedUserId = useSelector(selectAdminUserSelectedUserId);
+
   useReduxFetch({
-    fetchAction: fetchAvailableTasks,
+    fetchAction: !selectedUserId && isAdmin ? undefined : fetchAvailableTasks,
+    fetchData:
+      selectedUserId && isAdmin ? { isAdmin, userId: selectedUserId } : {},
     fetchCompleteSelector: selectTasksFetchStatus,
     loadingSelector: selectTasksLoadingStatus,
     errorSelector: selectTasksErrorStatus,
@@ -74,6 +83,12 @@ export default function AvailableTasksMain() {
     errorSelector: selectTagsErrorStatus,
     refetchSelector: selectTagsRefetchNeeded,
   });
+
+  useEffect(() => {
+    if (isAdmin && !selectedUserId) {
+      navigate("/admin/userManagement");
+    }
+  }, [isAdmin, selectedUserId, navigate]);
 
   const { t } = useTranslation();
 
@@ -110,7 +125,7 @@ export default function AvailableTasksMain() {
       showContent={isFetchCompleteTags && isFetchCompleteTasks}
       contentHeader={t("availableTasks.title")}
       contentSubHeader={filteredTasks?.length === 0 && t("common.nothingHere")}
-      contentFilter={<TasksLevelFilter />}
+      contentFilter={isAdmin ? null : <TasksLevelFilter />}
       tagFilter={<TagFilter />}
       contentCol={filteredTasks?.map((task) => (
         <TaskDisplay
@@ -138,3 +153,7 @@ export default function AvailableTasksMain() {
     />
   );
 }
+
+AvailableTasksMain.propTypes = {
+  isAdmin: PropTypes.bool,
+};

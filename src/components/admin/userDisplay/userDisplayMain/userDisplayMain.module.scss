@@ -5,11 +5,15 @@
   @extend .horizontalTileContainer;
   grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr;
   // grid-template-rows: 1fr 1fr;
+  gap: $size-xs;
   align-items: center;
+
   .statusContainer {
     display: flex;
     align-items: center;
-    gap: $size-xxxs;
+    justify-content: space-between;
+    gap: $size-xs;
+    padding: $size-xxxxs;
   }
 }
 .userManagementPanel {
@@ -17,7 +21,7 @@
   height: 100%;
   border-radius: $size-xxxxs;
   box-shadow: $soft-shadow-gray;
-  background-color: $main-white-lightest;
+  background-color: $main-white-light;
   padding: $size-xxxxs $size-xs;
   margin-top: $size-xs;
   display: flex;

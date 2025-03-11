@@ -13,7 +13,8 @@ import { useDispatch, useSelector } from "react-redux";
  * @param {Function} options.refetchSelector - a selector that determines if the data needs to be refetched
  */
 export default function useReduxFetch({
-  fetchAction,
+  fetchAction = () => ({ type: "NO_OP" }),
+  fetchData = {},
   fetchCompleteSelector,
   loadingSelector,
   errorSelector,
@@ -27,13 +28,13 @@ export default function useReduxFetch({
 
   useEffect(() => {
     if (!isComplete && !isLoading && !hasError) {
-      dispatch(fetchAction());
+      dispatch(fetchAction({ ...fetchData }));
     }
-  }, [isComplete, isLoading, hasError, dispatch, fetchAction]);
+  }, [isComplete, isLoading, hasError, dispatch, fetchAction, fetchData]);
 
   useEffect(() => {
     if (refetchNeeded) {
-      dispatch(fetchAction());
+      dispatch(fetchAction({ ...fetchData }));
     }
-  }, [refetchNeeded, dispatch, fetchAction]);
+  }, [refetchNeeded, dispatch, fetchAction, fetchData]);
 }

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import Button from "../../components/elements/button/button";
 import LoadingState from "../../components/loadingState/loadingState";
 import ModalWindowMain from "../../components/modalWindows/modalWindow/modalWindowMain";
 import { classNameFormatter } from "../../utilities/utilities";
@@ -9,6 +11,13 @@ export default function DashboardContentContainer({
   isStretchedVertically,
   contentHeader,
   contentSubHeader,
+
+  showCalendarNavigation,
+  calendarBtnNextHandler,
+  calendarBtnPrevHandler,
+  nextButtonDisabled,
+  prevButtonDisabled,
+
   contentFilter,
   tagFilter,
   contentCol,
@@ -16,6 +25,7 @@ export default function DashboardContentContainer({
   disableLoadingState,
   modals,
 }) {
+  const { t } = useTranslation();
   if (!showContent) return;
   return (
     <div
@@ -41,6 +51,21 @@ export default function DashboardContentContainer({
           </div>
           <div>{contentFilter && contentFilter}</div>
         </div>
+        {showCalendarNavigation && (
+          <div className={styles.calendardNavigationButtons}>
+            <Button
+              label={t("buttons.previousWeek")}
+              onClick={calendarBtnPrevHandler}
+              disabled={prevButtonDisabled}
+            />
+
+            <Button
+              label={t("buttons.nextWeek")}
+              onClick={calendarBtnNextHandler}
+              disabled={nextButtonDisabled}
+            />
+          </div>
+        )}
         {contentCol}
       </div>
       {additionalContentCol && (
@@ -57,7 +82,9 @@ export default function DashboardContentContainer({
                 modalType={modal.modalType}
                 data={modal.data}
                 onSubmit={modal.onSubmit}
+                onDeleteSubmit={modal.onDeleteSubmit}
                 onCancel={modal.onCancel}
+                disableBlur={modal.disableBlur}
               />
             )
         )}
@@ -68,8 +95,8 @@ export default function DashboardContentContainer({
 
 DashboardContentContainer.propTypes = {
   columnCount: PropTypes.number,
-  contentCol: PropTypes.array || PropTypes.object,
-  additionalContentCol: PropTypes.element,
+  contentCol: PropTypes.any,
+  additionalContentCol: PropTypes.any,
   showContent: PropTypes.bool,
   disableLoadingState: PropTypes.bool,
   modals: PropTypes.array,
@@ -78,4 +105,9 @@ DashboardContentContainer.propTypes = {
   contentSubHeader: PropTypes.string,
   contentFilter: PropTypes.element,
   tagFilter: PropTypes.element,
+  showCalendarNavigation: PropTypes.bool,
+  calendarBtnNextHandler: PropTypes.func,
+  calendarBtnPrevHandler: PropTypes.func,
+  nextButtonDisabled: PropTypes.bool,
+  prevButtonDisabled: PropTypes.bool,
 };

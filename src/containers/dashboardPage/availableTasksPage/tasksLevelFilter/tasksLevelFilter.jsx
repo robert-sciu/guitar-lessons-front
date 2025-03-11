@@ -15,6 +15,7 @@ import styles from "./tasksLevelFilter.module.scss";
 
 import { debounce } from "lodash";
 import InputElement from "../../../../components/elements/inputElement/inputElement";
+import { selectAdminUserSelectedUser } from "../../../../store/admin/adminUserInfoSlice";
 
 export default function TasksLevelFilter() {
   const [minimumTaskLevel, setMinimumTaskLevel] = useState(0);
@@ -23,10 +24,13 @@ export default function TasksLevelFilter() {
   const dispatch = useDispatch();
 
   const userId = useSelector(selectUserId);
+  const userSelectedByAdmin = useSelector(selectAdminUserSelectedUser);
 
+  // console.log(userSelectedByAdmin);
   const userInfoMinimumDifficultyLevel = useSelector(
     selectUserInfoMinimumDifficultyLevel
   );
+
   const { t } = useTranslation();
 
   function handleMinimumTaskLevelChange(e) {
@@ -49,8 +53,11 @@ export default function TasksLevelFilter() {
   ).current;
 
   useEffect(() => {
-    setMinimumTaskLevel(userInfoMinimumDifficultyLevel);
-  }, [userInfoMinimumDifficultyLevel]);
+    setMinimumTaskLevel(
+      userSelectedByAdmin?.minimum_task_level_to_display ||
+        userInfoMinimumDifficultyLevel
+    );
+  }, [userInfoMinimumDifficultyLevel, userSelectedByAdmin]);
 
   return (
     <div className={styles.levelFilter}>

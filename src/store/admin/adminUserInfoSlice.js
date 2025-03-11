@@ -54,6 +54,7 @@ const adminUserInfoSlice = createSlice({
     fetchComplete: false,
     userInfo: [],
     showMoreId: null,
+    selectedUser: {},
   },
   reducers: {
     clearError: (state) => {
@@ -70,7 +71,13 @@ const adminUserInfoSlice = createSlice({
     clearShowMoreId: (state) => {
       state.showMoreId = null;
     },
+    setSelectedUser: (state, action) => {
+      state.selectedUser = state.userInfo.filter(
+        (user) => user.id === action.payload
+      )[0];
+    },
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllUsers.pending, (state) => {
@@ -78,9 +85,17 @@ const adminUserInfoSlice = createSlice({
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
         manageFulfilledState(state);
-        state.userInfo = action.payload.sort((a, b) => a.id - b.id);
+        state.userInfo = action.payload.sort(
+          (a, b) => b.is_active - a.is_active
+        );
+        state.userInfo = action.payload;
         state.fetchComplete = true;
         state.refetchNeeded = false;
+        if (state.selectedUser.id) {
+          state.selectedUser = state.userInfo.filter(
+            (user) => user.id === state.selectedUser.id
+          )[0];
+        }
       })
       .addCase(fetchAllUsers.rejected, manageRejectedState)
 
@@ -100,8 +115,12 @@ const adminUserInfoSlice = createSlice({
   },
 });
 
-export const { clearAdminUserInfoError, setShowMoreId, clearShowMoreId } =
-  adminUserInfoSlice.actions;
+export const {
+  clearAdminUserInfoError,
+  setShowMoreId,
+  clearShowMoreId,
+  setSelectedUser,
+} = adminUserInfoSlice.actions;
 
 export const selectAdminUserInfo = (state) => state.adminUserInfo.userInfo;
 export const selectAdminUserInfoLoadingStatus = (state) =>
@@ -116,5 +135,9 @@ export const selectAdminUserInfoRefetchNeeded = (state) =>
   state.adminUserInfo.refetchNeeded;
 export const selectAdminUserShowMoreId = (state) =>
   state.adminUserInfo.showMoreId;
+export const selectAdminUserSelectedUser = (state) =>
+  state.adminUserInfo.selectedUser;
+export const selectAdminUserSelectedUserId = (state) =>
+  state.adminUserInfo?.selectedUser?.id;
 
 export default adminUserInfoSlice.reducer;

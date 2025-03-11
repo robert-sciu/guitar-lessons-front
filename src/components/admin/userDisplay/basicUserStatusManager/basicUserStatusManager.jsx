@@ -9,7 +9,7 @@ import UserSectionDisplay from "../userManagementDisplay/userSectionDisplay";
 export default function BasicUserStatusManager({ user }) {
   return (
     // <div className={styles.mainContainer}>
-    <UserSectionDisplay columns={4}>
+    <UserSectionDisplay columns={3}>
       <ConfigurableUserInput
         controllerType={"enable-disable"}
         label={"verification"}
@@ -41,16 +41,6 @@ export default function BasicUserStatusManager({ user }) {
         userId={user.id}
       />
       <ConfigurableUserInput
-        controllerType={"increase-decrease"}
-        label={"Level: "}
-        userId={user.id}
-        showSpinner={true}
-        adjustableValueCurrent={user.difficulty_clearance_level}
-        statusChangeHandler={updateUser}
-        valueToUpdate={"difficulty_clearance_level"}
-        showAdjustableValue={true}
-      />
-      <ConfigurableUserInput
         controllerType={"enable-disable"}
         label={"delete"}
         userId={user.id}
@@ -61,6 +51,26 @@ export default function BasicUserStatusManager({ user }) {
         valueToUpdate={null}
         lockRedBtn={true}
         redBtnUnlockCode={"enable-delete"}
+      />
+      <ConfigurableUserInput
+        controllerType={"increase-decrease"}
+        label={"Level: "}
+        userId={user.id}
+        showSpinner={true}
+        adjustableValueCurrent={user.difficulty_clearance_level}
+        statusChangeHandler={updateUser}
+        valueToUpdate={"difficulty_clearance_level"}
+        showAdjustableValue={true}
+      />
+      <ConfigurableUserInput
+        controllerType={"increase-decrease"}
+        label={"Hide tasks below lvl: "}
+        userId={user.id}
+        showSpinner={true}
+        adjustableValueCurrent={user.minimum_task_level_to_display}
+        statusChangeHandler={updateUser}
+        valueToUpdate={"minimum_task_level_to_display"}
+        showAdjustableValue={true}
       />
     </UserSectionDisplay>
     // </div>

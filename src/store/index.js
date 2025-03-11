@@ -5,10 +5,8 @@ import userTasksReducer from "./userTasksSlice";
 import completedUserTasksReducer from "./completedUserTasksSlice";
 import tagsReducer from "./tagsSlice";
 import fullCalendarReducer from "./fullCalendarSlice";
-// import calendarReducer from "./calendar/calendarSlice";
 import userInfoReducer from "./userInfoSlice";
 import planInfoReducer from "./planInfoSlice";
-import loadStateReducer from "./loadStateSlice";
 import pricingInfoReducer from "./pricingInfoSlice";
 
 import adminUserInfoReducer from "./admin/adminUserInfoSlice";
@@ -32,7 +30,7 @@ import adminPlanInfoReducer from "./admin/adminPlanInfoSlice";
 
 const appReducer = combineReducers({
   auth: authReducer,
-  loadState: loadStateReducer,
+  // loadState: loadStateReducer,
   tasks: tasksReducer,
   userTasks: userTasksReducer,
   completedUserTasks: completedUserTasksReducer,

@@ -1,7 +1,6 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../../store/authSlice";
-import { useEffect, useState } from "react";
 import {
   fetchUserInfo,
   selectUserInfo,
@@ -16,44 +15,34 @@ import styles from "./dashboardNav.module.scss";
 import { useTranslation } from "react-i18next";
 
 import PropTypes from "prop-types";
+import useReduxFetch from "../../../hooks/useReduxFetch";
+import {
+  selectAdminUserSelectedUser,
+  selectAdminUserSelectedUserId,
+} from "../../../store/admin/adminUserInfoSlice";
 
 export default function DashboardNav({ showAdminNav = false }) {
-  const [fetchComplete, setFetchComplete] = useState(false);
-
   const { t } = useTranslation();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const userInfo = useSelector(selectUserInfo);
-  const userInfoIsLoading = useSelector(selectUserInfoLoadingStatus);
-  const userInfoHasError = useSelector(selectUserInfoErrorStatus);
-  const userInfoFetchComplete = useSelector(selectUserInfoFetchStatus);
-  const userRefetchNeeded = useSelector(selectUserRefetchNeeded);
+  const fetchComplete = useSelector(selectUserInfoFetchStatus);
+  const selectedUserId = useSelector(
+    showAdminNav ? selectAdminUserSelectedUserId : () => null
+  );
+  const selectedUser = useSelector(
+    selectedUserId ? selectAdminUserSelectedUser : () => null
+  );
 
-  useEffect(() => {
-    if (!userInfoFetchComplete && !userInfoIsLoading && !userInfoHasError) {
-      dispatch(fetchUserInfo());
-    }
-  }, [
-    userInfoFetchComplete,
-    userInfoIsLoading,
-    userInfoHasError,
-    dispatch,
-    navigate,
-  ]);
-
-  useEffect(() => {
-    if (userRefetchNeeded) {
-      dispatch(fetchUserInfo());
-    }
-  }, [userRefetchNeeded, dispatch]);
-
-  useEffect(() => {
-    if (userInfoFetchComplete) {
-      setFetchComplete(true);
-    }
-  }, [userInfoFetchComplete]);
+  useReduxFetch({
+    fetchAction: fetchUserInfo,
+    fetchCompleteSelector: selectUserInfoFetchStatus,
+    loadingSelector: selectUserInfoLoadingStatus,
+    errorSelector: selectUserInfoErrorStatus,
+    refetchSelector: selectUserRefetchNeeded,
+  });
 
   function handleLogout(e) {
     e.preventDefault();
@@ -84,6 +73,7 @@ export default function DashboardNav({ showAdminNav = false }) {
           onLogout={handleLogout}
           showAdminLink={userInfo?.role === "admin"}
           showAdminNav={showAdminNav}
+          selectedUser={selectedUser}
         />
       </div>
       <div className={styles.dashboardContentContainer}>

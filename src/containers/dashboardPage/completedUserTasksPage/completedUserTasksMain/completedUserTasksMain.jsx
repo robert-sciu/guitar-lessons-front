@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
 import TaskDisplay from "../../../../components/taskDisplay/taskDisplayMain/taskDisplayMain";
@@ -14,50 +12,46 @@ import {
   selectCompletedUserTasksLoadingStatus,
   selectCompletedUserTasksRefetchNeeded,
 } from "../../../../store/completedUserTasksSlice";
-import {
-  selectCompletedUserTasksPageLoaded,
-  setCompletedUserTasksPageLoaded,
-} from "../../../../store/loadStateSlice";
 
 import DashboardContentContainer from "../../../dashboardContentContainer/DashboardContentContainer";
+import useReduxFetch from "../../../../hooks/useReduxFetch";
+import { useSelector } from "react-redux";
 
-export default function UserTasksPageMain() {
-  const [fetchComplete, setFetchComplete] = useState(false);
+import PropTypes from "prop-types";
+import { selectAdminUserSelectedUserId } from "../../../../store/admin/adminUserInfoSlice";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-  const dispatch = useDispatch();
+export default function CompletedUserTasksPageMain({ isAdmin = false }) {
   const { t } = useTranslation();
 
-  const dataLoaded = useSelector(selectCompletedUserTasksPageLoaded);
+  const navigate = useNavigate();
 
   const completedUserTasks = useSelector(selectCompletedUserTasks);
-  const isLoading = useSelector(selectCompletedUserTasksLoadingStatus);
   const isFetchComplete = useSelector(selectCompletedUserTasksFetchStatus);
-  const needsRefetch = useSelector(selectCompletedUserTasksRefetchNeeded);
-  const hasError = useSelector(selectCompletedUserTasksErrorStatus);
-  const errorMessage = useSelector(selectCompletedUserTasksErrorMessage);
+
+  const selectedUserId = useSelector(selectAdminUserSelectedUserId);
+
+  useReduxFetch({
+    fetchAction:
+      !selectedUserId && isAdmin ? undefined : fetchCompletedUserTasks,
+    fetchData:
+      selectedUserId && isAdmin ? { isAdmin, userId: selectedUserId } : {},
+    fetchCompleteSelector: selectCompletedUserTasksFetchStatus,
+    loadingSelector: selectCompletedUserTasksLoadingStatus,
+    errorSelector: selectCompletedUserTasksErrorStatus,
+    refetchSelector: selectCompletedUserTasksRefetchNeeded,
+  });
 
   useEffect(() => {
-    if (!isFetchComplete && !isLoading && !hasError) {
-      dispatch(fetchCompletedUserTasks());
+    if (isAdmin && !selectedUserId) {
+      navigate("/admin/userManagement");
     }
-  }, [dispatch, isFetchComplete, isLoading, hasError]);
-
-  useEffect(() => {
-    if (needsRefetch) {
-      dispatch(fetchCompletedUserTasks());
-    }
-  }, [needsRefetch, dispatch]);
-
-  useEffect(() => {
-    if (isFetchComplete) {
-      setFetchComplete(true);
-      dispatch(setCompletedUserTasksPageLoaded());
-    }
-  }, [isFetchComplete, dispatch]);
+  }, [isAdmin, selectedUserId, navigate]);
 
   return (
     <DashboardContentContainer
-      showContent={fetchComplete || dataLoaded}
+      showContent={isFetchComplete}
       contentHeader={t("completedTasks.title")}
       contentSubHeader={
         completedUserTasks?.length === 0 && t("common.nothingHere")
@@ -71,15 +65,19 @@ export default function UserTasksPageMain() {
           enableShowMore={true}
         />
       ))}
-      disableLoadingState={dataLoaded}
+      disableLoadingState={isFetchComplete}
       modals={[
         {
-          showModal: hasError,
+          showModal: useSelector(selectCompletedUserTasksErrorStatus),
           modalType: "error",
           onCancel: clearCompletedUserTasksError,
-          data: errorMessage,
+          data: useSelector(selectCompletedUserTasksErrorMessage),
         },
       ]}
     />
   );
 }
+
+CompletedUserTasksPageMain.propTypes = {
+  isAdmin: PropTypes.bool,
+};

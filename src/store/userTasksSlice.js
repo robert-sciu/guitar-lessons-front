@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
-  checkAuthenticated,
+  buildUserOrAdminUrl,
   extractErrorResponse,
   extractResponseData,
   manageFulfilledState,
@@ -11,10 +11,11 @@ import apiClient from "../api/api";
 
 export const fetchUserTasks = createAsyncThunk(
   "userTasks/fetchUserTasks",
-  async (_, { getState, rejectWithValue }) => {
+  async ({ isAdmin = false, userId = null }, { rejectWithValue }) => {
     try {
-      checkAuthenticated(getState);
-      const response = await apiClient.get("/userTasks");
+      const response = await apiClient.get(
+        buildUserOrAdminUrl({ url: "/userTasks", isAdmin, userId })
+      );
       return extractResponseData(response);
     } catch (error) {
       return rejectWithValue(extractErrorResponse(error));
@@ -24,10 +25,12 @@ export const fetchUserTasks = createAsyncThunk(
 
 export const addUserTask = createAsyncThunk(
   "userTasks/addUserTask",
-  async (data, { getState, rejectWithValue }) => {
+  async ({ data, isAdmin = false, userId = null }, { rejectWithValue }) => {
     try {
-      checkAuthenticated(getState);
-      const response = await apiClient.post("/userTasks", data);
+      const response = await apiClient.post(
+        buildUserOrAdminUrl({ url: "/userTasks", isAdmin, userId }),
+        data
+      );
       return extractResponseData(response);
     } catch (error) {
       return rejectWithValue(extractErrorResponse(error));
@@ -37,9 +40,8 @@ export const addUserTask = createAsyncThunk(
 
 export const updateUserTaskNotes = createAsyncThunk(
   "userTasks/updateUserTaskNotes",
-  async (data, { getState, rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      checkAuthenticated(getState);
       const response = await apiClient.patch(`/userTasks/userNotes`, data);
       return extractResponseData(response);
     } catch (error) {
@@ -50,10 +52,23 @@ export const updateUserTaskNotes = createAsyncThunk(
 
 export const deleteUserTask = createAsyncThunk(
   "userTasks/deleteUserTask",
-  async (id, { getState, rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
-      checkAuthenticated(getState);
       const response = await apiClient.delete(`/userTasks/${id}`);
+      return extractResponseData(response);
+    } catch (error) {
+      return rejectWithValue(extractErrorResponse(error));
+    }
+  }
+);
+
+export const deleteUserTaskAdmin = createAsyncThunk(
+  "userTasks/deleteUserTaskAdmin",
+  async ({ userId, taskId }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.delete(
+        `admin/userTasks/${taskId}?userId=${userId}`
+      );
       return extractResponseData(response);
     } catch (error) {
       return rejectWithValue(extractErrorResponse(error));
@@ -87,6 +102,9 @@ const userTasksSlice = createSlice({
     },
     clearTaskToDeleteId: (state) => {
       state.taskToDeleteId = null;
+    },
+    setUserTasksRefetchNeeded: (state) => {
+      state.refetchNeeded = true;
     },
   },
   extraReducers: (builder) => {
@@ -127,9 +145,22 @@ const userTasksSlice = createSlice({
       .addCase(deleteUserTask.rejected, (state, action) => {
         manageRejectedState(state, action);
       })
+      .addCase(deleteUserTaskAdmin.pending, (state) => {
+        managePendingState(state);
+      })
+      .addCase(deleteUserTaskAdmin.fulfilled, (state) => {
+        manageFulfilledState(state);
+        state.taskToDeleteId = null;
+        state.userTaskUpdated = true;
+        state.refetchNeeded = true;
+      })
+      .addCase(deleteUserTaskAdmin.rejected, (state, action) => {
+        manageRejectedState(state, action);
+      })
       .addCase(updateUserTaskNotes.pending, (state) => {
         managePendingState(state);
       })
+
       .addCase(updateUserTaskNotes.fulfilled, (state, action) => {
         const userTask = Object.values(state.userTasks).find((userTask) => {
           return userTask.user_task.id === action.payload.user_task_id;
@@ -150,6 +181,7 @@ export const {
   clearUserTaskUpdated,
   setTaskToDeleteId,
   clearTaskToDeleteId,
+  setUserTasksRefetchNeeded,
 } = userTasksSlice.actions;
 
 export const selectUserTasks = (state) => state.userTasks.userTasks;

@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
-  checkAuthenticated,
   extractErrorResponse,
   extractResponseData,
   manageFulfilledState,
@@ -11,7 +10,7 @@ import {
 import apiClient from "../api/api";
 
 export const registerUser = createAsyncThunk(
-  "open/userInfo/createUser",
+  "userInfo/createUser",
   async (data, { rejectWithValue }) => {
     try {
       const response = await apiClient.post("/users", data);
@@ -23,7 +22,7 @@ export const registerUser = createAsyncThunk(
 );
 
 export const verifyUser = createAsyncThunk(
-  "open/userInfo/verifyUser",
+  "userInfo/verifyUser",
   async (data, { rejectWithValue }) => {
     try {
       const response = await apiClient.post("/users/verify_user", data);
@@ -35,7 +34,7 @@ export const verifyUser = createAsyncThunk(
 );
 
 export const activateUserWithToken = createAsyncThunk(
-  "open/userInfo/activateUserWithToken",
+  "userInfo/activateUserWithToken",
   async (data, { rejectWithValue }) => {
     try {
       const response = await apiClient.post("/users/activate_user", data);
@@ -48,9 +47,8 @@ export const activateUserWithToken = createAsyncThunk(
 
 export const fetchUserInfo = createAsyncThunk(
   "userInfo/fetchUserInfo",
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      checkAuthenticated(getState);
       const response = await apiClient.get("/users");
       return extractResponseData(response);
     } catch (error) {
@@ -61,9 +59,8 @@ export const fetchUserInfo = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   "userInfo/updateUser",
-  async (data, { getState, rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      checkAuthenticated(getState);
       await apiClient.patch(`/users`, data);
       return true;
     } catch (error) {
@@ -74,9 +71,8 @@ export const updateUser = createAsyncThunk(
 
 export const updateUserMailCodeRequest = createAsyncThunk(
   "userInfo/updateUserEmallCodeRequest",
-  async (email, { getState, rejectWithValue }) => {
+  async (email, { rejectWithValue }) => {
     try {
-      checkAuthenticated(getState);
       const response = await apiClient.post(
         "/users/change_email_address",
         email
@@ -90,9 +86,8 @@ export const updateUserMailCodeRequest = createAsyncThunk(
 
 export const updateEmail = createAsyncThunk(
   "userInfo/updateEmail",
-  async (changeEmailToken, { getState, rejectWithValue }) => {
+  async (changeEmailToken, { rejectWithValue }) => {
     try {
-      checkAuthenticated(getState);
       await apiClient.patch("/users/change_email_address", changeEmailToken);
       return true;
     } catch (error) {

@@ -3,20 +3,15 @@
 .dashboardHomePageContainer {
   position: relative;
   display: flex;
-  // flex-direction: column;
   gap: $size-l;
-  // height: 100%;
-  // transition: $reveal-transition;
   .headerContainer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    // gap: $size-s;
 
     .header {
       display: flex;
       flex-direction: column;
-      // align-items: center;
       gap: $size-xs;
       margin-bottom: $size-xxs;
     }
@@ -30,11 +25,26 @@
 
   .dashboardInfoContainer {
     flex: 1;
+    // position: relative;
     display: flex;
     flex-direction: column;
     border-radius: $size-xxxxs;
     padding: $size-l $size-s;
     gap: $size-xxxs;
+
+    .calendardNavigationButtons {
+      display: flex;
+      justify-content: space-between;
+      padding: $size-xs;
+      position: absolute;
+      top: $size-s;
+      left: 0;
+      width: 100%;
+
+      button {
+        flex: 0;
+      }
+    }
   }
 }
 

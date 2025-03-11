@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   clearAdminUserInfoError,
   fetchAllUsers,
@@ -9,7 +9,6 @@ import {
   selectAdminUserInfoLoadingStatus,
   selectAdminUserInfoRefetchNeeded,
 } from "../../../../store/admin/adminUserInfoSlice";
-import { useEffect } from "react";
 
 import UserDisplayMain from "../../../../components/admin/userDisplay/userDisplayMain/userDisplayMain";
 
@@ -27,10 +26,6 @@ import {
 } from "../../../../store/admin/adminPlanInfoSlice";
 import DashboardContentContainer from "../../../dashboardContentContainer/DashboardContentContainer";
 import {
-  selectAdminUserInfoPageLoaded,
-  setAdminUserInfoPageLoaded,
-} from "../../../../store/loadStateSlice";
-import {
   clearPricingInfoError,
   fetchPricingInfo,
   selectPricingInfo,
@@ -39,115 +34,49 @@ import {
   selectPricingInfoFetchStatus,
   selectPricingInfoLoadingStatus,
 } from "../../../../store/pricingInfoSlice";
+import useReduxFetch from "../../../../hooks/useReduxFetch";
 
 export default function UserManagementPageMain() {
-  const dispatch = useDispatch();
-
-  const dataLoaded = useSelector(selectAdminUserInfoPageLoaded);
-
   const adminPlanInfo = useSelector(selectAdminPlanInfo);
-  const adminPlanInfoIsLoading = useSelector(selectAdminPlanInfoLoadingStatus);
-  const adminPlanInfoHasError = useSelector(selectAdminPlanInfoErrorStatus);
-  const adminPlanInfoErrorMessage = useSelector(
-    selectAdminPlanInfoErrorMessage
-  );
   const adminPlanInfoFetchComplete = useSelector(
     selectAdminPlanInfoFetchStatus
   );
-  const adminPlanInfoRefetchNeeded = useSelector(
-    selectAdminPlanInfoRefetchNeeded
-  );
-
+  const pricingInfo = useSelector(selectPricingInfo);
+  const pricingInfoFetchComplete = useSelector(selectPricingInfoFetchStatus);
   const adminUserInfo = useSelector(selectAdminUserInfo);
-  const adminUserInfoIsLoading = useSelector(selectAdminUserInfoLoadingStatus);
-  const adminUserInfoHasError = useSelector(selectAdminUserInfoErrorStatus);
-  const adminUserInfoErrorMessage = useSelector(
-    selectAdminUserInfoErrorMessage
-  );
   const adminUserInfoFetchComplete = useSelector(
     selectAdminUserInfoFetchStatus
   );
-  const adminUserInfoRefetchNeeded = useSelector(
-    selectAdminUserInfoRefetchNeeded
-  );
 
-  const pricingInfo = useSelector(selectPricingInfo);
-  const pricingInfoIsLoading = useSelector(selectPricingInfoLoadingStatus);
-  const pricingInfoHasError = useSelector(selectPricingInfoErrorStatus);
-  const pricingInfoErrorMessage = useSelector(selectPricingInfoErrorMessage);
-  const pricingInfoFetchComplete = useSelector(selectPricingInfoFetchStatus);
-
-  useEffect(() => {
-    if (
-      !adminUserInfoFetchComplete &&
-      !adminUserInfoIsLoading &&
-      !adminUserInfoHasError
-    ) {
-      dispatch(fetchAllUsers());
-    }
-  }, [
-    adminUserInfoFetchComplete,
-    adminUserInfoIsLoading,
-    adminUserInfoHasError,
-    dispatch,
-  ]);
-
-  useEffect(() => {
-    if (
-      !adminPlanInfoFetchComplete &&
-      !adminPlanInfoIsLoading &&
-      !adminPlanInfoHasError
-    ) {
-      dispatch(fetchAllPlanInfo());
-    }
-  }, [
-    adminPlanInfoFetchComplete,
-    adminPlanInfoIsLoading,
-    adminPlanInfoHasError,
-    dispatch,
-  ]);
-
-  useEffect(() => {
-    if (
-      !pricingInfoFetchComplete &&
-      !pricingInfoIsLoading &&
-      !pricingInfoHasError
-    ) {
-      dispatch(fetchPricingInfo());
-    }
-  }, [
-    pricingInfoFetchComplete,
-    pricingInfoIsLoading,
-    pricingInfoHasError,
-    dispatch,
-  ]);
-
-  useEffect(() => {
-    if (
-      adminUserInfoFetchComplete &&
-      adminPlanInfoFetchComplete &&
-      pricingInfoFetchComplete
-    ) {
-      dispatch(setAdminUserInfoPageLoaded());
-    }
+  useReduxFetch({
+    fetchAction: fetchAllPlanInfo,
+    fetchCompleteSelector: selectAdminPlanInfoFetchStatus,
+    loadingSelector: selectAdminPlanInfoLoadingStatus,
+    errorSelector: selectAdminPlanInfoErrorStatus,
+    refetchSelector: selectAdminPlanInfoRefetchNeeded,
   });
 
-  useEffect(() => {
-    if (adminUserInfoRefetchNeeded) {
-      dispatch(fetchAllUsers());
-    }
-  }, [adminUserInfoRefetchNeeded, dispatch]);
+  useReduxFetch({
+    fetchAction: fetchAllUsers,
+    fetchCompleteSelector: selectAdminUserInfoFetchStatus,
+    loadingSelector: selectAdminUserInfoLoadingStatus,
+    errorSelector: selectAdminUserInfoErrorStatus,
+    refetchSelector: selectAdminUserInfoRefetchNeeded,
+  });
 
-  useEffect(() => {
-    if (adminPlanInfoRefetchNeeded) {
-      dispatch(fetchAllPlanInfo());
-    }
-  }, [adminPlanInfoRefetchNeeded, dispatch]);
+  useReduxFetch({
+    fetchAction: fetchPricingInfo,
+    fetchCompleteSelector: selectPricingInfoFetchStatus,
+    loadingSelector: selectPricingInfoLoadingStatus,
+    errorSelector: selectPricingInfoErrorStatus,
+  });
 
   return (
     <DashboardContentContainer
       showContent={
-        (adminUserInfoFetchComplete && adminPlanInfoFetchComplete) || dataLoaded
+        adminUserInfoFetchComplete &&
+        adminPlanInfoFetchComplete &&
+        pricingInfoFetchComplete
       }
       contentCol={
         adminUserInfo &&
@@ -161,24 +90,28 @@ export default function UserManagementPageMain() {
           />
         ))
       }
-      disableLoadingState={dataLoaded}
+      disableLoadingState={
+        adminUserInfoFetchComplete &&
+        adminPlanInfoFetchComplete &&
+        pricingInfoFetchComplete
+      }
       modals={[
         {
-          showModal: adminUserInfoHasError,
+          showModal: useSelector(selectAdminUserInfoErrorStatus),
           modalType: "error",
-          data: adminUserInfoErrorMessage,
+          data: useSelector(selectAdminUserInfoErrorMessage),
           onCancel: clearAdminUserInfoError,
         },
         {
-          showModal: adminPlanInfoHasError,
+          showModal: useSelector(selectAdminPlanInfoErrorStatus),
           modalType: "error",
-          data: adminPlanInfoErrorMessage,
+          data: useSelector(selectAdminPlanInfoErrorMessage),
           onCancel: clearAdminPlayInfoError,
         },
         {
-          showModal: pricingInfoHasError,
+          showModal: useSelector(selectPricingInfoErrorStatus),
           modalType: "error",
-          data: pricingInfoErrorMessage,
+          data: useSelector(selectPricingInfoErrorMessage),
           onCancel: clearPricingInfoError,
         },
       ]}

@@ -2,6 +2,8 @@ import { useTranslation } from "react-i18next";
 import styles from "./taskDeleteModal.module.scss";
 import PropTypes from "prop-types";
 import Button from "../../elements/button/button";
+import { useSelector } from "react-redux";
+import { selectAdminUserSelectedUserId } from "../../../store/admin/adminUserInfoSlice";
 
 export default function TaskDeleteModal({
   onSubmit,
@@ -9,10 +11,15 @@ export default function TaskDeleteModal({
   taskId,
   dispatch,
 }) {
+  const adminSelectedUserId = useSelector(selectAdminUserSelectedUserId);
   const { t } = useTranslation();
   function handleClick(isConfirmed) {
     if (isConfirmed) {
-      dispatch(onSubmit(taskId));
+      if (adminSelectedUserId) {
+        dispatch(onSubmit({ userId: adminSelectedUserId, taskId }));
+      } else {
+        dispatch(onSubmit(taskId));
+      }
     } else {
       dispatch(onCancel());
     }

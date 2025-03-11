@@ -6,5 +6,19 @@
 
   .dashboardNavLinks {
     @extend .navLink;
+    .selectedUserSubMenu {
+      margin-left: $size-xs;
+      display: flex;
+      flex-direction: column;
+
+      gap: $size-xxxxs;
+      .selectedUserTile {
+        display: flex;
+        background-color: $main-gray-transparent;
+        padding: $size-xxxs $size-xxs;
+        border-radius: $size-xxxxs;
+        box-shadow: $inset-soft-shadow;
+      }
+    }
   }
 }

@@ -55,7 +55,9 @@ i18n
           adminNav: {
             dashboard: "Panel standardowy",
             users: "Użytkownicy",
-            tasks: "Zadania",
+            tasks: "Zadania użytkownika",
+            availableTasks: "dostępne zadania",
+            completedTasks: "wykonane zadania",
             tags: "Tagi",
           },
           userInfo: {
@@ -238,8 +240,10 @@ i18n
           },
           adminNav: {
             dashboard: "standard dashboard",
-            users: "users",
-            tasks: "tasks",
+            users: "user",
+            tasks: "user tasks",
+            availableTasks: "available tasks",
+            completedTasks: "completed tasks",
             tags: "tags",
           },
 

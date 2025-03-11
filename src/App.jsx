@@ -183,19 +183,43 @@ function App() {
             </Suspense>
           }
         >
-          <Route
+          {/* <Route
             path="/admin/welcome"
             element={
               <Suspense fallback={<LoadingState />}>
                 <LazyDashboardHomePage />
               </Suspense>
             }
-          />
+          /> */}
           <Route
             path="/admin/userManagement"
             element={
               <Suspense fallback={<LoadingState />}>
                 <LazyAdminUserManagementPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/admin/userManagement/tasks"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <LazyUserTasksPage isAdmin={true} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/admin/userManagement/availableTasks"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <LazyAvailableTasksPage isAdmin={true} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/admin/userManagement/completedTasks"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <LazyCompletedUserTasksPage isAdmin={true} />
               </Suspense>
             }
           />

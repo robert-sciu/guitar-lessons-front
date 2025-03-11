@@ -20,10 +20,7 @@ import { useTranslation } from "react-i18next";
 import LoadingState from "../../../components/loadingState/loadingState";
 import styles from "./loginForm.module.scss";
 import InputElement from "../../../components/elements/inputElement/inputElement";
-import {
-  selectLoginPageLoaded,
-  setLoginPageLoaded,
-} from "../../../store/loadStateSlice";
+
 import Button from "../../../components/elements/button/button";
 import {
   isEmailValid,
@@ -47,7 +44,7 @@ export default function LoginForm() {
   const tokenVerificationComplete = useSelector(
     selectAuthTokenVerificationStatus
   );
-  const dataLoaded = useSelector(selectLoginPageLoaded);
+  // const dataLoaded = useSelector(selectLoginPageLoaded);
   const hasError = useSelector(selectAuthErrorStatus);
   const errorMessage = useSelector(selectAuthErrorMessage);
 
@@ -65,7 +62,7 @@ export default function LoginForm() {
     } else {
       setTimeout(() => {
         setShowLogin(true);
-        dispatch(setLoginPageLoaded());
+        // dispatch(setLoginPageLoaded());
       }, 300);
     }
   }, [loggedIn, tokenVerificationComplete, token, navigate, dispatch]);
@@ -124,7 +121,7 @@ export default function LoginForm() {
         />
       )}
 
-      <LoadingState fadeOut={showLogin} inactive={dataLoaded} />
+      <LoadingState fadeOut={showLogin} />
     </div>
   );
 }

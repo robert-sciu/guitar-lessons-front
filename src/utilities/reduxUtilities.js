@@ -25,6 +25,10 @@ export function checkAuthenticated(getState) {
   }
 }
 
+export function buildUserOrAdminUrl({ url, isAdmin, userId }) {
+  return `${isAdmin ? "/admin" : ""}${url}${userId ? "/" + userId : ""}`;
+}
+
 export function extractResponseData(response) {
   return response?.data?.data || response?.data?.message || "empty response";
 }

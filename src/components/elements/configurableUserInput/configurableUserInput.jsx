@@ -41,7 +41,7 @@ export default function ConfigurableUserInput({
     adjustableValueCurrent
   );
   const [savingValue, setSavingValue] = useState(false);
-  console.log(savingValue);
+
   const dispatch = useDispatch();
 
   useEffect(() => {

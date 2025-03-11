@@ -21,6 +21,7 @@ export default function DashboardNavLinks({
   onLogout,
   showAdminLink = false,
   showAdminNav = false,
+  selectedUser = null,
 }) {
   const { t } = useTranslation();
   return (
@@ -62,16 +63,38 @@ export default function DashboardNavLinks({
         )}
         {showAdminNav && (
           <>
-            <NavLinkBtn
+            {/* <NavLinkBtn
               to="/admin/welcome"
               label={t("dashboardNav.home")}
               icon={<HiOutlineHome />}
-            />
+            /> */}
             <NavLinkBtn
               to="/admin/userManagement"
               label={t("adminNav.users")}
               icon={<HiMiniUserGroup />}
             />
+            {selectedUser && (
+              <div className={styles.selectedUserSubMenu}>
+                <p className={styles.selectedUserTile}>
+                  User: {selectedUser.username}
+                </p>
+                <NavLinkBtn
+                  to={`/admin/userManagement/tasks`}
+                  label={t("adminNav.tasks")}
+                  icon={<HiOutlineInboxStack />}
+                />
+                <NavLinkBtn
+                  to={`/admin/userManagement/availableTasks`}
+                  label={t("adminNav.availableTasks")}
+                  icon={<HiMagnifyingGlassPlus />}
+                />
+                <NavLinkBtn
+                  to={`/admin/userManagement/completedTasks`}
+                  label={t("adminNav.completedTasks")}
+                  icon={<HiCheck />}
+                />
+              </div>
+            )}
             <NavLinkBtn
               to="/admin/taskManagement"
               label={t("adminNav.tasks")}
@@ -82,11 +105,16 @@ export default function DashboardNavLinks({
               label={t("adminNav.tags")}
               icon={<HiOutlineTag />}
             />
+            <NavLinkBtn
+              to="/admin/calendar"
+              label={t("adminNav.calendar")}
+              icon={<HiCalendarDays />}
+            />
           </>
         )}
         {showAdminLink && (
           <NavLinkBtn
-            to={showAdminNav ? "/dashboard/welcome" : "/admin/welcome"}
+            to={showAdminNav ? "/dashboard/welcome" : "/admin/userManagement"}
             label={t(
               showAdminNav ? "adminNav.dashboard" : "dashboardNav.admin"
             )}
@@ -110,4 +138,5 @@ DashboardNavLinks.propTypes = {
   onLogout: PropTypes.func.isRequired,
   showAdminLink: PropTypes.bool,
   showAdminNav: PropTypes.bool,
+  selectedUser: PropTypes.object,
 };

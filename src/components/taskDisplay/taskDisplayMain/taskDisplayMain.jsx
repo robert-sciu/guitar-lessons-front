@@ -20,6 +20,7 @@ import styles from "./taskDisplayMain.module.scss";
 import { debounce } from "lodash";
 import i18n from "../../../../config/i18n";
 import PropTypes from "prop-types";
+import { selectAdminUserSelectedUserId } from "../../../store/admin/adminUserInfoSlice";
 
 export default function TaskDisplayMain({ task, ...props }) {
   const language = i18n.language;
@@ -39,6 +40,7 @@ export default function TaskDisplayMain({ task, ...props }) {
 
   const taskToDeleteId = useSelector(selectUserTaskToDeleteId);
   const dataIsLoading = useSelector(selectUserTasksLoadingStatus);
+  const adminSelectedUserId = useSelector(selectAdminUserSelectedUserId);
 
   const dispatch = useDispatch();
   const { t } = useTranslation();
@@ -53,7 +55,13 @@ export default function TaskDisplayMain({ task, ...props }) {
   function handleAddTask(e) {
     e.preventDefault();
     setAddingTask(true);
-    dispatch(addUserTask({ task_id: task.id }));
+    dispatch(
+      addUserTask({
+        data: { task_id: task.id },
+        isAdmin: adminSelectedUserId ? true : false,
+        userId: adminSelectedUserId,
+      })
+    );
   }
 
   function handleDeleteTask(e) {

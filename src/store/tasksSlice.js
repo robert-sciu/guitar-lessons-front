@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
-  checkAuthenticated,
+  buildUserOrAdminUrl,
   downloadFile,
   extractResponseData,
   manageFulfilledState,
@@ -11,10 +11,11 @@ import apiClient from "../api/api";
 
 export const fetchAvailableTasks = createAsyncThunk(
   "tasks/fetchTasks",
-  async (_, { getState, rejectWithValue }) => {
+  async ({ isAdmin = false, userId = null }, { rejectWithValue }) => {
     try {
-      checkAuthenticated(getState);
-      const response = await apiClient.get("/tasks");
+      const response = await apiClient.get(
+        buildUserOrAdminUrl({ url: "/tasks", isAdmin, userId })
+      );
       return extractResponseData(response);
     } catch (error) {
       return rejectWithValue(extractResponseData(error));
@@ -24,9 +25,8 @@ export const fetchAvailableTasks = createAsyncThunk(
 
 export const downloadTaskFile = createAsyncThunk(
   "tasks/downloadTaskFile",
-  async (data, { getState, rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      checkAuthenticated(getState);
       const response = await apiClient.get("/tasks/download", {
         params: { filename: data.filename },
       });
